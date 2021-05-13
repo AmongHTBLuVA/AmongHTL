@@ -6,8 +6,11 @@ var io = require("socket.io")(server);
 var playerPos = {};
 
 function copy(o) {
-    return JSON.parse(JSON.stringify(o));
+  return JSON.parse(JSON.stringify(o));
 }
+
+var needBorders = true;
+var Borders = [];
 
 const {
   getPlayerCollObj,
@@ -19,7 +22,7 @@ const {
 require("./router")(app);
 
 function getStartPoint(playerPos) {
-  let pos0 = { x: 1000, y: 50 };
+  let pos0 = { x: 50, y: 50 };
   if (Object.keys(playerPos).length == 0) {
     return pos0;
   }
@@ -55,33 +58,44 @@ function playerCollision(collObjs, id, pos, playerPos) {
 
 io.on("connection", (socket) => {
   console.log("a user connected");
+  var readingBorders = false;
 
   socket.on("requestID", () => {
     console.log("SocketID: " + socket.id);
     playerPos[socket.id] = getStartPoint(playerPos);
     socket.emit("idReply", socket.id);
-
-    socket.emit("playerMovement", playerPos);
-    socket.broadcast.emit("playerMovement", playerPos);
+    console.log(needBorders);
+    if (needBorders) {
+      console.log("REquesting");
+      needBorders = false;
+      readingBorders = true;
+      socket.emit("RequestMapBorders", playerPos[socket.id]);
+    } else {
+      socket.emit("playerMovement", playerPos);
+      socket.broadcast.emit("playerMovement", playerPos);
+    }
   });
 
-  socket.on("authenticate", (id) => {
-    playerPos[socket.id] = getStartPoint(playerPos);
-
+  socket.on("ReplyMapBorders", (mapBorders) => {
+    Borders = copy(mapBorders);
+    readingBorders = false;
     socket.emit("playerMovement", playerPos);
     socket.broadcast.emit("playerMovement", playerPos);
   });
 
   socket.on("movementRequest", (deltapos, wallCollisionObj, id) => {
+    if (readingBorders) {
+      return;
+    }
     id = socket.id;
     let pos = playerPos[id];
     mergedPos = mergePos(deltapos, copy(pos));
     playerPos[id] = mergedPos;
     let collObjs = getPlayerCollObj(mergedPos, deltapos, id, playerPos);
-    if (!playerCollision(collObjs, id, pos, playerPos)){
-        if(!validCollision(wallCollisionObj, deltapos)){
-            playerPos[id] = pos;
-        }
+    if (!playerCollision(collObjs, id, pos, playerPos)) {
+      if (!validCollision(wallCollisionObj, deltapos)) {
+        playerPos[id] = pos;
+      }
     }
     socket.broadcast.emit("playerMovement", playerPos);
     socket.emit("playerMovement", playerPos);
@@ -89,6 +103,7 @@ io.on("connection", (socket) => {
 
   socket.on("disconnect", () => {
     let tmp = {};
+    needBorders = readingBorders;
     Object.keys(playerPos).forEach((e) => {
       if (e != socket.id) {
         tmp[e] = playerPos[e];
