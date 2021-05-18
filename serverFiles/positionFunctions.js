@@ -36,7 +36,7 @@ module.exports = {
             (left <= 0 && left >= -(hitbox * 2))) &&
           ((bottom >= 0 && bottom <= hitbox * 2) ||
             (top <= 0 && top >= -(hitbox * 2)));
-        console.log();
+        /*console.log();
         console.log("ID: " + id);
         console.log("right: " + right + " | " + rightCollision);
         console.log("left: " + left + " | " + leftCollision);
@@ -51,7 +51,7 @@ module.exports = {
             (bottom >= 0 && bottom <= hitbox * 2) +
             " [top]" +
             inside
-        );
+        );*/
         if (deltaPos.x == 0 && deltaPos.y == 0) {
           collision =
             collision ||
@@ -71,7 +71,7 @@ module.exports = {
             collision = collision || topCollision;
           }
         }
-        console.log("KOLLISIONE: " + collision);
+        //console.log("KOLLISIONE: " + collision);
         if (collision || inside) {
           let collObj = {
             id: idPos,
@@ -98,35 +98,35 @@ module.exports = {
   ) {
     var vPos = playerPos[collObj.victimId];
     var Backup = { v: copy(vPos), p: copy(pos) };
-    console.log();
+    /*console.log();
     console.log("victim: " + collObj.victimId);
     console.log("initiator POS: " + pos.x + "|" + pos.y);
-    console.log("victim POS: " + vPos.x + "|" + vPos.y);
+    console.log("victim POS: " + vPos.x + "|" + vPos.y);*/
     let breakLoop = false;
     victimCollObjs.forEach((victimCollObj) => {
-      console.log("VICTIM OBJ: " + victimCollObj);
+      //console.log("VICTIM OBJ: " + victimCollObj);
       if (!breakLoop) {
         if (victimCollObj.victimId == collObj.id) {
           if (collObj.bottom && victimCollObj.top) {
-            console.log("bottom");
+            //console.log("bottom");
             pos.y -= playerPushSpeed;
             vPos.y -= playerPushSpeed;
           } else if (collObj.top && victimCollObj.bottom) {
-            console.log("top");
+            //console.log("top");
             pos.y += playerPushSpeed;
             vPos.y += playerPushSpeed;
           }
           if (collObj.right && victimCollObj.left) {
-            console.log("right");
+            //console.log("right");
             pos.x -= playerPushSpeed;
             vPos.x -= playerPushSpeed;
           } else if (collObj.left && victimCollObj.right) {
-            console.log("left");
+            //console.log("left");
             pos.x += playerPushSpeed;
             vPos.x += playerPushSpeed;
           }
         } else {
-          console.log(
+          /*console.log(
             "victim coll: [bottom] " +
               victimCollObj.bottom +
               " [top] " +
@@ -136,7 +136,7 @@ module.exports = {
               " [left] " +
               victimCollObj.left
           );
-          console.log("victim coll: [inside] " + victimCollObj.inside);
+          console.log("victim coll: [inside] " + victimCollObj.inside);*/
           if (
             (collObj.bottom && victimCollObj.bottom) ||
             victimCollObj.inside
@@ -161,8 +161,8 @@ module.exports = {
         }
       }
     });
-    console.log("initiatorA POS: " + pos.x + "|" + pos.y);
-    console.log("victimA POS: " + vPos.x + "|" + vPos.y);
+    //console.log("initiatorA POS: " + pos.x + "|" + pos.y);
+    //console.log("victimA POS: " + vPos.x + "|" + vPos.y);
     let moveObj = { initiator: pos, victim: vPos };
     return moveObj;
   },
@@ -173,30 +173,5 @@ module.exports = {
       tmp.y = pos.y + deltaPos.y;
       return tmp;
     }
-  },
-  validCollision: function validCollision(wallCollisionObj, deltaPos) {
-    if (
-      (wallCollisionObj.topLeft && wallCollisionObj.topRight) &&
-      deltaPos.y < 0
-    ) {
-      return false;
-    } else if (
-      (wallCollisionObj.bottomLeft && wallCollisionObj.bottomRight) &&
-      deltaPos.y > 0
-    ) {
-      return false;
-    }
-    if (
-      (wallCollisionObj.topLeft && wallCollisionObj.bottomLeft) &&
-      deltaPos.x < 0
-    ) {
-      return false;
-    } else if (
-      (wallCollisionObj.bottomRight && wallCollisionObj.topRight) &&
-      deltaPos.x > 0
-    ) {
-      return false;
-    }
-    return true;
   },
 };
