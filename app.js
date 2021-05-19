@@ -12,6 +12,7 @@ function copy(o) {
 }
 
 var needBorders = true;
+var readingBorders = false;
 var BordersAbsolute = [];
 
 
@@ -44,18 +45,18 @@ function playerCollision(collObjs, id, pos, clientBorder) {
         playerPos[id] = pos;
         return;
       }
-      let wallCollObj = wallCollision(playerPos[collObj.victimId], clientBorder);
+      let wallCollObj = wallCollision(playerPos[collObj.victimId], clientBorder, -2);
       let victimColl = getPlayerCollObj(
         playerPos[collObj.victimId],
         { x: 0, y: 0 },
         collObj.victimId,
         playerPos
       );
-      if(wallCollObj.collision &&
-        ((wallCollObj.type.y && !collObj.top && !collObj.bottom) || 
-        (wallCollObj.type.x && !collObj.right && !collObj.left))){
-          console.log("collll: " + wallCollObj.collision);
-        return true;
+      if(wallCollObj.collision){
+        if((wallCollObj.collision.x && !collObj.top && !collObj.bottom) || 
+        (wallCollObj.collision.y && !collObj.right && !collObj.left)){
+          return true;
+        }
       }
       let moveObj = movePlayer(pos, collObj, victimColl, playerPos);
       playerPos[id] = moveObj.initiator;
@@ -65,66 +66,61 @@ function playerCollision(collObjs, id, pos, clientBorder) {
   }
 }
 
-function wallCollision(pos, clientBorder) {
+function wallCollision(pos, clientBorder, wallHitboxTol) {
+  if(wallHitboxTol == undefined || wallHitboxTol == null){
+    wallHitboxTol = 0;
+  }
   let border0 = false;
-  let colliding = false;
+  let colliding = {x: false, y: false};
   let distances = [];
   copy(clientBorder).forEach((b) => {
     if (border0) {
-      let dstObj = {dist: 0, type: {x: false, y:false}};
+      let dst = 0;
       if (border0.y - b.y >= -1 && Math.abs(border0.y - b.y) <= 2) {
-        //When wall no Clip change -1 /
-        dstObj.dist = border0.y - pos.y;
-        dstObj.type.y = true; 
+        //When wall no Clip change -1 / 2
+        dst = border0.y - pos.y;
         if (
-          border0.y - pos.y >= 0 &&
+          border0.y - pos.y >= wallHitboxTol &&
           border0.y - pos.y <= hitbox &&
           ((border0.x - (pos.x + hitbox) <= 0 && b.x - pos.x >= 0) ||
             (border0.x - (pos.x + hitbox) >= 0 && b.x - pos.x <= 0) ||
             (border0.x - pos.x <= 0 && b.x - (pos.x + hitbox) >= 0) ||
             (border0.x - pos.x >= 0 && b.x - (pos.x + hitbox) <= 0))
         ) {
-          colliding = true;
+          colliding.y = true;
         }
       } if (border0.x - b.x >= -1 && Math.abs(border0.x - b.x) <= 2) {
         //When wall no Clip change -1 / 2
-        dstObj.dist = border0.x - pos.x;
-        dstObj.type.x = true;
+        dst = border0.x - pos.x;
         if (
-          border0.x - pos.x >= 0 &&
+          border0.x - pos.x >= wallHitboxTol &&
           border0.x - pos.x <= hitbox &&
           ((border0.y - (pos.y + hitbox) <= 0 && b.y - pos.y >= 0) ||
             (border0.y - (pos.y + hitbox) >= 0 && b.y - pos.y <= 0) ||
             (border0.y - pos.y <= 0 && b.y - (pos.y + hitbox) >= 0) ||
             (border0.y - pos.y >= 0 && b.y - (pos.y + hitbox) <= 0))
         ) {
-          colliding = true;
+          colliding.x = true;
         }
       }
-      distances.push(copy(dstObj));
+      distances.push(copy(dst));
     }
     border0 = b;
   });
-  if(distances[0] == undefined){
-    return { collision: false, minDistance: 0, type: null};
+  if(distances[0] == undefined || (!colliding.x && !colliding.y)){
+    return { collision: false, minDistance: 0};
   }
-  let minDist = copy(distances[0]);
+  let minDist = Math.abs(copy(distances[0]));
   distances.forEach((d) => {
-    if (minDist.dist > Math.abs(d.dist)) {
-      let cpD = copy(d);
-      cpD.dist = Math.abs(cpD.dist)
-      minDist = copy(cpD);
+    if (minDist > Math.abs(d)) {
+      minDist = Math.abs(copy(d));
     }
   });
-  console.log("mindist obj: " + minDist);
-  console.log("mindist type: " + minDist.type);
-  console.log("mindist: " + minDist.type.x + " | " + minDist.type.y);
-  return { collision: colliding, minDistance: minDist.dist, type: copy(minDist.type)};
+  return { collision: colliding, minDistance: minDist};
 }
 
 io.on("connection", (socket) => {
   console.log("a user connected");
-  var readingBorders = false;
   var clientBorders = [];
   var movesTillCheck = 0;
 
@@ -145,12 +141,11 @@ io.on("connection", (socket) => {
   });
 
   socket.on("stillReading", (borderTmp, searchDirection, cpPos) => {
-    console.log("conitnue: " + cpPos);
     socket.emit("continueReading", borderTmp, searchDirection, cpPos);
   });
 
   socket.on("connect_timeout", () => {
-    console.log("connection timeout");
+    console.log("["+ socket.id +"] connection timeout");
   });
 
   socket.on("movementRequest", (deltapos, id) => {
@@ -178,9 +173,8 @@ io.on("connection", (socket) => {
   });
 
   socket.on("authenticated", () => {
-    console.log("Borders Needed: " + needBorders);
     if (needBorders) {
-      console.log("REquesting");
+      console.log("Requesting");
       needBorders = false;
       readingBorders = true;
       setTimeout(() => {
