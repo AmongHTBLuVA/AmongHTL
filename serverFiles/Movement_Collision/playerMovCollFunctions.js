@@ -1,13 +1,21 @@
-const hitbox = 30;
+const hitbox = 60;
 
-const playerPushSpeed = 1;
+const playerPushSpeed = 0.5;
 
 function copy(o) {
   return JSON.parse(JSON.stringify(o));
 }
 
+function round(x) {
+  const parsed = parseInt(x, 10);
+  if (isNaN(parsed)) {
+    return 0;
+  }
+  return parsed;
+}
+
 module.exports = {
-  getPlayerCollObj: function playerCollision(pos, deltaPos, idPos, playerPos) {
+  getPlayerCollObj: function getCollisionObject(pos, deltaPos, idPos, playerPos) {
     if (
       playerPos == null ||
       playerPos == undefined ||
@@ -22,20 +30,20 @@ module.exports = {
     Object.keys(playerPos).forEach((id) => {
       if (id != idPos) {
         let element = playerPos[id];
-        let right = element.x - (pos.x - hitbox * 2);
-        let left = element.x - hitbox * 2 - pos.x;
-        let bottom = element.y + hitbox * 2 - pos.y;
-        let top = element.y - (pos.y + hitbox * 2);
+        let right = round(element.x - (pos.x - hitbox));
+        let left = round(element.x - hitbox - pos.x);
+        let bottom = round(element.y + hitbox - pos.y);
+        let top = round(element.y - (pos.y + hitbox));
 
-        let rightCollision = right == 0 && top <= 0 && top >= -hitbox * 4;
-        let leftCollision = left == 0 && top <= 0 && top >= -hitbox * 4;
-        let topCollision = top == 0 && left <= 0 && left >= -(hitbox * 4);
-        let bottomCollision = bottom == 0 && left <= 0 && left >= -hitbox * 4;
+        let rightCollision = right == 0 && top <= 0 && top >= -hitbox * 2;
+        let leftCollision = left == 0 && top <= 0 && top >= -hitbox * 2;
+        let topCollision = top == 0 && left <= 0 && left >= -(hitbox * 2);
+        let bottomCollision = bottom == 0 && left <= 0 && left >= -hitbox * 2;
         let inside =
-          ((right >= 0 && right <= hitbox * 2) ||
-            (left <= 0 && left >= -(hitbox * 2))) &&
-          ((bottom >= 0 && bottom <= hitbox * 2) ||
-            (top <= 0 && top >= -(hitbox * 2)));
+          ((right >= 0 && right <= hitbox) ||
+            (left <= 0 && left >= -(hitbox))) &&
+          ((bottom >= 0 && bottom <= hitbox) ||
+            (top <= 0 && top >= -(hitbox)));
         /*console.log();
         console.log("ID: " + id);
         console.log("right: " + right + " | " + rightCollision);
@@ -44,11 +52,11 @@ module.exports = {
         console.log("bottom: " + bottom + " | " + bottomCollision);
         console.log(
           "inside: [right] " +
-            (right >= 0 && right <= hitbox * 2) +
+            (right >= 0 && right <= hitbox) +
             " [left] " +
-            (left <= 0 && left >= hitbox * 2) +
+            (left <= 0 && left >= hitbox) +
             " [bottom] " +
-            (bottom >= 0 && bottom <= hitbox * 2) +
+            (bottom >= 0 && bottom <= hitbox) +
             " [top]" +
             inside
         );*/
@@ -90,7 +98,7 @@ module.exports = {
     });
     return collObjs;
   },
-  movePlayer: function playerCollision(
+  movePlayer: function movePlayer(
     pos,
     collObj,
     victimCollObjs,
@@ -169,8 +177,8 @@ module.exports = {
   mergePos: function mergePos(deltaPos, pos) {
     if (pos != undefined) {
       let tmp = { x: 0, y: 0 };
-      tmp.x = pos.x + deltaPos.x;
-      tmp.y = pos.y + deltaPos.y;
+      tmp.x = round(pos.x + deltaPos.x);
+      tmp.y = round(pos.y + deltaPos.y);
       return tmp;
     }
   },

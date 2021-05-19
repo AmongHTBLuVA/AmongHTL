@@ -12,6 +12,14 @@ function translateBorderPosBack(pos) {
   };
 }
 
+function drawBorders(pos0, pos1) {
+  ctx.strokeStyle = "#FF0000";
+  ctx.beginPath();
+  ctx.moveTo(pos0.x, pos0.y);
+  ctx.lineTo(pos1.x, pos1.y);
+  ctx.stroke();
+}
+
 function getMapStartPoint(pos) {
   let cpPos = copy(pos);
   let Borders = [];
@@ -161,4 +169,34 @@ function getSearchDirection(pos) {
     searchDirection.checkDeltaY = -1;
   }
   return searchDirection;
+}
+
+function round(x) {
+  const parsed = parseInt(x, 10);
+  if (isNaN(parsed)) {
+    return 0;
+  }
+  return parsed;
+}
+
+function isWall(x, y) {
+  let pix = getPixel(x, y);
+  //console.log("PIX: " + pix[0] + " | " + pix[1] + " | " + pix[2]);
+  return pix[0] > 0 && pix[1] > 0 && pix[2] > 0;
+}
+
+function getPixel(x, y) {
+  height = window.innerHeight;
+  width = window.innerWidth;
+  var imgd = ctx.getImageData(x, y, width, height);
+  var pix = imgd.data;
+
+  // Loop over each pixel and invert the color.
+  for (var i = 0, n = pix.length; i < n; i += 4) {
+    pix[i] = 255 - pix[i]; // red
+    pix[i + 1] = 255 - pix[i + 1]; // green
+    pix[i + 2] = 255 - pix[i + 2]; // blue
+    // i+3 is alpha (the fourth element)
+  }
+  return pix;
 }
