@@ -1,52 +1,66 @@
 module.exports = function (app) {
-	
-//html
+  //html
 
-    app.get('/', function(req, res) {
-        res.sendFile('/public/index.html', {root: 'clientFiles' });
-    });
-    
-//scripts
+  app.get("/", function (req, res) {
+    res.sendFile("/public/index.html", { root: "clientFiles" });
+  });
 
-    app.get('/main.js', function(req, res) {
-        res.sendFile('/src/main.js', {root: 'clientFiles' });
-    });
+  app.get("/game", function (req, res) {
+    res.sendFile("/public/game.html", { root: "clientFiles" });
+  });
 
-    app.get('/socket.js', function(req, res) {
-        res.sendFile('/src/socket.js', {root: 'clientFiles' });
-    });
+  //scripts
 
-    app.get('/Events.js', function(req, res) {
-        res.sendFile('/src/Events.js', {root: 'clientFiles' });
-    });
+  app.get("/main.js", function (req, res) {
+    res.sendFile("/src/main.js", { root: "clientFiles" });
+  });
 
-    //Movement Collision Scripts
-    app.get('/borderFunctions.js', function(req, res) {
-        res.sendFile('/src/Movement_Collision/borderFunctions.js', {root: 'clientFiles' });
-    });
+  app.get("/socket.js", function (req, res) {
+    res.sendFile("/src/socket.js", { root: "clientFiles" });
+  });
 
-    app.get('/movement.js', function(req, res) {
-        res.sendFile('/src/Movement_Collision/movement.js', {root: 'clientFiles' });
-    });
+  app.get("/Events.js", function (req, res) {
+    res.sendFile("/src/Events.js", { root: "clientFiles" });
+  });
 
-    app.get('/MovementCollisionEvents.js', function(req, res) {
-        res.sendFile('/src/Movement_Collision/MovementCollisionEvents.js', {root: 'clientFiles' });
+  //Movement Collision Scripts
+  app.get("/borderFunctions.js", function (req, res) {
+    res.sendFile("/src/Movement_Collision/borderFunctions.js", {
+      root: "clientFiles",
     });
+  });
 
-//css
+  app.get("/movement.js", function (req, res) {
+    res.sendFile("/src/Movement_Collision/movement.js", {
+      root: "clientFiles",
+    });
+  });
 
-    
-//images
+  app.get("/MovementCollisionEvents.js", function (req, res) {
+    res.sendFile("/src/Movement_Collision/MovementCollisionEvents.js", {
+      root: "clientFiles",
+    });
+  });
 
-    app.get('/Wieser.png', function(req, res) {
-        res.sendFile('/images/Wieser.png', {root: 'serverFiles' });
+  //css
+
+  app.get("/lobbyStyles.css", function (req, res) {
+    res.sendFile("/public/css/lobbyStyles.css", {
+      root: "clientFiles",
     });
-    
-    app.get('/testmap.png', function(req, res) {
-        res.sendFile('/images/testmap.png', {root: 'serverFiles' });
-    });
-    
-    app.get('/testmapKlein.png', function(req, res) {
-        res.sendFile('/images/testmapKlein.png', {root: 'serverFiles' });
-    });
+  });
+
+  //images
+
+  app.get("/Wieser.png", function (req, res) {
+    res.sendFile("/images/Wieser.png", { root: "serverFiles" });
+  });
+
+  app.get("/testmap.png", function (req, res) {
+    res.sendFile("/images/testmap.png", { root: "serverFiles" });
+  });
+
+  app.get("/testmapKlein.png", function (req, res) {
+    res.sendFile("/images/testmapKlein.png", { root: "serverFiles" });
+  });
 };

@@ -36,7 +36,7 @@ io.on("connection", (socket) => {
       needBorders = false;
       readingBorders = true;
       setTimeout(() => {
-        socket.emit("RequestMapBorders");
+        //socket.emit("RequestMapBorders");
       }, 1000);
     } else {
       socket.emit("translateBorders", BordersAbsolute);
