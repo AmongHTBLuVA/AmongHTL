@@ -1,3 +1,4 @@
+import {socket} from "/script/socket.js"
 
 document.addEventListener("keydown", function (event) {
     if (event.keyCode == 87) {

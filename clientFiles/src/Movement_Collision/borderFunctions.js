@@ -1,3 +1,5 @@
+import {socket} from "/script/socket.js"
+
 function translateBorderPos(pos) {
   return {
     x: round(pos.x * (window.width / background.width)),
@@ -47,11 +49,6 @@ function getMapStartPoint(pos) {
     copy(cpPos)
   );
 }
-
-socket.on("continueReading", (Borders, searchDirection, cpPos) => {
-  console.log("conitnue: " + cpPos);
-  readMapBorders(Borders, searchDirection, cpPos);
-});
 
 function readMapBorders(Borders, searchDirection, cpPos) {
   while (

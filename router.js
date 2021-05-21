@@ -11,32 +11,36 @@ module.exports = function (app) {
 
   //scripts
 
-  app.get("/main.js", function (req, res) {
+  app.get("/script/main.js", function (req, res) {
     res.sendFile("/src/main.js", { root: "clientFiles" });
   });
 
-  app.get("/socket.js", function (req, res) {
+  app.get("/script/socket.js", function (req, res) {
     res.sendFile("/src/socket.js", { root: "clientFiles" });
   });
 
-  app.get("/Events.js", function (req, res) {
+  app.get("/script/lobby.js", function (req, res) {
+    res.sendFile("/src/lobby.js", { root: "clientFiles" });
+  });
+
+  app.get("/script/Events.js", function (req, res) {
     res.sendFile("/src/Events.js", { root: "clientFiles" });
   });
 
   //Movement Collision Scripts
-  app.get("/borderFunctions.js", function (req, res) {
+  app.get("/script/borderFunctions.js", function (req, res) {
     res.sendFile("/src/Movement_Collision/borderFunctions.js", {
       root: "clientFiles",
     });
   });
 
-  app.get("/movement.js", function (req, res) {
+  app.get("/script/movement.js", function (req, res) {
     res.sendFile("/src/Movement_Collision/movement.js", {
       root: "clientFiles",
     });
   });
 
-  app.get("/MovementCollisionEvents.js", function (req, res) {
+  app.get("/script/MovementCollisionEvents.js", function (req, res) {
     res.sendFile("/src/Movement_Collision/MovementCollisionEvents.js", {
       root: "clientFiles",
     });
@@ -44,7 +48,7 @@ module.exports = function (app) {
 
   //css
 
-  app.get("/lobbyStyles.css", function (req, res) {
+  app.get("/style/lobbyStyles.css", function (req, res) {
     res.sendFile("/public/css/lobbyStyles.css", {
       root: "clientFiles",
     });
@@ -52,15 +56,15 @@ module.exports = function (app) {
 
   //images
 
-  app.get("/Wieser.png", function (req, res) {
+  app.get("/img/Wieser.png", function (req, res) {
     res.sendFile("/images/Wieser.png", { root: "serverFiles" });
   });
 
-  app.get("/testmap.png", function (req, res) {
+  app.get("/img/testmap.png", function (req, res) {
     res.sendFile("/images/testmap.png", { root: "serverFiles" });
   });
 
-  app.get("/testmapKlein.png", function (req, res) {
+  app.get("/img/testmapKlein.png", function (req, res) {
     res.sendFile("/images/testmapKlein.png", { root: "serverFiles" });
   });
 };

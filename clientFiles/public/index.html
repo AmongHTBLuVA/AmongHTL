@@ -5,18 +5,34 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <link rel="preconnect" href="https://fonts.gstatic.com" />
-    <link rel="stylesheet" href="/lobbyStyles.css" />
+    <link rel="stylesheet" href="/style/lobbyStyles.css" />
+    <script src="//code.jquery.com/jquery-1.12.0.min.js"></script>
+    <script src="//code.jquery.com/jquery-migrate-1.2.1.min.js"></script>
+    <script type="module" src="/script/lobby.js"></script>
+    <script type="module" src="/script/Events.js"></script>
+    <!--Event files needs to be last-->
     <title>AmongHTL - Lobby</title>
   </head>
   <body>
-    <div class="container">
+    <div class="userNamePopup">
+      <div class="nameInputConatiner">
+        <p>User Name:</p>
+        <input type="text" class="userNameInput" />
+      </div>
+      <input type="button" value="Confirm" id="confUserNameBtn"/>
+    </div>
+    <div class="container popUpBackground">
       <h1>AMONG HTL</h1>
       <div class="keySection">
         <div class="keyContainer">
           <p>Room Key:</p>
-          <p>L33S1</p>
+          <p id="roomKey">-</p>
         </div>
-        <span class="info">🛈</span>
+        <span
+          class="info"
+          title="To join another room just paste the room key in the url"
+          >🛈</span
+        >
       </div>
       <div class="playerJoined">
         <p>get some Friends</p>

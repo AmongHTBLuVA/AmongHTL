@@ -1,3 +1,5 @@
+import {socket} from "/script/socket.js"
+
 socket.on("drawBorders", (Borders, pos) => {
   let b0;
   Borders.forEach((b) => {
@@ -47,4 +49,9 @@ socket.on("translateBorders", (Borders) => {
     tmp.push(translateBorderPos(copy(b)));
   });
   socket.emit("replyTranslatedBorders", tmp);
+});
+
+socket.on("continueReading", (Borders, searchDirection, cpPos) => {
+  console.log("conitnue: " + cpPos);
+  readMapBorders(Borders, searchDirection, cpPos);
 });

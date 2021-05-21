@@ -3,11 +3,14 @@
 body{
     margin: 0px;
     background-color: #222222;
-
     color: #FFF;
     font-family: 'Poppins';
     font-weight: 200;
     user-select: none;
+}
+
+.popUpBackground{
+    opacity: 10%;
 }
 
 h1{
@@ -16,6 +19,46 @@ h1{
     text-shadow: 5px 5px 3px black ;
     margin-bottom: 0px;
     text-align: center;
+}
+
+.nameInputConatiner{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.userNameInput{
+    height: 30px;
+    width: 200px;
+    font-size: 15pt;
+}
+
+.userNamePopup p{
+    margin: 5px;
+}
+
+#confUserNameBtn{
+    width: 150px;
+    height: 30px;
+    margin-top: 20px;
+}
+
+.userNamePopup{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    z-index: 2;
+    background-color: #303030;
+    opacity: 100%;
+    width: 500px;
+    height: 200px;
+    border-radius: 10px;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    font-size: 15pt;
+    transform: translate(-50%, -50%);
 }
 
 .container{
@@ -31,6 +74,7 @@ h1{
 
 .playerJoined{
     display: flex;
+    flex-direction: column;
     justify-content: center;
     align-items: center;
     margin-top: 20px;
@@ -39,6 +83,11 @@ h1{
     width: 500px;
     background-color: #303030;
     border-radius: 5px;
+    padding: 10px;
+}
+
+.playerJoined p{
+    margin: 5px;
 }
 
 .startBtn{
@@ -90,4 +139,5 @@ h1{
     font-size: 25pt;
     margin-left: 20px;
     user-select: text;
+    height: 50px;
 }
