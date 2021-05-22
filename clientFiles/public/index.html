@@ -6,6 +6,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <link rel="preconnect" href="https://fonts.gstatic.com" />
     <link rel="stylesheet" href="/style/lobbyStyles.css" />
+    <link rel="stylesheet" href="/style/userNameInput.css" />
+    <link rel="stylesheet" href="/style/buffer.css" />
     <script src="//code.jquery.com/jquery-1.12.0.min.js"></script>
     <script src="//code.jquery.com/jquery-migrate-1.2.1.min.js"></script>
     <script type="module" src="/script/lobby.js"></script>
@@ -14,31 +16,51 @@
     <title>AmongHTL - Lobby</title>
   </head>
   <body>
-    <div class="userNamePopup">
-      <div class="nameInputConatiner">
-        <p>User Name:</p>
-        <input type="text" class="userNameInput" />
-      </div>
-      <input type="button" value="Confirm" id="confUserNameBtn"/>
+    <div class="loading">
+        <div class="loader"></div>
     </div>
-    <div class="container popUpBackground">
-      <h1>AMONG HTL</h1>
-      <div class="keySection">
-        <div class="keyContainer">
-          <p>Room Key:</p>
-          <p id="roomKey">-</p>
+    <div class="content-wrapper hide">
+      <div class="userNamePopup">
+        <div class="nameInputConatiner">
+          <div class="form__group field">
+            <input
+              maxlength="25"
+              autocomplete="false"
+              type="input"
+              class="form__field"
+              placeholder="Name"
+              name="name"
+              id="name"
+              required
+            />
+            <label for="name" class="form__label">Name</label>
+          </div>
+          <span class="arrow" id="confUserNameBtn"></span>
         </div>
-        <span
-          class="info"
-          title="To join another room just paste the room key in the url"
-          >🛈</span
-        >
       </div>
-      <div class="playerJoined">
-        <p>get some Friends</p>
+      <div class="name">
+        <p id="userNameLabel" class="hide">Username:</p>
+        <p id="username"></p>
       </div>
-      <div class="btnContainer">
-        <input type="button" value="START" class="startBtn" />
+      <div class="container popUpBackground">
+        <h1>AMONG HTL</h1>
+        <div class="keySection">
+          <div class="keyContainer">
+            <p>Room Key:</p>
+            <p id="roomKey">-</p>
+          </div>
+          <span
+            class="info"
+            title="To join another room just paste the room key in the url"
+            >🛈</span
+          >
+        </div>
+        <div class="playerJoined">
+          <p>get some Friends</p>
+        </div>
+        <div class="btnContainer">
+          <input type="button" value="START" class="startBtn" />
+        </div>
       </div>
     </div>
   </body>

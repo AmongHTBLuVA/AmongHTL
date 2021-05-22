@@ -1,4 +1,4 @@
-import {socket, setId} from "/script/socket.js"
+import { socket, setId, getName } from "/script/socket.js";
 
 socket.on("connect", () => {
   /*
@@ -11,14 +11,14 @@ socket.on("connect", () => {
   setInterval(tick, tickIntervall);*/
 });
 
-socket.on("disconnect", () => {
-  console.log("Disconnected;");
-  window.clearInterval();
-});
-
-socket.on("sendClientId", (id) => {
+socket.on("sendClientId", (id, absId) => {
   setId(id);
-  console.log();
+  let prevAbsId = localStorage.getItem("absID");
+  if(prevAbsId){
+    socket.emit("checkPreviousLogOn", prevAbsId);
+  }else{
+    localStorage.setItem("absID", absId);
+  }
   /*height = window.innerHeight;
   width = window.innerWidth;
   canvas.width = width;

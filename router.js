@@ -53,7 +53,19 @@ module.exports = function (app) {
       root: "clientFiles",
     });
   });
+  
+  app.get("/style/userNameInput.css", function (req, res) {
+    res.sendFile("/public/css/userNameInput.css", {
+      root: "clientFiles",
+    });
+  });
 
+  app.get("/style/buffer.css", function (req, res) {
+    res.sendFile("/public/css/buffer.css", {
+      root: "clientFiles",
+    });
+  });
+  
   //images
 
   app.get("/img/Wieser.png", function (req, res) {
