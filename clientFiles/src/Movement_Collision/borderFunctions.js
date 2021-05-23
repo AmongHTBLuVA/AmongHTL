@@ -1,16 +1,28 @@
-import {socket} from "/script/socket.js"
+import {socket, getId} from "/script/socket.js"
+import {
+  background,
+  ctx,
+  canvas,
+  copy,
+  setWidth,
+  getWidth,
+  getHeight,
+  setHeight,
+} from "/script/main.js";
 
 function translateBorderPos(pos) {
+  console.log("Back: " + background.width + " | " + background.height);
+  console.log("window: " + window.innerWidth + " | " + window.innerHeight);
   return {
-    x: round(pos.x * (window.width / background.width)),
-    y: round(pos.y * (window.height / background.height)),
+    x: round(pos.x * (window.innerWidth / background.width)),
+    y: round(pos.y * (window.innerHeight / background.height)),
   };
 }
 
 function translateBorderPosBack(pos) {
   return {
-    x: round(pos.x / (window.width / background.width)),
-    y: round(pos.y / (window.height / background.height)),
+    x: round(pos.x / (window.innerWidth / background.width)),
+    y: round(pos.y / (window.innerHeight / background.height)),
   };
 }
 
@@ -28,7 +40,7 @@ function getMapStartPoint(pos) {
 
   ctx.strokeStyle = "#FF0000";
   console.log("ReadMap");
-  console.log("Client ID: " + Clientid);
+  console.log("Client ID: " + getId());
   let multiplyer = 1;
   while (!isWall(cpPos.x - 1, cpPos.y)) {
     cpPos.x -= 1 * multiplyer;
@@ -71,10 +83,10 @@ function readMapBorders(Borders, searchDirection, cpPos) {
     Borders[0].y == cpPos.y
   ) {
     console.log("break!;");
-    height = window.innerHeight;
-    width = window.innerWidth;
-    canvas.width = width;
-    canvas.height = height;
+    setHeight(window.innerHeight);
+    setWidth(window.innerWidth);
+    canvas.width = getWidth();
+    canvas.height = getHeight();
     socket.emit("ReplyMapBorders", Borders);
     return;
   }
@@ -183,9 +195,9 @@ function isWall(x, y) {
 }
 
 function getPixel(x, y) {
-  height = window.innerHeight;
-  width = window.innerWidth;
-  var imgd = ctx.getImageData(x, y, width, height);
+  setHeight(window.innerHeight);
+  setWidth(window.innerWidth);
+  var imgd = ctx.getImageData(x, y, getWidth(), getHeight());
   var pix = imgd.data;
 
   // Loop over each pixel and invert the color.
@@ -197,3 +209,5 @@ function getPixel(x, y) {
   }
   return pix;
 }
+
+export {translateBorderPos, translateBorderPosBack ,getMapStartPoint, readMapBorders}

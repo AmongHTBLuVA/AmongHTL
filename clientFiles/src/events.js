@@ -1,14 +1,6 @@
-import { socket, setId, getName } from "/script/socket.js";
+import { socket, setId, setName } from "/script/socket.js";
 
 socket.on("connect", () => {
-  /*
-  canvas = document.getElementById("canvas");
-  ctx = canvas.getContext("2d");
-  player.width = 70;
-  player.height = 70;
-  player.src = playerImageUrl;
-  background.src = backgroundImageUrl;
-  setInterval(tick, tickIntervall);*/
 });
 
 socket.on("sendClientId", (id, absId) => {
@@ -17,10 +9,33 @@ socket.on("sendClientId", (id, absId) => {
   if(prevAbsId){
     socket.emit("checkPreviousLogOn", prevAbsId);
   }else{
+    console.log("RIP: " + prevAbsId);
     localStorage.setItem("absID", absId);
   }
-  /*height = window.innerHeight;
-  width = window.innerWidth;
-  canvas.width = width;
-  canvas.height = height;*/
 });
+
+socket.on("checkLogOn", (oldName, absID) => {
+  console.log("name: " + oldName);
+  if(oldName){
+    logOn(oldName);
+  }else{
+    localStorage.setItem("absID", absID);
+  }
+});
+
+function logOn(userName) {
+  $(".userNamePopup").hide();
+  $(".container").removeClass("popUpBackground");
+  $("#username").html(userName);
+  $("#userNameLabel").removeClass("hide");
+  let path = window.location.pathname;
+  let key = path.substr(1, path.length - 1);
+  setName(userName);
+  socket.emit(
+    "authenticated",
+    userName,
+    key
+  );
+}
+
+export {logOn};

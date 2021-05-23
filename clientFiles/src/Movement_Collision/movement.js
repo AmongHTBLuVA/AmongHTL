@@ -1,4 +1,22 @@
-import {socket} from "/script/socket.js"
+import {socket, getId} from "/script/socket.js"
+import {
+  player,
+  background,
+  ctx,
+  canvas,
+  getWidth,
+  getHeight,
+} from "/script/main.js";
+
+var keyPressed = { w: false, s: false, d: false, a: false };
+
+function round(x) {
+  const parsed = parseInt(x, 10);
+  if (isNaN(parsed)) {
+    return 0;
+  }
+  return parsed;
+}
 
 document.addEventListener("keydown", function (event) {
     if (event.keyCode == 87) {
@@ -61,19 +79,20 @@ document.addEventListener("keydown", function (event) {
   }
   
   function requestMovement(deltaPos) {
-    socket.emit("movementRequest", deltaPos, Clientid);
+    socket.emit("movementRequest", deltaPos, getId());
   }
   
   function setPlayerPositions(playerPos) {
-    height = window.innerHeight;
-    width = window.innerWidth;
     ctx.clearRect(0, 0, canvas.width, canvas.height);
-    let pos = playerPos[Clientid];
-    let backgroundPos = translateMapPosistion(playerPos[Clientid]);
-    ctx.drawImage(background, backgroundPos.x, backgroundPos.y, width, height);
-    ctx.drawImage(player, round(width / 2) - 30, round(height / 2) - 30, 70, 70);
+    Object.keys(playerPos).forEach(p => {
+      console.log("Player: " + p + " | " + playerPos[p].x + "/" +playerPos[p].y);
+    });
+    let pos = playerPos[getId()];
+    let backgroundPos = translateMapPosistion(playerPos[getId()]);
+    ctx.drawImage(background, backgroundPos.x, backgroundPos.y, getWidth(), getHeight());
+    ctx.drawImage(player, round(getWidth() / 2) - 30, round(getHeight() / 2) - 30, 70, 70);
     Object.keys(playerPos).forEach((id) => {
-      if (id != Clientid) {
+      if (id != getId()) {
         let relativPos = translatePlayerPosistion(playerPos[id], pos);
         ctx.drawImage(player, relativPos.x, relativPos.y, 70, 70);
       }
@@ -84,18 +103,16 @@ document.addEventListener("keydown", function (event) {
     if (bpos == undefined) {
       return false;
     }
-    height = window.innerHeight;
-    width = window.innerWidth;
     return {
-      x: -bpos.x + (round(width / 2) - 30),
-      y: -bpos.y + (round(height / 2) - 30),
+      x: -bpos.x + (round(getWidth() / 2) - 30),
+      y: -bpos.y + (round(getHeight() / 2) - 30),
     };
   }
   
   function translatePlayerPosistion(ppos, cpos) {
-    height = window.innerHeight;
-    width = window.innerWidth;
     let xdiff = ppos.x - cpos.x;
     let ydiff = ppos.y - cpos.y;
-    return { x: width / 2 - 30 + xdiff, y: height / 2 - 30 + ydiff };
+    return { x: getWidth() / 2 - 30 + xdiff, y: getHeight() / 2 - 30 + ydiff };
   }
+
+export {getDeltaPos, requestMovement, setPlayerPositions}

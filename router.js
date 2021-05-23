@@ -5,7 +5,7 @@ module.exports = function (app) {
     res.sendFile("/public/index.html", { root: "clientFiles" });
   });
 
-  app.get("/game", function (req, res) {
+  app.get("/game/:room", function (req, res) {
     res.sendFile("/public/game.html", { root: "clientFiles" });
   });
 
@@ -26,7 +26,6 @@ module.exports = function (app) {
   app.get("/script/Events.js", function (req, res) {
     res.sendFile("/src/Events.js", { root: "clientFiles" });
   });
-
   //Movement Collision Scripts
   app.get("/script/borderFunctions.js", function (req, res) {
     res.sendFile("/src/Movement_Collision/borderFunctions.js", {

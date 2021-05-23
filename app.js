@@ -17,13 +17,13 @@ const {
 } = require("./serverFiles/evaluationFuctions.js");
 
 var playerPos = {};
-var needBorders = true;
-var readingBorders = false;
-var BordersAbsolute = [];
+var readingBorders = {};
+var BordersAbsolute = {};
 
 var openLobbies = {};
+var activeGames = {};
 
-var lastDisconnect = undefined;
+var connectedUsers = {};
 
 function copy(o) {
   return JSON.parse(JSON.stringify(o));
@@ -46,7 +46,6 @@ io.on("connection", (socket) => {
   var clientName = undefined;
   var movesTillCheck = 0;
 
-  playerPos[socket.id] = getStartPoint(playerPos);
   let timeNow = new Date();
   let absClientId =
     timeNow.getMinutes().toString(16) +
@@ -59,13 +58,14 @@ io.on("connection", (socket) => {
   socket.emit("sendClientId", socket.id, absClientId);
 
   socket.on("checkPreviousLogOn", (prevAbsId) => {
-    if (prevAbsId && lastDisconnect) {
-      console.log("DRIN! " + (Date.now() - lastDisconnect.time) + " | " + lastDisconnect.absUserId + " = "+ prevAbsId);
-      console.log((lastDisconnect.absUserId == prevAbsId));
-      if (Date.now() - lastDisconnect.time < 800 && lastDisconnect.absUserId == prevAbsId){
+    if (prevAbsId && connectedUsers[prevAbsId]) {
+      if (
+        Date.now() - connectedUsers[prevAbsId].dctime < 800 &&
+        connectedUsers[prevAbsId].absUserId == prevAbsId
+      ) {
         absClientId = prevAbsId;
-        clientName = lastDisconnect.name;
-        console.log("NAME; " + clientName);
+        clientName = connectedUsers[prevAbsId].name;
+        connectedUsers[prevAbsId].dctime = undefined;
         socket.emit("checkLogOn", clientName, absClientId);
         return;
       }
@@ -74,43 +74,63 @@ io.on("connection", (socket) => {
   });
 
   socket.on("authenticated", (username, currentRoom) => {
-    console.log("key: " + (currentRoom == ""));
-    if(!clientName){
-      clientName = username;
+    console.log("key: " + currentRoom);
+    let parts = currentRoom.split("/");
+    if(!connectedUsers[absClientId]){
+      connectedUsers[absClientId] = {name: username, absUserId: absClientId, dctime: undefined};
     }
-    if (currentRoom != "") {
-      clientRoomKey = currentRoom;
-      openLobbies[currentRoom].push({ id: socket.id, name: username });
+    if (parts.length != 1 && parts[0] == "game") {
+      clientRoomKey = parts[1];
+      if (!activeGames[clientRoomKey]) {
+        activeGames[clientRoomKey] = [];
+        playerPos[clientRoomKey] = {};
+      }else if(BordersAbsolute[clientRoomKey]){
+        socket.emit("translateBorders", copy(BordersAbsolute[clientRoomKey]));
+      }
+      activeGames[clientRoomKey].push({
+        id: socket.id,
+        name: username,
+        role: undefined,
+      });
+      playerPos[clientRoomKey][socket.id] = getStartPoint(playerPos[clientRoomKey]);
+      if (!BordersAbsolute[clientRoomKey] && !readingBorders[clientRoomKey]) {
+        console.log("Requesting");
+        readingBorders[clientRoomKey] = true;
+        setTimeout(() => {
+          socket.emit("RequestMapBorders");
+        }, 1000);
+      }
     } else {
-      let roomKey = getRoomKey(openLobbies);
-      openLobbies[roomKey] = [];
-      openLobbies[roomKey].push({ id: socket.id, name: username });
-      clientRoomKey = roomKey;
+      if (!clientName) {
+        clientName = username;
+      }
+      if (currentRoom != "") {
+        clientRoomKey = currentRoom;
+        openLobbies[currentRoom].push({ id: socket.id, name: username });
+      } else {
+        let roomKey = getRoomKey(openLobbies);
+        openLobbies[roomKey] = [];
+        openLobbies[roomKey].push({ id: socket.id, name: username });
+        clientRoomKey = roomKey;
+      }
     }
     socket.join(clientRoomKey);
     socket.emit("assignRoomKey", clientRoomKey);
     io.to(clientRoomKey).emit("lobbyMembers", openLobbies[clientRoomKey]);
   });
 
-  /*  socket.on("startGame", () => {
-      if (needBorders) {
-      console.log("Requesting");
-      needBorders = false;
-      readingBorders = true;
-      setTimeout(() => {
-        socket.emit("RequestMapBorders");
-      }, 1000);
-    } else {
-      socket.emit("translateBorders", BordersAbsolute);
-    }
-  });*/
+  socket.on("lobbyStartRequest", (roomKey) => {
+    io.to(roomKey).emit("startLobby");
+  });
 
   app.get("/:roomKey", function (req, res) {
     let newRoomKey = req.params.roomKey;
-    if (openLobbies[newRoomKey]) {
-      res.sendFile("/public/index.html", { root: "clientFiles" });
-    } else {
-      res.redirect("/");
+    if (newRoomKey != "game") {
+      if (openLobbies[newRoomKey] != undefined) {
+        res.sendFile("/public/index.html", { root: "clientFiles" });
+      } else {
+        res.redirect("/");
+      }
     }
   });
 
@@ -123,33 +143,42 @@ io.on("connection", (socket) => {
   });
 
   socket.on("disconnect", () => {
-    let tmp = {};
-    lastDisconnect = {
-      absUserId: absClientId,
-      name: clientName,
-      time: Date.now(),
-    };
-    console.log("[" + socket.id + "] disconnected " +absClientId + " | " + clientName);
-    needBorders = readingBorders;
+    connectedUsers[absClientId].dctime = Date.now();
+    console.log(
+      "[" + socket.id + "] disconnected " + absClientId + " | " + clientName
+    );
+    if(activeGames[clientRoomKey]){
+      if(activeGames[clientRoomKey].length == 1 && false){//!!!!CHANGE!!!!!
+        delete activeGames[clientRoomKey];
+      }else{
+        let tmp = []
+        activeGames[clientRoomKey].forEach(element => {
+          if(element.id != socket.id){
+            tmp.push(element);
+          }else{
+            tmp.push({id: element.id, name: element.name, role: 'dead'});
+          }
+        });
+        activeGames[clientRoomKey] = tmp;
+      }
+    }
     if (openLobbies[clientRoomKey]) {
       delete openLobbies[clientRoomKey];
     }
-    delete playerPos[socket.id];
-    playerPos = tmp;
-    socket.broadcast.emit("playerMovement", playerPos);
-    socket.emit("playerMovement", playerPos);
+    if (playerPos[clientRoomKey]) {
+      delete playerPos[clientRoomKey][socket.id];
+    }
+    io.to(clientRoomKey).emit("playerMovement", playerPos[clientRoomKey]);
   });
 
   //Movement Collision Events
 
   socket.on("ReplyMapBorders", (mapBorders) => {
     console.log("reply");
-    BordersAbsolute = copy(mapBorders);
-    needBorders = false;
-    socket.emit("translateBorders", BordersAbsolute);
-    socket.emit("playerMovement", playerPos);
-    socket.broadcast.emit("playerMovement", playerPos);
-    readingBorders = false;
+    BordersAbsolute[clientRoomKey] = copy(mapBorders);
+    io.to(clientRoomKey).emit("translateBorders", copy(BordersAbsolute[clientRoomKey]));
+    io.to(clientRoomKey).emit("playerMovement", playerPos[clientRoomKey]);
+    readingBorders[clientRoomKey] = false;
   });
 
   socket.on("stillReading", (borderTmp, searchDirection, cpPos) => {
@@ -157,33 +186,42 @@ io.on("connection", (socket) => {
   });
 
   socket.on("movementRequest", (deltapos, id) => {
-    if (readingBorders) {
+    if (readingBorders[clientRoomKey]) {
       return;
     }
     id = socket.id;
-    let pos = playerPos[id];
+    let pos = playerPos[clientRoomKey][id];
     mergedPos = mergePos(deltapos, copy(pos));
-    playerPos[id] = mergedPos;
-    let collObjs = getPlayerCollObj(mergedPos, deltapos, id, playerPos);
-    playerCollision(collObjs, id, pos, copy(clientBorders), playerPos);
+    playerPos[clientRoomKey][id] = mergedPos;
+    let collObjs = getPlayerCollObj(
+      mergedPos,
+      deltapos,
+      id,
+      playerPos[clientRoomKey]
+    );
+    playerCollision(
+      collObjs,
+      id,
+      pos,
+      copy(clientBorders),
+      playerPos[clientRoomKey]
+    );
     if (movesTillCheck - 70 <= 0) {
       let wallColltest = wallCollision(copy(mergedPos), copy(clientBorders));
       if (wallColltest.collision) {
-        playerPos[id] = copy(pos);
+        playerPos[clientRoomKey][id] = copy(pos);
       } else {
         movesTillCheck = wallColltest.minDistance;
       }
     }
     movesTillCheck--;
-    socket.broadcast.emit("playerMovement", playerPos);
-    socket.emit("playerMovement", playerPos);
+    io.to(clientRoomKey).emit("playerMovement", playerPos[clientRoomKey]);
     //socket.emit("drawBorders", copy(clientBorders), copy(mergedPos)); //DEBUG
   });
 
   socket.on("replyTranslatedBorders", (borders) => {
     clientBorders = copy(borders);
-    socket.emit("playerMovement", playerPos);
-    socket.broadcast.emit("playerMovement", playerPos);
+    io.to(clientRoomKey).emit("playerMovement", playerPos[clientRoomKey]);
   });
 });
 
