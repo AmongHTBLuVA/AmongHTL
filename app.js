@@ -76,15 +76,19 @@ io.on("connection", (socket) => {
   socket.on("authenticated", (username, currentRoom) => {
     console.log("key: " + currentRoom);
     let parts = currentRoom.split("/");
-    if(!connectedUsers[absClientId]){
-      connectedUsers[absClientId] = {name: username, absUserId: absClientId, dctime: undefined};
+    if (!connectedUsers[absClientId]) {
+      connectedUsers[absClientId] = {
+        name: username,
+        absUserId: absClientId,
+        dctime: undefined,
+      };
     }
     if (parts.length != 1 && parts[0] == "game") {
       clientRoomKey = parts[1];
       if (!activeGames[clientRoomKey]) {
         activeGames[clientRoomKey] = [];
         playerPos[clientRoomKey] = {};
-      }else if(BordersAbsolute[clientRoomKey]){
+      } else if (BordersAbsolute[clientRoomKey]) {
         socket.emit("translateBorders", copy(BordersAbsolute[clientRoomKey]));
       }
       activeGames[clientRoomKey].push({
@@ -92,7 +96,9 @@ io.on("connection", (socket) => {
         name: username,
         role: undefined,
       });
-      playerPos[clientRoomKey][socket.id] = getStartPoint(playerPos[clientRoomKey]);
+      playerPos[clientRoomKey][socket.id] = getStartPoint(
+        playerPos[clientRoomKey]
+      );
       if (!BordersAbsolute[clientRoomKey] && !readingBorders[clientRoomKey]) {
         console.log("Requesting");
         readingBorders[clientRoomKey] = true;
@@ -143,20 +149,23 @@ io.on("connection", (socket) => {
   });
 
   socket.on("disconnect", () => {
-    connectedUsers[absClientId].dctime = Date.now();
+    if (connectedUsers[absClientId]) {
+      connectedUsers[absClientId].dctime = Date.now();
+    }
     console.log(
       "[" + socket.id + "] disconnected " + absClientId + " | " + clientName
     );
-    if(activeGames[clientRoomKey]){
-      if(activeGames[clientRoomKey].length == 1 && false){//!!!!CHANGE!!!!!
+    if (activeGames[clientRoomKey]) {
+      if (activeGames[clientRoomKey].length == 1 && false) {
+        //!!!!CHANGE!!!!!
         delete activeGames[clientRoomKey];
-      }else{
-        let tmp = []
-        activeGames[clientRoomKey].forEach(element => {
-          if(element.id != socket.id){
+      } else {
+        let tmp = [];
+        activeGames[clientRoomKey].forEach((element) => {
+          if (element.id != socket.id) {
             tmp.push(element);
-          }else{
-            tmp.push({id: element.id, name: element.name, role: 'dead'});
+          } else {
+            tmp.push({ id: element.id, name: element.name, role: "dead" });
           }
         });
         activeGames[clientRoomKey] = tmp;
@@ -176,7 +185,10 @@ io.on("connection", (socket) => {
   socket.on("ReplyMapBorders", (mapBorders) => {
     console.log("reply");
     BordersAbsolute[clientRoomKey] = copy(mapBorders);
-    io.to(clientRoomKey).emit("translateBorders", copy(BordersAbsolute[clientRoomKey]));
+    io.to(clientRoomKey).emit(
+      "translateBorders",
+      copy(BordersAbsolute[clientRoomKey])
+    );
     io.to(clientRoomKey).emit("playerMovement", playerPos[clientRoomKey]);
     readingBorders[clientRoomKey] = false;
   });
