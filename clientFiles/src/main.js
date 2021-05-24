@@ -1,5 +1,4 @@
 import { getDeltaPos, requestMovement } from "/script/movement.js";
-import { socket } from "/script/socket.js";
 
 var player = new Image();
 const playerImageUrl = "/img/Wieser.png";
@@ -16,8 +15,6 @@ var width;
 
 const speed = 4;
 const tickIntervall = 50;
-
-console.log("WINDOW: " + window.innerWidth);
 
 function copy(o) {
   return JSON.parse(JSON.stringify(o));

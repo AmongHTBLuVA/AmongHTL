@@ -84,9 +84,6 @@ document.addEventListener("keydown", function (event) {
   
   function setPlayerPositions(playerPos) {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
-    Object.keys(playerPos).forEach(p => {
-      console.log("Player: " + p + " | " + playerPos[p].x + "/" +playerPos[p].y);
-    });
     let pos = playerPos[getId()];
     let backgroundPos = translateMapPosistion(playerPos[getId()]);
     ctx.drawImage(background, backgroundPos.x, backgroundPos.y, getWidth(), getHeight());

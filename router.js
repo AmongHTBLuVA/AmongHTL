@@ -19,13 +19,18 @@ module.exports = function (app) {
     res.sendFile("/src/socket.js", { root: "clientFiles" });
   });
 
-  app.get("/script/lobby.js", function (req, res) {
-    res.sendFile("/src/lobby.js", { root: "clientFiles" });
-  });
-
   app.get("/script/Events.js", function (req, res) {
     res.sendFile("/src/Events.js", { root: "clientFiles" });
   });
+
+  app.get("/script/lobby.js", function (req, res) {
+    res.sendFile("/src/lobby/lobby.js", { root: "clientFiles" });
+  });
+
+  app.get("/script/lobbyEvents.js", function (req, res) {
+    res.sendFile("/src/lobby/lobbyEvents.js", { root: "clientFiles" });
+  });
+
   //Movement Collision Scripts
   app.get("/script/borderFunctions.js", function (req, res) {
     res.sendFile("/src/Movement_Collision/borderFunctions.js", {

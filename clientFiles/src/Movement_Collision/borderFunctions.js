@@ -11,8 +11,6 @@ import {
 } from "/script/main.js";
 
 function translateBorderPos(pos) {
-  console.log("Back: " + background.width + " | " + background.height);
-  console.log("window: " + window.innerWidth + " | " + window.innerHeight);
   return {
     x: round(pos.x * (window.innerWidth / background.width)),
     y: round(pos.y * (window.innerHeight / background.height)),
@@ -44,12 +42,10 @@ function getMapStartPoint(pos) {
   let multiplyer = 1;
   while (!isWall(cpPos.x - 1, cpPos.y)) {
     cpPos.x -= 1 * multiplyer;
-    console.log("CpPOS: " + cpPos.x + " | " + cpPos.y);
   }
   while (!isWall(cpPos.x, cpPos.y + 1) && isWall(cpPos.x - 1, cpPos.y - 1)) {
     cpPos.y += 1 * multiplyer;
     multiplyer = Math.min(1, multiplyer++);
-    console.log("CpPOS BottomFind: " + cpPos.x + " | " + cpPos.y);
   }
   console.log("Wall Found");
   Borders.push(copy(cpPos));
@@ -123,7 +119,6 @@ function getSearchDirection(pos) {
   if (!isWall(pos.x + 1, pos.y - 1) && isWall(pos.x, pos.y - 1)) {
     pos.y += -1;
     pos.x += 1;
-    console.log("change -1 1");
     searchDirection.deltaX = 0;
     searchDirection.deltaY = -1;
     searchDirection.checkDeltaX = -1;
@@ -131,7 +126,6 @@ function getSearchDirection(pos) {
   } else if (!isWall(pos.x + 1, pos.y + 1) && isWall(pos.x + 1, pos.y)) {
     pos.y += 1;
     pos.x += 1;
-    console.log("change 1 1");
     searchDirection.deltaX = 1;
     searchDirection.deltaY = 0;
     searchDirection.checkDeltaX = 1;
@@ -139,7 +133,6 @@ function getSearchDirection(pos) {
   } else if (!isWall(pos.x - 1, pos.y + 1) && isWall(pos.x, pos.y + 1)) {
     pos.y += 1;
     pos.x += -1;
-    console.log("change 1 -1");
     searchDirection.deltaX = 0;
     searchDirection.deltaY = 1;
     searchDirection.checkDeltaX = 1;
@@ -147,31 +140,26 @@ function getSearchDirection(pos) {
   } else if (!isWall(pos.x - 1, pos.y - 1) && isWall(pos.x - 1, pos.y)) {
     pos.y += -1;
     pos.x += -1;
-    console.log("change -1 -1");
     searchDirection.deltaX = -1;
     searchDirection.deltaY = 0;
     searchDirection.checkDeltaX = -1;
     searchDirection.checkDeltaY = 1;
   } else if (!isWall(pos.x + 1, pos.y) && isWall(pos.x, pos.y - 1)) {
-    console.log("ETST1");
     searchDirection.deltaX = 1;
     searchDirection.deltaY = 0;
     searchDirection.checkDeltaX = 1;
     searchDirection.checkDeltaY = -1;
   } else if (!isWall(pos.x, pos.y + 1) && isWall(pos.x + 1, pos.y)) {
-    console.log("ETST2");
     searchDirection.deltaX = 0;
     searchDirection.deltaY = 1;
     searchDirection.checkDeltaX = 1;
     searchDirection.checkDeltaY = 1;
   } else if (!isWall(pos.x - 1, pos.y) && isWall(pos.x, pos.y + 1)) {
-    console.log("ETST3");
     searchDirection.deltaX = -1;
     searchDirection.deltaY = 0;
     searchDirection.checkDeltaX = -1;
     searchDirection.checkDeltaY = 1;
   } else if (!isWall(pos.x, pos.y - 1) && isWall(pos.x - 1, pos.y)) {
-    console.log("ETST4");
     searchDirection.deltaX = 0;
     searchDirection.deltaY = -1;
     searchDirection.checkDeltaX = -1;
