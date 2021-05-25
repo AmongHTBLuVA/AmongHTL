@@ -18,7 +18,7 @@ const {
   getAbsoluteID,
 } = require("./serverFiles/authenticationFunctions.js");
 
-const reconnectionTime = 2000;
+const reconnectionTime = 15000;
 
 var playerPos = {};
 var readingBorders = {};
@@ -47,7 +47,7 @@ io.on("connection", (socket) => {
   socket.on("checkPreviousLogOn", (prevAbsId) => {
     if (prevAbsId && connectedUsers[prevAbsId]) {
       if (
-        Date.now() - connectedUsers[prevAbsId].dctime < 2000 &&
+        Date.now() - connectedUsers[prevAbsId].dctime < reconnectionTime &&
         connectedUsers[prevAbsId].absUserId == prevAbsId
       ) {
         absClientId = prevAbsId;

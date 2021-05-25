@@ -26,6 +26,8 @@ socket.on("lobbyMembers", (roomMembers) => {
                 }
             } else if (i != 0) {
                 $(".btnContainer").hide();
+            } else {
+                $(".playerJoined").append("<p style='font-weight: 100;'>" + element.name + "</p>");
             }
         });
     }
