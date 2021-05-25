@@ -141,7 +141,6 @@ io.on("connection", (socket) => {
     if (readingBorders[clientRoomKey]) {
       return;
     }
-    id = socket.id;
     let pos = playerPos[clientRoomKey][id];
     mergedPos = mergePos(deltapos, copy(pos));
     playerPos[clientRoomKey][id] = mergedPos;

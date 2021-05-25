@@ -76,7 +76,7 @@ module.exports = {
       if (!clientName) {
         clientName = username;
       }
-      if (currentRoom != "") {
+      if (currentRoom != "" && openLobbies[currentRoom]) {
         clientRoomKey = currentRoom;
         openLobbies[currentRoom].push({ id: socket.id, name: username });
       } else {
