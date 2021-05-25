@@ -1,0 +1,137 @@
+@import url("https://fonts.googleapis.com/css2?family=Amatic+SC:wght@400;700&family=Poppins:wght@100;200;300&display=swap");
+
+body {
+  margin: 0px;
+  background-color: #222222;
+  color: #fff;
+  font-family: "Poppins";
+  font-weight: 200;
+  user-select: none;
+}
+
+.hide {
+    visibility: hidden;
+}
+
+.popUpBackground {
+  opacity: 5%;
+}
+
+.name{
+    font-size: 12pt;
+    display: flex;
+    align-items: center;
+    position: absolute;
+    top: 96%;
+    left: 1%;
+}
+
+.name p{
+    margin: 0px;
+}
+
+#userNameLabel{
+    margin-right: 10px;
+}
+
+#username{
+    font-weight: 500;
+}
+
+h1 {
+  font-family: "Amatic SC";
+  font-size: 100pt;
+  text-shadow: 5px 5px 3px black;
+  margin-bottom: 0px;
+  text-align: center;
+}
+
+.container {
+  position: absolute;
+  top: 25%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+.playerJoined {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  margin-top: 20px;
+  margin-bottom: 20px;
+  min-height: 70px;
+  width: 500px;
+  background-color: #303030;
+  border-radius: 5px;
+  padding: 10px;
+}
+
+.playerJoined p {
+  margin: 5px;
+}
+
+.startBtn {
+  border: none;
+  background: linear-gradient(-30deg, #009b62 45%, #00a86b 55%);
+  font-family: "Amatic SC";
+  font-weight: 600;
+  color: white;
+  position: fixed;
+  font-size: 20pt;
+  border-radius: 10px;
+  width: 200px;
+  transform: translate(-100px, 0px);
+  height: 60px;
+  outline: none;
+  box-shadow: 4px 5px 0px #d1d1d1, 2px 5px 0px #d1d1d1, 4px 5px 0px #d1d1d1,
+    -4px 5px 0px #d1d1d1;
+}
+
+.loading {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+}
+
+.keySection {
+  display: flex;
+}
+
+.info {
+  font-size: 14pt;
+  font-family: Arial, Helvetica, sans-serif;
+  margin: 0px 3px;
+  cursor: pointer;
+}
+
+.startBtn:active {
+  margin-top: 2px;
+  box-shadow: 4px 3px 0px #d1d1d1, 0px 3px 0px #d1d1d1, 4px 3px 0px #d1d1d1,
+    -4px 3px 0px #d1d1d1;
+}
+
+.keyContainer {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 16pt;
+}
+
+.keyContainer p {
+  margin: 0px;
+}
+
+.keyContainer p:last-child {
+  display: flex;
+  font-weight: 300;
+  font-size: 25pt;
+  margin-left: 20px;
+  user-select: text;
+  height: 50px;
+}  

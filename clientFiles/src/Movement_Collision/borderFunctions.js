@@ -1,14 +1,26 @@
+import {socket, getId} from "/script/socket.js"
+import {
+  background,
+  ctx,
+  canvas,
+  copy,
+  setWidth,
+  getWidth,
+  getHeight,
+  setHeight,
+} from "/script/main.js";
+
 function translateBorderPos(pos) {
   return {
-    x: round(pos.x * (window.width / background.width)),
-    y: round(pos.y * (window.height / background.height)),
+    x: round(pos.x * (window.innerWidth / background.width)),
+    y: round(pos.y * (window.innerHeight / background.height)),
   };
 }
 
 function translateBorderPosBack(pos) {
   return {
-    x: round(pos.x / (window.width / background.width)),
-    y: round(pos.y / (window.height / background.height)),
+    x: round(pos.x / (window.innerWidth / background.width)),
+    y: round(pos.y / (window.innerHeight / background.height)),
   };
 }
 
@@ -26,16 +38,14 @@ function getMapStartPoint(pos) {
 
   ctx.strokeStyle = "#FF0000";
   console.log("ReadMap");
-  console.log("Client ID: " + Clientid);
+  console.log("Client ID: " + getId());
   let multiplyer = 1;
   while (!isWall(cpPos.x - 1, cpPos.y)) {
     cpPos.x -= 1 * multiplyer;
-    console.log("CpPOS: " + cpPos.x + " | " + cpPos.y);
   }
   while (!isWall(cpPos.x, cpPos.y + 1) && isWall(cpPos.x - 1, cpPos.y - 1)) {
     cpPos.y += 1 * multiplyer;
     multiplyer = Math.min(1, multiplyer++);
-    console.log("CpPOS BottomFind: " + cpPos.x + " | " + cpPos.y);
   }
   console.log("Wall Found");
   Borders.push(copy(cpPos));
@@ -47,11 +57,6 @@ function getMapStartPoint(pos) {
     copy(cpPos)
   );
 }
-
-socket.on("continueReading", (Borders, searchDirection, cpPos) => {
-  console.log("conitnue: " + cpPos);
-  readMapBorders(Borders, searchDirection, cpPos);
-});
 
 function readMapBorders(Borders, searchDirection, cpPos) {
   while (
@@ -74,10 +79,10 @@ function readMapBorders(Borders, searchDirection, cpPos) {
     Borders[0].y == cpPos.y
   ) {
     console.log("break!;");
-    height = window.innerHeight;
-    width = window.innerWidth;
-    canvas.width = width;
-    canvas.height = height;
+    setHeight(window.innerHeight);
+    setWidth(window.innerWidth);
+    canvas.width = getWidth();
+    canvas.height = getHeight();
     socket.emit("ReplyMapBorders", Borders);
     return;
   }
@@ -114,7 +119,6 @@ function getSearchDirection(pos) {
   if (!isWall(pos.x + 1, pos.y - 1) && isWall(pos.x, pos.y - 1)) {
     pos.y += -1;
     pos.x += 1;
-    console.log("change -1 1");
     searchDirection.deltaX = 0;
     searchDirection.deltaY = -1;
     searchDirection.checkDeltaX = -1;
@@ -122,7 +126,6 @@ function getSearchDirection(pos) {
   } else if (!isWall(pos.x + 1, pos.y + 1) && isWall(pos.x + 1, pos.y)) {
     pos.y += 1;
     pos.x += 1;
-    console.log("change 1 1");
     searchDirection.deltaX = 1;
     searchDirection.deltaY = 0;
     searchDirection.checkDeltaX = 1;
@@ -130,7 +133,6 @@ function getSearchDirection(pos) {
   } else if (!isWall(pos.x - 1, pos.y + 1) && isWall(pos.x, pos.y + 1)) {
     pos.y += 1;
     pos.x += -1;
-    console.log("change 1 -1");
     searchDirection.deltaX = 0;
     searchDirection.deltaY = 1;
     searchDirection.checkDeltaX = 1;
@@ -138,31 +140,26 @@ function getSearchDirection(pos) {
   } else if (!isWall(pos.x - 1, pos.y - 1) && isWall(pos.x - 1, pos.y)) {
     pos.y += -1;
     pos.x += -1;
-    console.log("change -1 -1");
     searchDirection.deltaX = -1;
     searchDirection.deltaY = 0;
     searchDirection.checkDeltaX = -1;
     searchDirection.checkDeltaY = 1;
   } else if (!isWall(pos.x + 1, pos.y) && isWall(pos.x, pos.y - 1)) {
-    console.log("ETST1");
     searchDirection.deltaX = 1;
     searchDirection.deltaY = 0;
     searchDirection.checkDeltaX = 1;
     searchDirection.checkDeltaY = -1;
   } else if (!isWall(pos.x, pos.y + 1) && isWall(pos.x + 1, pos.y)) {
-    console.log("ETST2");
     searchDirection.deltaX = 0;
     searchDirection.deltaY = 1;
     searchDirection.checkDeltaX = 1;
     searchDirection.checkDeltaY = 1;
   } else if (!isWall(pos.x - 1, pos.y) && isWall(pos.x, pos.y + 1)) {
-    console.log("ETST3");
     searchDirection.deltaX = -1;
     searchDirection.deltaY = 0;
     searchDirection.checkDeltaX = -1;
     searchDirection.checkDeltaY = 1;
   } else if (!isWall(pos.x, pos.y - 1) && isWall(pos.x - 1, pos.y)) {
-    console.log("ETST4");
     searchDirection.deltaX = 0;
     searchDirection.deltaY = -1;
     searchDirection.checkDeltaX = -1;
@@ -186,9 +183,9 @@ function isWall(x, y) {
 }
 
 function getPixel(x, y) {
-  height = window.innerHeight;
-  width = window.innerWidth;
-  var imgd = ctx.getImageData(x, y, width, height);
+  setHeight(window.innerHeight);
+  setWidth(window.innerWidth);
+  var imgd = ctx.getImageData(x, y, getWidth(), getHeight());
   var pix = imgd.data;
 
   // Loop over each pixel and invert the color.
@@ -200,3 +197,5 @@ function getPixel(x, y) {
   }
   return pix;
 }
+
+export {translateBorderPos, translateBorderPosBack ,getMapStartPoint, readMapBorders}

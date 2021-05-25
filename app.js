@@ -8,68 +8,129 @@ const {
   getPlayerCollObj,
   mergePos,
 } = require("./serverFiles/Movement_Collision/playerMovCollFunctions.js");
-const { wallCollision } = require("./serverFiles/Movement_Collision/wallCollisionFunctions");
-const { getStartPoint, playerCollision } = require("./serverFiles/evaluationFuctions.js");
+const {
+  wallCollision,
+} = require("./serverFiles/Movement_Collision/wallCollisionFunctions");
+const { playerCollision } = require("./serverFiles/evaluationFunctions.js");
+const {
+  authenticate,
+  cleanUp,
+  getAbsoluteID,
+} = require("./serverFiles/authenticationFunctions.js");
+
+const reconnectionTime = 15000;
 
 var playerPos = {};
-var needBorders = true;
-var readingBorders = false;
-var BordersAbsolute = [];
+var readingBorders = {};
+var BordersAbsolute = {};
+
+var openLobbies = {};
+var activeGames = {};
+
+var connectedUsers = {};
 
 function copy(o) {
   return JSON.parse(JSON.stringify(o));
 }
 
 io.on("connection", (socket) => {
-  console.log("["+ socket.id +"] connected");
+  console.log("[" + socket.id + "] connected on");
   var clientBorders = [];
+  var clientRoomKey = undefined;
+  var clientName = undefined;
   var movesTillCheck = 0;
 
-  socket.on("requestID", () => {
-    playerPos[socket.id] = getStartPoint(playerPos);
-    socket.emit("idReply", socket.id);
+  let absClientId = getAbsoluteID();
+
+  socket.emit("sendClientId", socket.id, absClientId);
+
+  socket.on("checkPreviousLogOn", (prevAbsId) => {
+    if (prevAbsId && connectedUsers[prevAbsId]) {
+      if (
+        Date.now() - connectedUsers[prevAbsId].dctime < reconnectionTime &&
+        connectedUsers[prevAbsId].absUserId == prevAbsId
+      ) {
+        absClientId = prevAbsId;
+        clientName = connectedUsers[prevAbsId].name;
+        connectedUsers[prevAbsId].dctime = undefined;
+        socket.emit("checkLogOn", clientName, absClientId);
+        return;
+      }
+    }
+    socket.emit("checkLogOn", clientName, absClientId);
   });
-  
-  socket.on("authenticated", () => {
-    if (needBorders) {
-      console.log("Requesting");
-      needBorders = false;
-      readingBorders = true;
-      setTimeout(() => {
-        socket.emit("RequestMapBorders");
-      }, 1000);
-    } else {
-      socket.emit("translateBorders", BordersAbsolute);
+
+  socket.on("authenticated", (username, currentRoom) => {
+    let authentiaction = authenticate(
+      socket,
+      username,
+      currentRoom,
+      connectedUsers,
+      openLobbies,
+      absClientId,
+      clientRoomKey,
+      activeGames,
+      playerPos,
+      BordersAbsolute,
+      readingBorders,
+      clientName
+    );
+    clientName = authentiaction.clientName;
+    clientRoomKey = authentiaction.clientRoomKey;
+
+    socket.join(clientRoomKey);
+    socket.emit("assignRoomKey", clientRoomKey);
+    io.to(clientRoomKey).emit("lobbyMembers", openLobbies[clientRoomKey]);
+  });
+
+  socket.on("lobbyStartRequest", (roomKey) => {
+    io.to(roomKey).emit("startLobby");
+  });
+
+  app.get("/:roomKey", function (req, res) {
+    let newRoomKey = req.params.roomKey;
+    if (newRoomKey != "game") {
+      if (openLobbies[newRoomKey] != undefined) {
+        res.sendFile("/public/index.html", { root: "clientFiles" });
+      } else {
+        res.redirect("/");
+      }
     }
   });
 
   socket.on("connect_timeout", () => {
-    console.log("["+ socket.id +"] connection timeout");
+    console.log("[" + socket.id + "] connection timeout");
+  });
+
+  socket.on("debug", (msg) => {
+    console.log(msg);
   });
 
   socket.on("disconnect", () => {
-    let tmp = {};
-    needBorders = readingBorders;
-    Object.keys(playerPos).forEach((e) => {
-      if (e != socket.id) {
-        tmp[e] = playerPos[e];
-      }
-    });
-    playerPos = tmp;
-    socket.broadcast.emit("playerMovement", playerPos);
-    socket.emit("playerMovement", playerPos);
+    cleanUp(
+      socket,
+      connectedUsers,
+      absClientId,
+      activeGames,
+      clientRoomKey,
+      openLobbies,
+      playerPos,
+      clientName
+    );
+    io.to(clientRoomKey).emit("playerMovement", playerPos[clientRoomKey]);
   });
 
-//Movement Collision Events
+//----------Movement Collision Events-------------------------------------
 
   socket.on("ReplyMapBorders", (mapBorders) => {
     console.log("reply");
-    BordersAbsolute = copy(mapBorders);
-    needBorders = false;
-    socket.emit("translateBorders", BordersAbsolute);
-    socket.emit("playerMovement", playerPos);
-    socket.broadcast.emit("playerMovement", playerPos);
-    readingBorders = false;
+    BordersAbsolute[clientRoomKey] = copy(mapBorders);
+    io.to(clientRoomKey).emit(
+      "translateBorders",
+      copy(BordersAbsolute[clientRoomKey])
+    );
+    io.to(clientRoomKey).emit("playerMovement", playerPos[clientRoomKey]);
+    readingBorders[clientRoomKey] = false;
   });
 
   socket.on("stillReading", (borderTmp, searchDirection, cpPos) => {
@@ -77,35 +138,43 @@ io.on("connection", (socket) => {
   });
 
   socket.on("movementRequest", (deltapos, id) => {
-    if (readingBorders) {
+    if (readingBorders[clientRoomKey]) {
       return;
     }
     id = socket.id;
-    let pos = playerPos[id];
+    let pos = playerPos[clientRoomKey][id];
     mergedPos = mergePos(deltapos, copy(pos));
-    playerPos[id] = mergedPos;
-    let collObjs = getPlayerCollObj(mergedPos, deltapos, id, playerPos);
-    playerCollision(collObjs, id, pos, copy(clientBorders), playerPos);
-    if (movesTillCheck-70 <= 0) {
+    playerPos[clientRoomKey][id] = mergedPos;
+    let collObjs = getPlayerCollObj(
+      mergedPos,
+      deltapos,
+      id,
+      playerPos[clientRoomKey]
+    );
+    playerCollision(
+      collObjs,
+      id,
+      pos,
+      copy(clientBorders),
+      playerPos[clientRoomKey]
+    );
+    if (movesTillCheck - 70 <= 0) {
       let wallColltest = wallCollision(copy(mergedPos), copy(clientBorders));
       if (wallColltest.collision) {
-        playerPos[id] = copy(pos);
+        playerPos[clientRoomKey][id] = copy(pos);
       } else {
         movesTillCheck = wallColltest.minDistance;
       }
     }
     movesTillCheck--;
-    socket.broadcast.emit("playerMovement", playerPos);
-    socket.emit("playerMovement", playerPos);
+    io.to(clientRoomKey).emit("playerMovement", playerPos[clientRoomKey]);
     //socket.emit("drawBorders", copy(clientBorders), copy(mergedPos)); //DEBUG
   });
 
   socket.on("replyTranslatedBorders", (borders) => {
     clientBorders = copy(borders);
-    socket.emit("playerMovement", playerPos);
-    socket.broadcast.emit("playerMovement", playerPos);
-  })
-
+    io.to(clientRoomKey).emit("playerMovement", playerPos[clientRoomKey]);
+  });
 });
 
 server.listen(8080, function () {

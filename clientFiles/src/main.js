@@ -1,21 +1,62 @@
+import { getDeltaPos, requestMovement } from "/script/movement.js";
+
 var player = new Image();
-const playerImageUrl = "Wieser.png";
+const playerImageUrl = "/img/Wieser.png";
 
 var background = new Image();
-const backgroundImageUrl = "testmapKlein.png";
+const backgroundImageUrl = "/img/testmapKlein.png";
 
 var canvas;
 var ctx;
 var readingBorders = false;
-var keyPressed = { w: false, s: false, d: false, a: false };
 
-var Clientid;
+var height;
+var width;
+
 const speed = 4;
 const tickIntervall = 50;
 
 function copy(o) {
   return JSON.parse(JSON.stringify(o));
 }
+
+function setWidth(a) {
+  width = a;
+}
+
+function getWidth() {
+  return width;
+}
+
+function setHeight(a) {
+  height = a;
+}
+
+function getHeight() {
+  return height;
+}
+
+function setReadingBorders(reading) {
+  readingBorders = reading;
+}
+
+function getReadingBorders() {
+  return readingBorders;
+}
+
+$(document).on("ready", () => {
+  canvas = document.getElementById("canvas");
+  ctx = canvas.getContext("2d");
+  player.width = 70;
+  player.height = 70;
+  player.src = playerImageUrl;
+  background.src = backgroundImageUrl;
+  height = window.innerHeight;
+  width = window.innerWidth;
+  canvas.width = width;
+  canvas.height = height;
+  setInterval(tick, tickIntervall);
+});
 
 function tick() {
   let delta = getDeltaPos();
@@ -25,3 +66,17 @@ function tick() {
     }
   }
 }
+
+export {
+  player,
+  background,
+  ctx,
+  canvas,
+  setReadingBorders,
+  getReadingBorders,
+  copy,
+  setWidth,
+  getWidth,
+  getHeight,
+  setHeight,
+};

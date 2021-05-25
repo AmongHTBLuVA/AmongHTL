@@ -4,24 +4,65 @@
     <meta charset="UTF-8" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" />
+    <link rel="stylesheet" href="/style/lobbyStyles.css" />
+    <link rel="stylesheet" href="/style/userNameInput.css" />
+    <link rel="stylesheet" href="/style/buffer.css" />
     <script src="//code.jquery.com/jquery-1.12.0.min.js"></script>
     <script src="//code.jquery.com/jquery-migrate-1.2.1.min.js"></script>
-    <script
-      src="https://cdn.socket.io/3.1.3/socket.io.min.js"
-      integrity="sha384-cPwlPLvBTa3sKAgddT6krw0cJat7egBga3DJepJyrLl4Q9/5WLra3rrnMcyTyOnh"
-      crossorigin="anonymous"
-    ></script>
-    <script src='/socket.js'></script><!--Needs to be 1. Position-->
-
-    <script src='/borderFunctions.js'></script><!--Files with Fuction Defs-->
-    <script src='/movement.js'></script>
-    <script src='/main.js'></script>
-
-    <script src='/MovementCollisionEvents.js'></script>
-    <script src='/Events.js'></script><!--Event file needs to be last--><!--Event files needs to be last-->
-    <title>AmongHTL</title>
+    <script type="module" src="/script/Events.js"></script>
+    <script type="module" src="/script/lobbyEvents.js"></script>
+    <script type="module" src="/script/lobby.js"></script>
+    <!--Event files needs to be last-->
+    <title>AmongHTL - Lobby</title>
   </head>
-  <body style="margin: 0px">
-    <canvas id="canvas"> </canvas>
+  <body>
+    <div class="loading">
+        <div class="loader"></div>
+    </div>
+    <div class="content-wrapper hide">
+      <div class="userNamePopup">
+        <div class="nameInputConatiner">
+          <div class="form__group field">
+            <input
+              maxlength="25"
+              autocomplete="false"
+              type="input"
+              class="form__field"
+              placeholder="Name"
+              name="name"
+              id="name"
+              required
+            />
+            <label for="name" class="form__label">Name</label>
+          </div>
+          <span class="arrow" id="confUserNameBtn"></span>
+        </div>
+      </div>
+      <div class="name">
+        <p id="userNameLabel" class="hide">Username:</p>
+        <p id="username"></p>
+      </div>
+      <div class="container popUpBackground">
+        <h1>AMONG HTL</h1>
+        <div class="keySection">
+          <div class="keyContainer">
+            <p>Room Key:</p>
+            <p id="roomKey">-</p>
+          </div>
+          <span
+            class="info"
+            title="To join paste the room key in the url: amonghtl.ddns.net/[RoomKey]"
+            >🛈</span
+          >
+        </div>
+        <div class="playerJoined">
+          <p>get some Friends</p>
+        </div>
+        <div class="btnContainer">
+          <input type="button" value="START"class="startBtn" />
+        </div>
+      </div>
+    </div>
   </body>
 </html>

@@ -1,28 +1,41 @@
+import { socket, setId, setName } from "/script/socket.js";
+
 socket.on("connect", () => {
-  canvas = document.getElementById("canvas");
-  ctx = canvas.getContext("2d");
-  player.width = 70;
-  player.height = 70;
-  player.src = playerImageUrl;
-  background.src = backgroundImageUrl;
-
-  socket.emit("requestID");
-  setInterval(tick, tickIntervall);
 });
 
-socket.on("disconnect", () => {
-  console.log("Disconnected;");
-  window.clearInterval();
+socket.on("sendClientId", (id, absId) => {
+  setId(id);
+  let prevAbsId = localStorage.getItem("absID");
+  if(prevAbsId){
+    socket.emit("checkPreviousLogOn", prevAbsId);
+  }else{
+    console.log("RIP: " + prevAbsId);
+    localStorage.setItem("absID", absId);
+  }
 });
 
-
-socket.on("idReply", (id) => {
-  Clientid = id;
-  localStorage.setItem("id", id);
-  height = window.innerHeight;
-  width = window.innerWidth;
-  canvas.width = width;
-  canvas.height = height;
-  socket.emit("authenticated");
+socket.on("checkLogOn", (oldName, absID) => {
+  console.log("name: " + oldName);
+  if(oldName){
+    logOn(oldName);
+  }else{
+    localStorage.setItem("absID", absID);
+  }
 });
 
+function logOn(userName) {
+  $(".userNamePopup").hide();
+  $(".container").removeClass("popUpBackground");
+  $("#username").html(userName);
+  $("#userNameLabel").removeClass("hide");
+  let path = window.location.pathname;
+  let key = path.substr(1, path.length - 1);
+  setName(userName);
+  socket.emit(
+    "authenticated",
+    userName,
+    key
+  );
+}
+
+export {logOn};

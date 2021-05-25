@@ -1,0 +1,138 @@
+:root{
+    --primaryColor: #129b40;
+    --secondaryColor: #29d846;
+}
+
+* {
+    box-sizing: border-box;
+}
+.arrow {
+    cursor: pointer;
+    position: absolute;
+    display: block;
+    left: 80%;
+    top: 38%;
+    width: 32px;
+    height: 32px;
+    border: none;
+    z-index: 1;
+    transition: all 0.2s linear;
+}
+.arrow:before, .arrow:after {
+    content: "";
+    position: absolute;
+    width: 35%;
+    height: 10%;
+    top: 41%;
+    left: 55%;
+    background: #999;
+    z-index: 2;
+    transform: translate(-50%, -50%) rotate(45deg);
+    transition: all 0.2s linear;
+}
+.arrow:after {
+    z-index: 3;
+    top: 59%;
+    left: 55%;
+    transform: translate(-50%, -50%) rotate(-45deg);
+}
+.arrow:hover:after, .arrow:hover:before {
+    background: linear-gradient(to right, var(--primaryColor),  var(--secondaryColor));
+}
+.arrow:active:after, .arrow:active:before {
+    background: linear-gradient(to right, var(--primaryColor), var(--secondaryColor));
+}
+
+.nameInputConatiner {
+  display: flex;
+  justify-content: left;
+  align-items: center;
+  width: 400px;
+}
+
+.userNameInput {
+  height: 30px;
+  width: 200px;
+  margin-left: 20px;
+  font-size: 15pt;
+  border: 5px;
+  border: none;
+}
+
+.userNamePopup p {
+  margin: 5px;
+}
+
+.userNamePopup {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 2;
+  background-color: #303030;
+  opacity: 100%;
+  width: 500px;
+  height: 120px;
+  border-radius: 10px;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  font-size: 15pt;
+  transform: translate(-50%, -50%);
+}
+
+.form__group {
+  position: relative;
+  padding: 15px 0 0;
+  display: flex;
+  margin-top: 10px;
+}
+.form__field {
+  font-family: inherit;
+  border: 0;
+  width: 380px;
+  margin-bottom: 25px;
+  border-bottom: 2px solid #9b9b9b;
+  outline: 0;
+  font-size: 1.3rem;
+  color: #fff;
+  padding: 7px 0;
+  background: transparent;
+  transition: border-color 0.2s;
+}
+.form__field::placeholder {
+  color: transparent;
+}
+.form__field:placeholder-shown ~ .form__label {
+  font-size: 1.3rem;
+  cursor: text;
+  top: 20px;
+}
+.form__label {
+  position: absolute;
+  top: 0;
+  display: block;
+  transition: 0.2s;
+  font-size: 1rem;
+  color: #9b9b9b;
+}
+.form__field:focus {
+  padding-bottom: 6px;
+  font-weight: 700;
+  border-width: 3px;
+  border-image: linear-gradient(to right, var(--primaryColor), var(--secondaryColor));
+  border-image-slice: 1;
+}
+.form__field:focus ~ .form__label {
+  position: absolute;
+  top: 0;
+  display: block;
+  transition: 0.2s;
+  font-size: 1rem;
+  color: var(--primaryColor);
+  font-weight: 700;
+}
+/* reset input */
+.form__field:required,
+.form__field:invalid {
+  box-shadow: none;
+}
