@@ -125,10 +125,6 @@ io.on("connection", (socket) => {
   socket.on("ReplyMapBorders", (mapBorders) => {
     console.log("reply");
     BordersAbsolute[clientRoomKey] = copy(mapBorders);
-    io.to(clientRoomKey).emit(
-      "translateBorders",
-      copy(BordersAbsolute[clientRoomKey])
-    );
     io.to(clientRoomKey).emit("playerMovement", playerPos[clientRoomKey]);
     readingBorders[clientRoomKey] = false;
   });
@@ -154,11 +150,11 @@ io.on("connection", (socket) => {
       collObjs,
       id,
       pos,
-      copy(clientBorders),
+      copy(BordersAbsolute[clientRoomKey]),
       playerPos[clientRoomKey]
     );
     if (movesTillCheck - 70 <= 0) {
-      let wallColltest = wallCollision(copy(mergedPos), copy(clientBorders));
+      let wallColltest = wallCollision(copy(mergedPos), copy(BordersAbsolute[clientRoomKey]));
       if (wallColltest.collision) {
         playerPos[clientRoomKey][id] = copy(pos);
       } else {
@@ -168,11 +164,6 @@ io.on("connection", (socket) => {
     movesTillCheck--;
     io.to(clientRoomKey).emit("playerMovement", playerPos[clientRoomKey]);
     //socket.emit("drawBorders", copy(clientBorders), copy(mergedPos)); //DEBUG
-  });
-
-  socket.on("replyTranslatedBorders", (borders) => {
-    clientBorders = copy(borders);
-    io.to(clientRoomKey).emit("playerMovement", playerPos[clientRoomKey]);
   });
 });
 

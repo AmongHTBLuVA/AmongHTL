@@ -10,20 +10,6 @@ import {
   setHeight,
 } from "/script/main.js";
 
-function translateBorderPos(pos) {
-  return {
-    x: round(pos.x * (window.innerWidth / background.width)),
-    y: round(pos.y * (window.innerHeight / background.height)),
-  };
-}
-
-function translateBorderPosBack(pos) {
-  return {
-    x: round(pos.x / (window.innerWidth / background.width)),
-    y: round(pos.y / (window.innerHeight / background.height)),
-  };
-}
-
 function drawBorders(pos0, pos1) {
   ctx.strokeStyle = "#FF0000";
   ctx.beginPath();
@@ -198,4 +184,4 @@ function getPixel(x, y) {
   return pix;
 }
 
-export {translateBorderPos, translateBorderPosBack ,getMapStartPoint, readMapBorders}
+export {getMapStartPoint, readMapBorders}
