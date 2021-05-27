@@ -1,6 +1,5 @@
-import {socket, getId} from "/script/socket.js"
+import {socket, getId, mapName} from "/script/socket.js"
 import {
-  background,
   ctx,
   canvas,
   copy,
@@ -69,7 +68,7 @@ function readMapBorders(Borders, searchDirection, cpPos) {
     setWidth(window.innerWidth);
     canvas.width = getWidth();
     canvas.height = getHeight();
-    socket.emit("ReplyMapBorders", Borders);
+    socket.emit("ReplyMapBorders", Borders, mapName);
     return;
   }
   console.log("still reading");
