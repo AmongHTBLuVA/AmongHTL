@@ -1,7 +1,7 @@
 const { getStartPoint } = require("./evaluationFunctions.js");
 const fs = require("fs");
 
-const imposterChance = 0.2;
+const imposterChance = 0.4;
 const revealTime = 5;
 
 function copy(o) {
@@ -27,7 +27,7 @@ function getRole(playerCount, players) {
   });
   console.log("playerCount: " + playerCount);
   console.log(Object.keys(players).length);
-  if (role == "imposter" && playerCount != Object.keys(players).length - 1) {
+  if (role == "imposter" && playerCount != Object.keys(players).length) {
     let rand = Math.random();
     console.log("RANDOM: " + rand);
     if (rand < 1 - imposterChance) {
