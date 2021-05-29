@@ -1,4 +1,5 @@
 const { getStartPoint } = require("./evaluationFunctions.js");
+const fs = require("fs");
 
 function copy(o) {
   return JSON.parse(JSON.stringify(o));
@@ -8,8 +9,8 @@ function getRoomKey(openLobbies) {
   let first = (Object.keys(openLobbies).length + 10).toString(16);
   let second = (
     new Date().getMilliseconds() +
-    (new Date().getSeconds() * 1000) +
-    (new Date().getMinutes() * 6000)
+    new Date().getSeconds() * 1000 +
+    new Date().getMinutes() * 6000
   ).toString(16);
   return first.toUpperCase() + second.toUpperCase();
 }
@@ -39,7 +40,8 @@ module.exports = {
     playerPos,
     BordersAbsolute,
     readingBorders,
-    clientName
+    clientName,
+    mapName
   ) {
     let parts = currentRoom.split("/");
     if (!connectedUsers[absClientId]) {
@@ -66,11 +68,16 @@ module.exports = {
         playerPos[clientRoomKey]
       );
       if (!BordersAbsolute[clientRoomKey] && !readingBorders[clientRoomKey]) {
-        console.log("Requesting");
-        readingBorders[clientRoomKey] = true;
-        setTimeout(() => {
-          socket.emit("RequestMapBorders");
-        }, 1000);
+        let path = "./serverFiles/borders/" + mapName + ".json";
+        if (fs.existsSync(path)) {
+          BordersAbsolute[clientRoomKey] = require("./borders/" + mapName + ".json");
+        } else {
+          console.log("Requesting");
+          readingBorders[clientRoomKey] = true;
+          setTimeout(() => {
+            socket.emit("RequestMapBorders");
+          }, 1000);
+        }
       }
     } else {
       if (!clientName) {

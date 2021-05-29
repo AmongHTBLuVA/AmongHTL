@@ -17,6 +17,7 @@ const {
   cleanUp,
   getAbsoluteID,
 } = require("./serverFiles/authenticationFunctions.js");
+const fs = require("fs");
 
 const reconnectionTime = 15000;
 
@@ -35,7 +36,6 @@ function copy(o) {
 
 io.on("connection", (socket) => {
   console.log("[" + socket.id + "] connected on");
-  var clientBorders = [];
   var clientRoomKey = undefined;
   var clientName = undefined;
   var movesTillCheck = 0;
@@ -60,7 +60,7 @@ io.on("connection", (socket) => {
     socket.emit("checkLogOn", clientName, absClientId);
   });
 
-  socket.on("authenticated", (username, currentRoom) => {
+  socket.on("authenticated", (username, currentRoom, mapName) => {
     let authentiaction = authenticate(
       socket,
       username,
@@ -73,7 +73,8 @@ io.on("connection", (socket) => {
       playerPos,
       BordersAbsolute,
       readingBorders,
-      clientName
+      clientName,
+      mapName
     );
     clientName = authentiaction.clientName;
     clientRoomKey = authentiaction.clientRoomKey;
@@ -81,6 +82,7 @@ io.on("connection", (socket) => {
     socket.join(clientRoomKey);
     socket.emit("assignRoomKey", clientRoomKey);
     io.to(clientRoomKey).emit("lobbyMembers", openLobbies[clientRoomKey]);
+    io.to(clientRoomKey).emit("playerMovement", playerPos[clientRoomKey]);
   });
 
   socket.on("lobbyStartRequest", (roomKey) => {
@@ -122,9 +124,13 @@ io.on("connection", (socket) => {
 
 //----------Movement Collision Events-------------------------------------
 
-  socket.on("ReplyMapBorders", (mapBorders) => {
+  socket.on("ReplyMapBorders", (mapBorders, mapName) => {
     console.log("reply");
     BordersAbsolute[clientRoomKey] = copy(mapBorders);
+    fs.writeFile("./serverFiles/borders/"+ mapName + ".json", JSON.stringify(BordersAbsolute[clientRoomKey]), function (err) {
+      if (err) throw err;
+      console.log('Saved!');
+    });
     io.to(clientRoomKey).emit("playerMovement", playerPos[clientRoomKey]);
     readingBorders[clientRoomKey] = false;
   });
