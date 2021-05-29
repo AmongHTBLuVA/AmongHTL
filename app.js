@@ -171,6 +171,27 @@ io.on("connection", (socket) => {
     io.to(clientRoomKey).emit("playerMovement", playerPos[clientRoomKey]);
     //socket.emit("drawBorders", copy(clientBorders), copy(mergedPos)); //DEBUG
   });
+
+//----------Client Action Events-------------------------------------------
+
+  socket.on("killRequest", (id) => {
+    let allPlayerPos = playerPos[clientRoomKey];
+    let currPos = allPlayerPos[id];
+
+    for (const playerId in allPlayerPos) {
+      if (playerId != id) {
+        console.log(allPlayerPos[playerId]);
+
+        let playerPos = allPlayerPos[playerId];
+        let a = currPos.x - playerPos.x;
+        let b = currPos.y - playerPos.y;
+
+        let c = Math.sqrt( a*a + b*b );
+
+        console.log(`distance to player ${playerId}: ${c}`);
+      }
+    }
+  })
 });
 
 server.listen(8080, function () {

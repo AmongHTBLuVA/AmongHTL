@@ -1,0 +1,29 @@
+@import url("https://fonts.googleapis.com/css2?family=Amatic+SC:wght@400;700&family=Poppins:wght@100;200;300&display=swap");
+
+button {
+  box-shadow: 0 12px #999;
+}
+
+button:active {
+  box-shadow: 0 8px #666;
+  transform: translateY(4px);
+}
+
+#killButton {
+  border-radius: 50%;
+  border: 5px solid #f00;
+  background-color: #000;
+  color: #fff;
+  outline: none;
+
+  height: 150px;
+  width: 150px;
+  position: fixed;
+  top: 75vh;
+  left: 75vw;
+
+  font-size: 60pt;
+  font-weight: bold;
+  font-family: "Amatic SC";
+  text-transform: uppercase;
+}
