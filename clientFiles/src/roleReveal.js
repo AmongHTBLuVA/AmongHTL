@@ -8,10 +8,12 @@ $(document).on("ready", () => {
 });
 
 socket.on("assignRole", (role, playerCount, time) => {
+  playerCount--;
   if(role == "imposter"){
     $("#roleReveal").html("Imposter");
     $("h3").hide();
-    $("body").addClass("imposter")   
+    $("body").addClass("imposter");
+    playerCount = 1;
 }  
   $(".container").removeClass("hide");
   console.log("role: " + role);
