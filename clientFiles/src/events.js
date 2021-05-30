@@ -6,6 +6,8 @@ socket.on("connect", () => {
 socket.on("sendClientId", (id, absId) => {
   setId(id);
   let prevAbsId = localStorage.getItem("absID");
+
+  console.log(id, prevAbsId, absId);
   if(prevAbsId){
     socket.emit("checkPreviousLogOn", prevAbsId);
   }else{

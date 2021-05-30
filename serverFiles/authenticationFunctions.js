@@ -145,6 +145,7 @@ module.exports = {
   cleanUp: function cleanUp(
     socket,
     connectedUsers,
+    killedPlayers,
     absClientId,
     activeGames,
     clientRoomKey,
@@ -171,6 +172,16 @@ module.exports = {
     }
     if (playerPos[clientRoomKey]) {
       delete playerPos[clientRoomKey][socket.id];
+    }
+    if (killedPlayers[clientRoomKey]) {
+      killedPlayersInRoom = killedPlayers[clientRoomKey];
+
+      for (var player in killedPlayersInRoom) {
+        const index = killedPlayersInRoom.indexOf(player);
+        if (index > -1) {
+          killedPlayersInRoom.splice(index, 1);
+        }
+      }
     }
   },
 };

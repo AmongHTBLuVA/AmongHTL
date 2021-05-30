@@ -15,6 +15,10 @@ module.exports = function (app) {
     res.sendFile("/src/main.js", { root: "clientFiles" });
   });
 
+  app.get("/script/requests.js", function (req, res) {
+    res.sendFile("/src/requests.js", { root: "clientFiles" });
+  });
+
   app.get("/script/socket.js", function (req, res) {
     res.sendFile("/src/socket.js", { root: "clientFiles" });
   });
@@ -70,6 +74,12 @@ module.exports = function (app) {
 
   app.get("/style/buffer.css", function (req, res) {
     res.sendFile("/public/css/buffer.css", {
+      root: "clientFiles",
+    });
+  });
+
+  app.get("/style/gameStyles.css", function (req, res) {
+    res.sendFile("/public/css/gameStyles.css", {
       root: "clientFiles",
     });
   });
