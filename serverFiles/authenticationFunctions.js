@@ -1,8 +1,7 @@
 const { getStartPoint } = require("./evaluationFunctions.js");
 const fs = require("fs");
 
-const imposterChance = 0.4;
-const revealTime = 5;
+const revealTime = 7;
 
 function copy(o) {
   return JSON.parse(JSON.stringify(o));
@@ -18,23 +17,9 @@ function getRoomKey(openLobbies) {
   return first.toUpperCase() + second.toUpperCase();
 }
 
-function getRole(playerCount, players) {
-  let role = "imposter";
-  Object.keys(players).forEach((element) => {
-    if (players[element].role == "imposter") {
-      role = "crewmate";
-    }
-  });
-  console.log("playerCount: " + playerCount);
-  console.log(Object.keys(players).length);
-  if (role == "imposter" && playerCount != Object.keys(players).length) {
-    let rand = Math.random();
-    console.log("RANDOM: " + rand);
-    if (rand < 1 - imposterChance) {
-      role = "crewmate";
-    }
-  }
-  return role;
+function getImposter(playerCount) {
+  let rand = Math.random();
+  return Math.floor(playerCount * rand);
 }
 
 module.exports = {
@@ -85,6 +70,10 @@ module.exports = {
         activeGames[clientRoomKey].players = {};
         activeGames[clientRoomKey].playerCount =
           openLobbies[clientRoomKey].length;
+        activeGames[clientRoomKey].imposterIndex = getImposter(
+          activeGames[clientRoomKey].playerCount
+        );
+        console.log("Imposter Index: " + activeGames[clientRoomKey].imposterIndex);
         let time = new Date();
         time.setSeconds(time.getSeconds() + revealTime);
         activeGames[clientRoomKey].startTime = time;
@@ -101,10 +90,9 @@ module.exports = {
         activeGames[clientRoomKey].players[socket.id].role =
           connectedUsers[absClientId].role;
       } else {
-        activeGames[clientRoomKey].players[socket.id].role = getRole(
-          activeGames[clientRoomKey].playerCount,
-          activeGames[clientRoomKey].players
-        );
+        console.log("lenght: " + Object.keys(activeGames[clientRoomKey].players).length);
+        activeGames[clientRoomKey].players[socket.id].role =
+          activeGames[clientRoomKey].imposterIndex == Object.keys(activeGames[clientRoomKey].players).length ? "imposter" : "crewmate";
       }
       playerPos[clientRoomKey][socket.id] = getStartPoint(
         playerPos[clientRoomKey]
