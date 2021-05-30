@@ -9,6 +9,7 @@ socket.on("assignRoomKey", (roomKey) => {
 });
 
 socket.on("startLobby", () => {
+    console.log("starting lobby " + currLobby);
     window.location.href = "/game/" + currLobby;
 });
 

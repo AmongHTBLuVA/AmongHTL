@@ -46,6 +46,8 @@ io.on("connection", (socket) => {
 
   socket.on("checkPreviousLogOn", (prevAbsId) => {
     if (prevAbsId && connectedUsers[prevAbsId]) {
+      console.log(prevAbsId, connectedUsers[prevAbsId]);
+
       if (
         Date.now() - connectedUsers[prevAbsId].dctime < reconnectionTime &&
         connectedUsers[prevAbsId].absUserId == prevAbsId
@@ -86,6 +88,7 @@ io.on("connection", (socket) => {
   });
 
   socket.on("lobbyStartRequest", (roomKey) => {
+    console.log("starting lobby: " + roomKey);
     io.to(roomKey).emit("startLobby");
   });
 
