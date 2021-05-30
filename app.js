@@ -18,8 +18,10 @@ const {
   getAbsoluteID,
 } = require("./serverFiles/authenticationFunctions.js");
 const fs = require("fs");
+const { kill } = require("process");
 
 const reconnectionTime = 15000;
+
 
 var playerPos = {};
 var readingBorders = {};
@@ -30,9 +32,43 @@ var activeGames = {};
 
 var connectedUsers = {};
 
+var killedPlayers = {};
+
+//-----------------utility functions------------------------
+
 function copy(o) {
   return JSON.parse(JSON.stringify(o));
 }
+
+function calcDist(playerA, playerB) {
+  let a = playerA.x - playerB.x;
+  let b = playerA.y - playerB.y;
+
+  return Math.sqrt(a * a + b * b);
+}
+
+function addKilledPlayer(roomId, playerId) {
+  if (killedPlayers[roomId] == undefined) {
+    killedPlayers[roomId] = [];
+  }
+  killedPlayers[roomId].push(playerId);
+}
+
+function filterKilledPlayers(positions, roomId) {
+  let filteredPos = copy(positions);
+
+  for (let player in positions) {
+    if (!killedPlayers[roomId].includes(player)) {
+      delete filteredPos[player];
+    }
+  }
+
+  return filteredPos;
+}
+
+
+
+//-----------------socket stuff------------------------------
 
 io.on("connection", (socket) => {
   console.log("[" + socket.id + "] connected on");
@@ -45,8 +81,7 @@ io.on("connection", (socket) => {
   socket.emit("sendClientId", socket.id, absClientId);
 
   socket.on("checkPreviousLogOn", (prevAbsId) => {
-    if (prevAbsId && connectedUsers[prevAbsId]) {
-      console.log(prevAbsId, connectedUsers[prevAbsId]);
+    if (prevAbsId && connectedUsers[prevAbsId]) { 
 
       if (
         Date.now() - connectedUsers[prevAbsId].dctime < reconnectionTime &&
@@ -115,6 +150,7 @@ io.on("connection", (socket) => {
     cleanUp(
       socket,
       connectedUsers,
+      killedPlayers,
       absClientId,
       activeGames,
       clientRoomKey,
@@ -146,6 +182,11 @@ io.on("connection", (socket) => {
     if (readingBorders[clientRoomKey]) {
       return;
     }
+
+    if (killedPlayers[clientRoomKey] && killedPlayers[clientRoomKey].includes(id)) {
+      return;
+    }
+
     let pos = playerPos[clientRoomKey][id];
     mergedPos = mergePos(deltapos, copy(pos));
     playerPos[clientRoomKey][id] = mergedPos;
@@ -171,6 +212,7 @@ io.on("connection", (socket) => {
       }
     }
     movesTillCheck--;
+
     io.to(clientRoomKey).emit("playerMovement", playerPos[clientRoomKey]);
     //socket.emit("drawBorders", copy(clientBorders), copy(mergedPos)); //DEBUG
   });
@@ -183,15 +225,14 @@ io.on("connection", (socket) => {
 
     for (const playerId in allPlayerPos) {
       if (playerId != id) {
-        console.log(allPlayerPos[playerId]);
 
         let playerPos = allPlayerPos[playerId];
-        let a = currPos.x - playerPos.x;
-        let b = currPos.y - playerPos.y;
+        let dist = calcDist(currPos, playerPos);
 
-        let c = Math.sqrt( a*a + b*b );
-
-        console.log(`distance to player ${playerId}: ${c}`);
+        if (dist <= 100) {
+          console.log(`player ${id} killed player ${playerId}`);
+          addKilledPlayer(clientRoomKey, playerId);
+        }
       }
     }
   })
