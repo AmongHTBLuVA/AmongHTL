@@ -35,6 +35,10 @@ module.exports = function (app) {
     res.sendFile("/src/lobby/lobbyEvents.js", { root: "clientFiles" });
   });
 
+  app.get("/script/roleReveal.js", function (req, res) {
+    res.sendFile("/src/roleReveal.js", { root: "clientFiles" });
+  });
+
   //Movement Collision Scripts
   app.get("/script/borderFunctions.js", function (req, res) {
     res.sendFile("/src/Movement_Collision/borderFunctions.js", {
@@ -80,6 +84,12 @@ module.exports = function (app) {
     });
   });
   
+  app.get("/style/game.css", function (req, res) {
+    res.sendFile("/public/css/game.css", {
+      root: "clientFiles",
+    });
+  });
+
   //images
 
   app.get("/img/Wieser.png", function (req, res) {

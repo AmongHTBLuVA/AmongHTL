@@ -5,22 +5,40 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
+    <link rel="stylesheet" href="/style/game.css">
+    <link rel="stylesheet" href="/style/buffer.css">
     <link rel="stylesheet" href="/style/gameStyles.css" />
-
+  
     <script src="//code.jquery.com/jquery-1.12.0.min.js"></script>
     <script src="//code.jquery.com/jquery-migrate-1.2.1.min.js"></script>
 
-    <script type="module" src="/script/borderFunctions.js"></script>
-    <script type="module" src="/script/movement.js"></script>
-    <script type="module" src="/script/main.js"></script>
+    <script type="module" src='/script/borderFunctions.js'></script>
+    <script type="module" src='/script/movement.js'></script>
+    <script type="module" src='/script/main.js'></script>
+    <script type="module" src="/script/roleReveal.js"></script>
     <script type="module" src="/script/requests.js"></script>
 
     <script type="module" src="/script/MovementCollisionEvents.js"></script>
     <script type="module" src="/script/Events.js"></script>
     <title>AmongHTL</title>
   </head>
-  <body style="margin: 0px">
-    <canvas id="canvas"> </canvas>
+
+  <body class="gameBackground">
+    <div class="container hide">
+      <div class="textContainer">
+        <h2 id="roleReveal">Crewmate</h2>
+        <h3 class="crwMateText">There is <span class="imposterDsp">1 Imposter</span> among htl</h3>
+      </div>
+      <div class="playerDisplayContainer">
+        <div class="bkgFade fadeInital">
+        </div>
+        <div class="bkgFadeNarrow fadeInital"></div>
+        <div class="playerDisplay">
+          
+        </div>
+      </div>
+    </div>
+    <canvas id="canvas" class="hide"> </canvas>
     <button id="killButton">Kill</button>
   </body>
 </html>
