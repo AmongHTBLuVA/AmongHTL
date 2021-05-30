@@ -1,10 +1,11 @@
 import { getDeltaPos, requestMovement } from "/script/movement.js";
+import {mapName} from "/script/socket.js"
 
 var player = new Image();
 const playerImageUrl = "/img/Wieser.png";
 
 var background = new Image();
-const backgroundImageUrl = "/img/testmapKlein.png";
+const backgroundImageUrl = "/img/"+mapName+".png";
 
 var canvas;
 var ctx;

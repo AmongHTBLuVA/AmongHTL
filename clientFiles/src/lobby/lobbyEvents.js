@@ -9,6 +9,7 @@ socket.on("assignRoomKey", (roomKey) => {
 });
 
 socket.on("startLobby", () => {
+    console.log("starting lobby " + currLobby);
     window.location.href = "/game/" + currLobby;
 });
 
@@ -26,6 +27,7 @@ socket.on("lobbyMembers", (roomMembers) => {
                 }
             } else if (i != 0) {
                 $(".btnContainer").hide();
+                $(".playerJoined").append("<p style='font-weight: 100;'>" + element.name + "</p>");
             } else {
                 $(".playerJoined").append("<p style='font-weight: 100;'>" + element.name + "</p>");
             }

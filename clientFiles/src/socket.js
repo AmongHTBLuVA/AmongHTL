@@ -3,6 +3,16 @@ import "https://cdn.socket.io/3.1.3/socket.io.min.js";
 var socket = io();
 var Clientid = undefined;
 var userName = undefined;
+var playerRole = undefined;
+const mapName = "testmapKlein";
+
+function setplayerRole(role) {
+  playerRole = role;
+}
+
+function getplayerRole() {
+  return playerRole;
+}
 
 function setId(id) {
   Clientid = id;
@@ -23,4 +33,4 @@ function getName() {
   return false;
 }
 
-export { socket, setId, getId, setName, getName};
+export { socket, setId, getId, setName, getName, getplayerRole, setplayerRole, mapName};

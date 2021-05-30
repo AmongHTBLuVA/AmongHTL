@@ -1,4 +1,4 @@
-import { socket, setId, setName } from "/script/socket.js";
+import { socket, setId, setName, mapName } from "/script/socket.js";
 
 socket.on("connect", () => {
 });
@@ -6,6 +6,8 @@ socket.on("connect", () => {
 socket.on("sendClientId", (id, absId) => {
   setId(id);
   let prevAbsId = localStorage.getItem("absID");
+
+  console.log(id, prevAbsId, absId);
   if(prevAbsId){
     socket.emit("checkPreviousLogOn", prevAbsId);
   }else{
@@ -31,10 +33,12 @@ function logOn(userName) {
   let path = window.location.pathname;
   let key = path.substr(1, path.length - 1);
   setName(userName);
+  console.log(mapName);
   socket.emit(
     "authenticated",
     userName,
-    key
+    key,
+    mapName
   );
 }
 

@@ -7,7 +7,7 @@ import {
   getReadingBorders,
   copy
 } from "/script/main.js";
-import { translateBorderPos, getMapStartPoint, readMapBorders } from "/script/borderFunctions.js";
+import { getMapStartPoint, readMapBorders } from "/script/borderFunctions.js";
 import { setPlayerPositions } from "/script/movement.js";
 
 socket.on("drawBorders", (Borders, pos) => {
@@ -51,15 +51,6 @@ socket.on("playerMovement", (pos) => {
 socket.on("requestWallCollision", (pos) => {
   let collObj = getWallCollisions(pos);
   socket.emit("CollisionReply", collObj);
-});
-
-socket.on("translateBorders", (Borders) => {
-  let tmp = [];
-  console.log("translate");
-  Borders.forEach((b) => {
-    tmp.push(translateBorderPos(copy(b)));
-  });
-  socket.emit("replyTranslatedBorders", tmp);
 });
 
 socket.on("continueReading", (Borders, searchDirection, cpPos) => {

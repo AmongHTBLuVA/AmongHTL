@@ -15,6 +15,10 @@ module.exports = function (app) {
     res.sendFile("/src/main.js", { root: "clientFiles" });
   });
 
+  app.get("/script/requests.js", function (req, res) {
+    res.sendFile("/src/requests.js", { root: "clientFiles" });
+  });
+
   app.get("/script/socket.js", function (req, res) {
     res.sendFile("/src/socket.js", { root: "clientFiles" });
   });
@@ -29,6 +33,10 @@ module.exports = function (app) {
 
   app.get("/script/lobbyEvents.js", function (req, res) {
     res.sendFile("/src/lobby/lobbyEvents.js", { root: "clientFiles" });
+  });
+
+  app.get("/script/roleReveal.js", function (req, res) {
+    res.sendFile("/src/roleReveal.js", { root: "clientFiles" });
   });
 
   //Movement Collision Scripts
@@ -69,7 +77,19 @@ module.exports = function (app) {
       root: "clientFiles",
     });
   });
+
+  app.get("/style/gameStyles.css", function (req, res) {
+    res.sendFile("/public/css/gameStyles.css", {
+      root: "clientFiles",
+    });
+  });
   
+  app.get("/style/game.css", function (req, res) {
+    res.sendFile("/public/css/game.css", {
+      root: "clientFiles",
+    });
+  });
+
   //images
 
   app.get("/img/Wieser.png", function (req, res) {
