@@ -92,7 +92,7 @@ module.exports = {
       } else {
         console.log("lenght: " + Object.keys(activeGames[clientRoomKey].players).length);
         activeGames[clientRoomKey].players[socket.id].role =
-          activeGames[clientRoomKey].imposterIndex == Object.keys(activeGames[clientRoomKey].players).length ? "imposter" : "crewmate";
+          activeGames[clientRoomKey].imposterIndex+1 == Object.keys(activeGames[clientRoomKey].players).length ? "imposter" : "crewmate";
       }
       playerPos[clientRoomKey][socket.id] = getStartPoint(
         playerPos[clientRoomKey]
