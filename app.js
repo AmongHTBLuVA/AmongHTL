@@ -38,6 +38,7 @@ io.on("connection", (socket) => {
   console.log("[" + socket.id + "] connected on");
   var clientRoomKey = undefined;
   var clientName = undefined;
+  var role = undefined;
   var movesTillCheck = 0;
 
   let absClientId = getAbsoluteID();
@@ -52,6 +53,7 @@ io.on("connection", (socket) => {
       ) {
         absClientId = prevAbsId;
         clientName = connectedUsers[prevAbsId].name;
+        role = connectedUsers[prevAbsId].role;
         connectedUsers[prevAbsId].dctime = undefined;
         socket.emit("checkLogOn", clientName, absClientId);
         return;
@@ -74,7 +76,8 @@ io.on("connection", (socket) => {
       BordersAbsolute,
       readingBorders,
       clientName,
-      mapName
+      mapName,
+      role
     );
     clientName = authentiaction.clientName;
     clientRoomKey = authentiaction.clientRoomKey;
