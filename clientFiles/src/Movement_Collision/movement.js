@@ -78,8 +78,8 @@ document.addEventListener("keydown", function (event) {
     return deltaPos;
   }
   
-  function requestMovement(deltaPos) {
-    socket.emit("movementRequest", deltaPos, getId());
+  function requestMovement(deltaPos, speed) {
+    socket.emit("movementRequest", deltaPos, getId(), speed);
   }
   
   function setPlayerPositions(playerPos) {
