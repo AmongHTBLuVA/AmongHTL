@@ -23,8 +23,8 @@ module.exports = function (app) {
     res.sendFile("/src/socket.js", { root: "clientFiles" });
   });
 
-  app.get("/script/Events.js", function (req, res) {
-    res.sendFile("/src/Events.js", { root: "clientFiles" });
+  app.get("/script/events.js", function (req, res) {
+    res.sendFile("/src/events.js", { root: "clientFiles" });
   });
 
   app.get("/script/lobby.js", function (req, res) {
