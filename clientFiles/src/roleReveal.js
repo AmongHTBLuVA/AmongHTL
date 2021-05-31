@@ -13,6 +13,7 @@ socket.on("assignRole", (role, playerCount, time) => {
     $("#roleReveal").html("Imposter");
     $("h3").hide();
     $("body").addClass("imposter");
+    $("#killButton").show();
     playerCount = 1;
 }  
   $(".container").removeClass("hide");
@@ -73,6 +74,6 @@ socket.on("assignRole", (role, playerCount, time) => {
   console.log("start: " + timeTill);
   setTimeout(() => {
     $(".container").hide();
-    $("#canvas").removeClass("hide");
+    $(".gameContainer").removeClass("hide");
   }, (timeTill < 0 ? 0 : timeTill) * 1000);
 });
