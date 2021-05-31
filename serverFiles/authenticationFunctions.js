@@ -49,7 +49,8 @@ module.exports = {
     readingBorders,
     clientName,
     mapName,
-    role
+    role,
+    socketToSessionID
   ) {
     let parts = currentRoom.split("/");
     if (!connectedUsers[absClientId]) {
@@ -60,6 +61,7 @@ module.exports = {
         dctime: undefined,
       };
     }
+    socketToSessionID[socket.id] = absClientId;
     if (parts.length != 1 && parts[0] == "game") {
       clientRoomKey = parts[1];
       if (!activeGames[clientRoomKey]) {
@@ -151,7 +153,8 @@ module.exports = {
     clientRoomKey,
     openLobbies,
     playerPos,
-    clientName
+    clientName,
+    socketToSessionID
   ) {
     if (connectedUsers[absClientId]) {
       connectedUsers[absClientId].dctime = Date.now();
@@ -166,6 +169,9 @@ module.exports = {
       } else {
         delete activeGames[clientRoomKey].players[socket.id];
       }
+    }
+    if(socketToSessionID[socket.id]){
+      delete socketToSessionID[socket.id];
     }
     if (openLobbies[clientRoomKey]) {
       //delete openLobbies[clientRoomKey];
