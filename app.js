@@ -18,7 +18,7 @@ const {
   getAbsoluteID,
 } = require("./serverFiles/authenticationFunctions.js");
 const fs = require("fs");
-const { kill } = require("process");
+const { kill, pid } = require("process");
 
 const reconnectionTime = 15000;
 
@@ -55,6 +55,16 @@ function addKilledPlayer(roomId, playerId) {
   killedPlayers[roomId].push(playerId);
 }
 
+function getOwnPosition(id, players){
+  let pos = undefined;
+  Object.keys(players).forEach(pId => {
+    if(pId == id){
+      pos = players[pId];
+    }
+  });
+  return pos;
+}
+
 function filterKilledPlayers(positions, roomId) {
   let filteredPos = copy(positions);
 
@@ -74,6 +84,7 @@ io.on("connection", (socket) => {
   var clientName = undefined;
   var role = undefined;
   var movesTillWallCheck = 0;
+  var deadPos = undefined;
 
   let absClientId = getAbsoluteID();
 
@@ -189,11 +200,18 @@ io.on("connection", (socket) => {
     if (readingBorders[clientRoomKey]) {
       return;
     }
-
     if (
       killedPlayers[clientRoomKey] &&
       killedPlayers[clientRoomKey].includes(absClientId)
     ) {
+      if(!deadPos){
+        deadPos = getOwnPosition(socket.id, playerPos[clientRoomKey]);
+      }
+      for (let i = 0; i < speed; i++) {
+        let mergedDeadPos = mergePos(deltapos, copy(deadPos));
+        deadPos = mergedDeadPos;
+      }
+      socket.emit("deadPlayerMove", deadPos, copy(playerPos[clientRoomKey]));
       return;
     }
 

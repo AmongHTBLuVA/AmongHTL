@@ -39,13 +39,13 @@ socket.on("RequestMapBorders", () => {
   }, 1);
 });
 
-socket.on("playerMovement", (pos) => {
+socket.on("playerMovement", (playerPositions) => {
   console.log("MOVE");
   if (getReadingBorders()) {
     console.log("no movement");
     return;
   }
-  setPlayerPositions(pos);
+  setPlayerPositions(playerPositions);
 });
 
 socket.on("requestWallCollision", (pos) => {
@@ -56,4 +56,8 @@ socket.on("requestWallCollision", (pos) => {
 socket.on("continueReading", (Borders, searchDirection, cpPos) => {
   console.log("conitnue: " + cpPos);
   readMapBorders(Borders, searchDirection, cpPos);
+});
+
+socket.on("deadPlayerMove", (pos, playerPositions) => {
+  setPlayerPositions(playerPositions, pos);
 });
