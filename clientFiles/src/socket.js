@@ -4,7 +4,7 @@ var socket = io();
 var Clientid = undefined;
 var userName = undefined;
 var playerRole = undefined;
-const mapName = "testmapKlein";
+const mapName = "testmap";
 
 function setplayerRole(role) {
   playerRole = role;
