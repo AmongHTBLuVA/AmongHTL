@@ -18,10 +18,10 @@ const {
   getAbsoluteID,
 } = require("./serverFiles/authenticationFunctions.js");
 const fs = require("fs");
-const { kill } = require("process");
 
 const reconnectionTime = 15000;
 
+var socketToSessionID = {};
 
 var playerPos = {};
 var readingBorders = {};
@@ -49,24 +49,22 @@ function calcDist(playerA, playerB) {
 
 function addKilledPlayer(roomId, playerId) {
   if (killedPlayers[roomId] == undefined) {
-    killedPlayers[roomId] = [];
+    killedPlayers[roomId] = {};
   }
-  killedPlayers[roomId].push(playerId);
+  console.log("abs: " + socketToSessionID[playerId]);
+  let absId = socketToSessionID[playerId];
+  killedPlayers[roomId][absId] = playerPos[roomId][playerId];
 }
 
-function filterKilledPlayers(positions, roomId) {
-  let filteredPos = copy(positions);
-
-  for (let player in positions) {
-    if (!killedPlayers[roomId].includes(player)) {
-      delete filteredPos[player];
+function getOwnPosition(id, players) {
+  let pos = undefined;
+  Object.keys(players).forEach((pId) => {
+    if (pId == id) {
+      pos = players[pId];
     }
-  }
-
-  return filteredPos;
+  });
+  return pos;
 }
-
-
 
 //-----------------socket stuff------------------------------
 
@@ -75,15 +73,15 @@ io.on("connection", (socket) => {
   var clientRoomKey = undefined;
   var clientName = undefined;
   var role = undefined;
-  var movesTillCheck = 0;
+  var movesTillWallCheck = 0;
+  var deadPos = undefined;
 
   let absClientId = getAbsoluteID();
 
   socket.emit("sendClientId", socket.id, absClientId);
 
   socket.on("checkPreviousLogOn", (prevAbsId) => {
-    if (prevAbsId && connectedUsers[prevAbsId]) { 
-
+    if (prevAbsId && connectedUsers[prevAbsId]) {
       if (
         Date.now() - connectedUsers[prevAbsId].dctime < reconnectionTime &&
         connectedUsers[prevAbsId].absUserId == prevAbsId
@@ -114,11 +112,14 @@ io.on("connection", (socket) => {
       readingBorders,
       clientName,
       mapName,
-      role
+      role,
+      socketToSessionID,
+      killedPlayers
     );
     clientName = authentiaction.clientName;
     clientRoomKey = authentiaction.clientRoomKey;
 
+    console.log(socket.id + " authenticated : " + clientName);
     socket.join(clientRoomKey);
     socket.emit("assignRoomKey", clientRoomKey);
     io.to(clientRoomKey).emit("lobbyMembers", openLobbies[clientRoomKey]);
@@ -159,20 +160,25 @@ io.on("connection", (socket) => {
       clientRoomKey,
       openLobbies,
       playerPos,
-      clientName
+      clientName,
+      socketToSessionID
     );
     io.to(clientRoomKey).emit("playerMovement", playerPos[clientRoomKey]);
   });
 
-//----------Movement Collision Events-------------------------------------
+  //----------Movement Collision Events-------------------------------------
 
   socket.on("ReplyMapBorders", (mapBorders, mapName) => {
     console.log("reply");
     BordersAbsolute[clientRoomKey] = copy(mapBorders);
-    fs.writeFile("./serverFiles/borders/"+ mapName + ".json", JSON.stringify(BordersAbsolute[clientRoomKey]), function (err) {
-      if (err) throw err;
-      console.log('Saved!');
-    });
+    fs.writeFile(
+      "./serverFiles/borders/" + mapName + ".json",
+      JSON.stringify(BordersAbsolute[clientRoomKey]),
+      function (err) {
+        if (err) throw err;
+        console.log("Saved!");
+      }
+    );
     io.to(clientRoomKey).emit("playerMovement", playerPos[clientRoomKey]);
     readingBorders[clientRoomKey] = false;
   });
@@ -181,46 +187,60 @@ io.on("connection", (socket) => {
     socket.emit("continueReading", borderTmp, searchDirection, cpPos);
   });
 
-  socket.on("movementRequest", (deltapos, id) => {
+  socket.on("movementRequest", (deltapos, id, speed) => {
     if (readingBorders[clientRoomKey]) {
       return;
     }
-
-    if (killedPlayers[clientRoomKey] && killedPlayers[clientRoomKey].includes(id)) {
+    if (
+      killedPlayers[clientRoomKey] &&
+      killedPlayers[clientRoomKey][absClientId] != undefined
+    ) {
+      if (!deadPos) {
+        deadPos = getOwnPosition(socket.id, playerPos[clientRoomKey]);
+      }
+      for (let i = 0; i < speed; i++) {
+        let mergedDeadPos = mergePos(deltapos, copy(deadPos));
+        deadPos = mergedDeadPos;
+      }
+      socket.emit("deadPlayerMove", deadPos, copy(playerPos[clientRoomKey]));
       return;
     }
 
-    let pos = playerPos[clientRoomKey][id];
-    mergedPos = mergePos(deltapos, copy(pos));
-    playerPos[clientRoomKey][id] = mergedPos;
-    let collObjs = getPlayerCollObj(
-      mergedPos,
-      deltapos,
-      id,
-      playerPos[clientRoomKey]
-    );
-    playerCollision(
-      collObjs,
-      id,
-      pos,
-      copy(BordersAbsolute[clientRoomKey]),
-      playerPos[clientRoomKey]
-    );
-    if (movesTillCheck - 70 <= 0) {
-      let wallColltest = wallCollision(copy(mergedPos), copy(BordersAbsolute[clientRoomKey]));
-      if (wallColltest.collision) {
-        playerPos[clientRoomKey][id] = copy(pos);
-      } else {
-        movesTillCheck = wallColltest.minDistance;
+    for (let i = 0; i < speed; i++) {
+      let pos = playerPos[clientRoomKey][id];
+      mergedPos = mergePos(deltapos, copy(pos));
+      playerPos[clientRoomKey][id] = mergedPos;
+      let collObjs = getPlayerCollObj(
+        mergedPos,
+        deltapos,
+        id,
+        playerPos[clientRoomKey]
+      );
+      playerCollision(
+        collObjs,
+        id,
+        pos,
+        copy(BordersAbsolute[clientRoomKey]),
+        playerPos[clientRoomKey]
+      );
+      if (movesTillWallCheck - 70 <= 0) {
+        let wallColltest = wallCollision(
+          copy(mergedPos),
+          copy(BordersAbsolute[clientRoomKey])
+        );
+        if (wallColltest.collision) {
+          playerPos[clientRoomKey][id] = copy(pos);
+        } else {
+          movesTillWallCheck = wallColltest.minDistance;
+        }
       }
+      movesTillWallCheck--;
     }
-    movesTillCheck--;
-
     io.to(clientRoomKey).emit("playerMovement", playerPos[clientRoomKey]);
     //socket.emit("drawBorders", copy(clientBorders), copy(mergedPos)); //DEBUG
   });
 
-//----------Client Action Events-------------------------------------------
+  //----------Client Action Events-------------------------------------------
 
   socket.on("killRequest", (id) => {
     let allPlayerPos = playerPos[clientRoomKey];
@@ -228,17 +248,18 @@ io.on("connection", (socket) => {
 
     for (const playerId in allPlayerPos) {
       if (playerId != id) {
-
         let playerPos = allPlayerPos[playerId];
         let dist = calcDist(currPos, playerPos);
 
         if (dist <= 100) {
-          console.log(`player ${id} killed player ${playerId}`);
+          console.log(
+            `player ${id} killed player ${socketToSessionID[playerId]}`
+          );
           addKilledPlayer(clientRoomKey, playerId);
         }
       }
     }
-  })
+  });
 });
 
 server.listen(8080, function () {

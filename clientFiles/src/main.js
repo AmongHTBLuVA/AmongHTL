@@ -14,8 +14,8 @@ var readingBorders = false;
 var height;
 var width;
 
-const speed = 4;
-const tickIntervall = 50;
+const speed = 5;
+const tickIntervall = 60;
 
 function copy(o) {
   return JSON.parse(JSON.stringify(o));
@@ -62,9 +62,7 @@ $(document).on("ready", () => {
 function tick() {
   let delta = getDeltaPos();
   if (delta.x != 0 || delta.y != 0) {
-    for (let i = 0; i < speed; i++) {
-      requestMovement(delta);
-    }
+    requestMovement(delta, speed);
   }
 }
 

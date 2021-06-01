@@ -17,10 +17,10 @@ button:active {
   outline: none;
 
   height: 150px;
-  width: 150px;
-  position: fixed;
-  top: 75vh;
-  left: 75vw;
+  width: 150px; 
+  position:absolute;
+  bottom:20px;
+  right:10px;
 
   font-size: 60pt;
   font-weight: bold;
