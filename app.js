@@ -191,12 +191,6 @@ io.on("connection", (socket) => {
     if (readingBorders[clientRoomKey]) {
       return;
     }
-    if(killedPlayers[clientRoomKey]){
-      console.log("lenght: " + Object.keys(killedPlayers[clientRoomKey]));
-      console.log("abs: " + absClientId);
-      console.log("value: " + killedPlayers[clientRoomKey][absClientId]);
-      console.log("valid: " + (killedPlayers[clientRoomKey][absClientId] ? true : false));
-    }
     if (
       killedPlayers[clientRoomKey] &&
       killedPlayers[clientRoomKey][absClientId] != undefined

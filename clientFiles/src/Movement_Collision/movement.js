@@ -9,6 +9,11 @@ import {
 } from "/script/main.js";
 
 var keyPressed = { w: false, s: false, d: false, a: false };
+var deadPlayerPos = undefined;
+
+function setDeadPos(pos){
+  deadPlayerPos = pos;
+}
 
 function round(x) {
   const parsed = parseInt(x, 10);
@@ -82,10 +87,9 @@ function requestMovement(deltaPos, speed) {
   socket.emit("movementRequest", deltaPos, getId(), speed);
 }
 
-function setPlayerPositions(playerPos, deadPos) {
+function setPlayerPositions(playerPos) {
   ctx.clearRect(0, 0, canvas.width, canvas.height);
-  console.log("posss: " + (deadPos ? "deadPos" : "playerPos"));
-  let pos = deadPos ? deadPos : playerPos[getId()];
+  let pos = deadPlayerPos ? deadPlayerPos : playerPos[getId()];
   let backgroundPos = translateMapPosistion(pos);
   ctx.drawImage(
     background,
@@ -94,7 +98,7 @@ function setPlayerPositions(playerPos, deadPos) {
     background.width,
     background.height
   );
-  if(!deadPos) {
+  if(!deadPlayerPos) {
     ctx.drawImage(
       player,
       round(getWidth() / 2) - 30,
@@ -105,13 +109,13 @@ function setPlayerPositions(playerPos, deadPos) {
   }
   console.log("pos: " + pos);
   Object.keys(playerPos).forEach((id) => {
-    if (id != getId() || deadPos) {
+    if (id != getId() || deadPlayerPos) {
       console.log("playerPos: " + playerPos[id]);
       let relativPos = translatePlayerPosistion(playerPos[id], pos);
       ctx.drawImage(player, relativPos.x, relativPos.y, 70, 70);
     }
   });
-  if (deadPos) {
+  if (deadPlayerPos) {
     ctx.globalAlpha = 0.7;
     ctx.drawImage(
       player,
@@ -140,4 +144,4 @@ function translatePlayerPosistion(ppos, cpos) {
   return { x: getWidth() / 2 - 30 + xdiff, y: getHeight() / 2 - 30 + ydiff };
 }
 
-export { getDeltaPos, requestMovement, setPlayerPositions };
+export { getDeltaPos, requestMovement, setPlayerPositions, setDeadPos };

@@ -8,7 +8,7 @@ import {
   copy
 } from "/script/main.js";
 import { getMapStartPoint, readMapBorders } from "/script/borderFunctions.js";
-import { setPlayerPositions } from "/script/movement.js";
+import { setPlayerPositions, setDeadPos } from "/script/movement.js";
 
 socket.on("drawBorders", (Borders, pos) => {
   let b0;
@@ -59,5 +59,6 @@ socket.on("continueReading", (Borders, searchDirection, cpPos) => {
 });
 
 socket.on("deadPlayerMove", (pos, playerPositions) => {
-  setPlayerPositions(playerPositions, pos);
+  setDeadPos(pos);
+  setPlayerPositions(playerPositions);
 });

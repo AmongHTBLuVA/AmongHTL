@@ -1,7 +1,7 @@
 const { getStartPoint } = require("./evaluationFunctions.js");
 const fs = require("fs");
 
-const revealTime = 1;
+const revealTime = 6;
 
 function copy(o) {
   return JSON.parse(JSON.stringify(o));
