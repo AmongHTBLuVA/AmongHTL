@@ -18,7 +18,6 @@ const {
   getAbsoluteID,
 } = require("./serverFiles/authenticationFunctions.js");
 const fs = require("fs");
-const { kill } = require("process");
 
 const reconnectionTime = 15000;
 
@@ -50,20 +49,21 @@ function calcDist(playerA, playerB) {
 
 function addKilledPlayer(roomId, playerId) {
   if (killedPlayers[roomId] == undefined) {
-    killedPlayers[roomId] = [];
+    killedPlayers[roomId] = {};
   }
-  killedPlayers[roomId].push(playerId);
+  console.log("abs: " + socketToSessionID[playerId]);
+  let absId = socketToSessionID[playerId];
+  killedPlayers[roomId][absId] = playerPos[roomId][playerId];
 }
 
-function filterKilledPlayers(positions, roomId) {
-  let filteredPos = copy(positions);
-
-  for (let player in positions) {
-    if (!killedPlayers[roomId].includes(player)) {
-      delete filteredPos[player];
+function getOwnPosition(id, players) {
+  let pos = undefined;
+  Object.keys(players).forEach((pId) => {
+    if (pId == id) {
+      pos = players[pId];
     }
-  }
-  return filteredPos;
+  });
+  return pos;
 }
 
 //-----------------socket stuff------------------------------
@@ -74,6 +74,7 @@ io.on("connection", (socket) => {
   var clientName = undefined;
   var role = undefined;
   var movesTillWallCheck = 0;
+  var deadPos = undefined;
 
   let absClientId = getAbsoluteID();
 
@@ -112,7 +113,8 @@ io.on("connection", (socket) => {
       clientName,
       mapName,
       role,
-      socketToSessionID
+      socketToSessionID,
+      killedPlayers
     );
     clientName = authentiaction.clientName;
     clientRoomKey = authentiaction.clientRoomKey;
@@ -189,11 +191,18 @@ io.on("connection", (socket) => {
     if (readingBorders[clientRoomKey]) {
       return;
     }
-
     if (
       killedPlayers[clientRoomKey] &&
-      killedPlayers[clientRoomKey].includes(absClientId)
+      killedPlayers[clientRoomKey][absClientId] != undefined
     ) {
+      if (!deadPos) {
+        deadPos = getOwnPosition(socket.id, playerPos[clientRoomKey]);
+      }
+      for (let i = 0; i < speed; i++) {
+        let mergedDeadPos = mergePos(deltapos, copy(deadPos));
+        deadPos = mergedDeadPos;
+      }
+      socket.emit("deadPlayerMove", deadPos, copy(playerPos[clientRoomKey]));
       return;
     }
 
@@ -201,19 +210,19 @@ io.on("connection", (socket) => {
       let pos = playerPos[clientRoomKey][id];
       mergedPos = mergePos(deltapos, copy(pos));
       playerPos[clientRoomKey][id] = mergedPos;
-        let collObjs = getPlayerCollObj(
-          mergedPos,
-          deltapos,
-          id,
-          playerPos[clientRoomKey]
-        );
-        playerCollision(
-          collObjs,
-          id,
-          pos,
-          copy(BordersAbsolute[clientRoomKey]),
-          playerPos[clientRoomKey]
-        );
+      let collObjs = getPlayerCollObj(
+        mergedPos,
+        deltapos,
+        id,
+        playerPos[clientRoomKey]
+      );
+      playerCollision(
+        collObjs,
+        id,
+        pos,
+        copy(BordersAbsolute[clientRoomKey]),
+        playerPos[clientRoomKey]
+      );
       if (movesTillWallCheck - 70 <= 0) {
         let wallColltest = wallCollision(
           copy(mergedPos),
@@ -243,8 +252,10 @@ io.on("connection", (socket) => {
         let dist = calcDist(currPos, playerPos);
 
         if (dist <= 100) {
-          console.log(`player ${id} killed player ${socketToSessionID[playerId]}`);
-          addKilledPlayer(clientRoomKey, socketToSessionID[playerId]);
+          console.log(
+            `player ${id} killed player ${socketToSessionID[playerId]}`
+          );
+          addKilledPlayer(clientRoomKey, playerId);
         }
       }
     }
