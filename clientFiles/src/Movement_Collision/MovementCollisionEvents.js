@@ -40,7 +40,6 @@ socket.on("RequestMapBorders", () => {
 });
 
 socket.on("playerMovement", (playerPositions) => {
-  console.log("MOVE");
   if (getReadingBorders()) {
     console.log("no movement");
     return;
@@ -58,7 +57,6 @@ socket.on("continueReading", (Borders, searchDirection, cpPos) => {
   readMapBorders(Borders, searchDirection, cpPos);
 });
 
-socket.on("deadPlayerMove", (pos, playerPositions) => {
+socket.on("deadPlayerPos", (pos) => {
   setDeadPos(pos);
-  setPlayerPositions(playerPositions);
 });

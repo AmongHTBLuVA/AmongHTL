@@ -10,8 +10,9 @@ import {
 
 var keyPressed = { w: false, s: false, d: false, a: false };
 var deadPlayerPos = undefined;
+var previousDelta = {x: -2, y: -2};
 
-function setDeadPos(pos){
+function setDeadPos(pos) {
   deadPlayerPos = pos;
 }
 
@@ -21,6 +22,15 @@ function round(x) {
     return 0;
   }
   return parsed;
+}
+
+function deltaChange(currDelta) {
+  if (previousDelta.x == currDelta.x && previousDelta.y == currDelta.y) {
+    previousDelta = currDelta;
+    return false;
+  }
+  previousDelta = currDelta;
+  return true;
 }
 
 document.addEventListener("keydown", function (event) {
@@ -40,6 +50,17 @@ document.addEventListener("keydown", function (event) {
     //S
     keyPressed.s = true;
   }
+  if (
+    event.keyCode == 87 ||
+    event.keyCode == 65 ||
+    event.keyCode == 68 ||
+    event.keyCode == 83
+  ) {
+    let delta = getDeltaPos();
+    if (deltaChange(delta)) {
+      socket.emit("setMoveDirection", delta);
+    }
+  }
 });
 
 document.addEventListener("keyup", function (event) {
@@ -58,6 +79,18 @@ document.addEventListener("keyup", function (event) {
   if (event.keyCode == 83) {
     //S
     keyPressed.s = false;
+  }
+  console.log("up");
+  if (
+    event.keyCode == 87 ||
+    event.keyCode == 65 ||
+    event.keyCode == 68 ||
+    event.keyCode == 83
+  ) {
+    let delta = getDeltaPos();
+    if (deltaChange(delta)) {
+      socket.emit("setMoveDirection", delta);
+    }
   }
 });
 
@@ -83,10 +116,6 @@ function getDeltaPos() {
   return deltaPos;
 }
 
-function requestMovement(deltaPos, speed) {
-  socket.emit("movementRequest", deltaPos, getId(), speed);
-}
-
 function setPlayerPositions(playerPos) {
   ctx.clearRect(0, 0, canvas.width, canvas.height);
   let pos = deadPlayerPos ? deadPlayerPos : playerPos[getId()];
@@ -98,7 +127,7 @@ function setPlayerPositions(playerPos) {
     background.width,
     background.height
   );
-  if(!deadPlayerPos) {
+  if (!deadPlayerPos) {
     ctx.drawImage(
       player,
       round(getWidth() / 2) - 30,
@@ -107,7 +136,6 @@ function setPlayerPositions(playerPos) {
       70
     );
   }
-  console.log("pos: " + pos);
   Object.keys(playerPos).forEach((id) => {
     if (id != getId() || deadPlayerPos) {
       console.log("playerPos: " + playerPos[id]);
@@ -125,7 +153,7 @@ function setPlayerPositions(playerPos) {
       70
     );
     ctx.globalAlpha = 1.0;
-  } 
+  }
 }
 
 function translateMapPosistion(bpos) {
@@ -144,4 +172,4 @@ function translatePlayerPosistion(ppos, cpos) {
   return { x: getWidth() / 2 - 30 + xdiff, y: getHeight() / 2 - 30 + ydiff };
 }
 
-export { getDeltaPos, requestMovement, setPlayerPositions, setDeadPos };
+export { getDeltaPos, setPlayerPositions, setDeadPos };

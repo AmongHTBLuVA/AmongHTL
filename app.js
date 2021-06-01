@@ -1,38 +1,29 @@
-var express = require("express");
-var app = express();
-var server = require("http").Server(app);
-var io = require("socket.io")(server);
-require("./router")(app);
-
-const {
-  getPlayerCollObj,
-  mergePos,
-} = require("./serverFiles/Movement_Collision/playerMovCollFunctions.js");
-const {
-  wallCollision,
-} = require("./serverFiles/Movement_Collision/wallCollisionFunctions");
-const { playerCollision } = require("./serverFiles/evaluationFunctions.js");
 const {
   authenticate,
   cleanUp,
   getAbsoluteID,
 } = require("./serverFiles/authenticationFunctions.js");
+const {
+  deltaPositions,
+  deadPositions,
+  movesTillCheck,
+  readingBorders,
+  BordersAbsolute,
+  playerPos,
+  killedPlayers,
+  openLobbies,
+  activeGames,
+  connectedUsers,
+  socketToSessionID,
+  app,
+  io,
+  server
+} = require("./serverFiles/dataStructures.js");
 const fs = require("fs");
 
+require("./router")(app);
+
 const reconnectionTime = 15000;
-
-var socketToSessionID = {};
-
-var playerPos = {};
-var readingBorders = {};
-var BordersAbsolute = {};
-
-var openLobbies = {};
-var activeGames = {};
-
-var connectedUsers = {};
-
-var killedPlayers = {};
 
 //-----------------utility functions------------------------
 
@@ -73,8 +64,6 @@ io.on("connection", (socket) => {
   var clientRoomKey = undefined;
   var clientName = undefined;
   var role = undefined;
-  var movesTillWallCheck = 0;
-  var deadPos = undefined;
 
   let absClientId = getAbsoluteID();
 
@@ -102,22 +91,18 @@ io.on("connection", (socket) => {
       socket,
       username,
       currentRoom,
-      connectedUsers,
-      openLobbies,
       absClientId,
       clientRoomKey,
-      activeGames,
-      playerPos,
-      BordersAbsolute,
-      readingBorders,
       clientName,
       mapName,
-      role,
-      socketToSessionID,
-      killedPlayers
+      role
     );
     clientName = authentiaction.clientName;
     clientRoomKey = authentiaction.clientRoomKey;
+    movesTillCheck[clientRoomKey] = {};
+    movesTillCheck[clientRoomKey][socket.id] = 0;
+    deltaPositions[clientRoomKey] = {};
+    deadPositions[clientRoomKey] = {};
 
     console.log(socket.id + " authenticated : " + clientName);
     socket.join(clientRoomKey);
@@ -161,7 +146,10 @@ io.on("connection", (socket) => {
       openLobbies,
       playerPos,
       clientName,
-      socketToSessionID
+      socketToSessionID,
+      deadPositions,
+      deltaPositions,
+      movesTillCheck
     );
     io.to(clientRoomKey).emit("playerMovement", playerPos[clientRoomKey]);
   });
@@ -187,57 +175,9 @@ io.on("connection", (socket) => {
     socket.emit("continueReading", borderTmp, searchDirection, cpPos);
   });
 
-  socket.on("movementRequest", (deltapos, id, speed) => {
-    if (readingBorders[clientRoomKey]) {
-      return;
-    }
-    if (
-      killedPlayers[clientRoomKey] &&
-      killedPlayers[clientRoomKey][absClientId] != undefined
-    ) {
-      if (!deadPos) {
-        deadPos = getOwnPosition(socket.id, playerPos[clientRoomKey]);
-      }
-      for (let i = 0; i < speed; i++) {
-        let mergedDeadPos = mergePos(deltapos, copy(deadPos));
-        deadPos = mergedDeadPos;
-      }
-      socket.emit("deadPlayerMove", deadPos, copy(playerPos[clientRoomKey]));
-      return;
-    }
-
-    for (let i = 0; i < speed; i++) {
-      let pos = playerPos[clientRoomKey][id];
-      mergedPos = mergePos(deltapos, copy(pos));
-      playerPos[clientRoomKey][id] = mergedPos;
-      let collObjs = getPlayerCollObj(
-        mergedPos,
-        deltapos,
-        id,
-        playerPos[clientRoomKey]
-      );
-      playerCollision(
-        collObjs,
-        id,
-        pos,
-        copy(BordersAbsolute[clientRoomKey]),
-        playerPos[clientRoomKey]
-      );
-      if (movesTillWallCheck - 70 <= 0) {
-        let wallColltest = wallCollision(
-          copy(mergedPos),
-          copy(BordersAbsolute[clientRoomKey])
-        );
-        if (wallColltest.collision) {
-          playerPos[clientRoomKey][id] = copy(pos);
-        } else {
-          movesTillWallCheck = wallColltest.minDistance;
-        }
-      }
-      movesTillWallCheck--;
-    }
-    io.to(clientRoomKey).emit("playerMovement", playerPos[clientRoomKey]);
-    //socket.emit("drawBorders", copy(clientBorders), copy(mergedPos)); //DEBUG
+  socket.on("setMoveDirection", (delta) => {
+    deltaPositions[clientRoomKey][socket.id] = delta;
+    console.log("set: " + deltaPositions[clientRoomKey][socket.id]);
   });
 
   //----------Client Action Events-------------------------------------------

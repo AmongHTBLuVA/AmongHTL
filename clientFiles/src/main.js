@@ -1,4 +1,3 @@
-import { getDeltaPos, requestMovement } from "/script/movement.js";
 import {mapName} from "/script/socket.js"
 
 var player = new Image();
@@ -13,9 +12,6 @@ var readingBorders = false;
 
 var height;
 var width;
-
-const speed = 5;
-const tickIntervall = 60;
 
 function copy(o) {
   return JSON.parse(JSON.stringify(o));
@@ -56,15 +52,7 @@ $(document).on("ready", () => {
   width = window.innerWidth;
   canvas.width = width;
   canvas.height = height;
-  setInterval(tick, tickIntervall);
 });
-
-function tick() {
-  let delta = getDeltaPos();
-  if (delta.x != 0 || delta.y != 0) {
-    requestMovement(delta, speed);
-  }
-}
 
 export {
   player,
