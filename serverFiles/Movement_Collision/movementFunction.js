@@ -15,6 +15,16 @@ function copy(o) {
   return JSON.parse(JSON.stringify(o));
 }
 
+function getOwnPosition(id, players) {
+  let pos = undefined;
+  Object.keys(players).forEach((pId) => {
+    if (pId == id) {
+      pos = players[pId];
+    }
+  });
+  return pos;
+}
+
 module.exports = {
   movePlayer: function movePlayer(
     deltapos,

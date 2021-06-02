@@ -47,16 +47,6 @@ function addKilledPlayer(roomId, playerId) {
   killedPlayers[roomId][absId] = playerPos[roomId][playerId];
 }
 
-function getOwnPosition(id, players) {
-  let pos = undefined;
-  Object.keys(players).forEach((pId) => {
-    if (pId == id) {
-      pos = players[pId];
-    }
-  });
-  return pos;
-}
-
 //-----------------socket stuff------------------------------
 
 io.on("connection", (socket) => {
