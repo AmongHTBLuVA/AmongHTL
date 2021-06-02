@@ -17,7 +17,7 @@ const {
   socketToSessionID,
   app,
   io,
-  server
+  server,
 } = require("./serverFiles/dataStructures.js");
 const fs = require("fs");
 
@@ -176,8 +176,9 @@ io.on("connection", (socket) => {
   });
 
   socket.on("setMoveDirection", (delta) => {
-    deltaPositions[clientRoomKey][socket.id] = delta;
-    console.log("set: " + deltaPositions[clientRoomKey][socket.id]);
+    if (deltaPositions[clientRoomKey]) {
+      deltaPositions[clientRoomKey][socket.id] = delta;
+    }
   });
 
   //----------Client Action Events-------------------------------------------

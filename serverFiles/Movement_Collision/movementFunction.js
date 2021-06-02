@@ -1,20 +1,19 @@
-const { 
-    deadPositions,
-    movesTillCheck,
-    readingBorders,
-    BordersAbsolute,
-    playerPos,
-    killedPlayers,
-    io
-  } = require("../dataStructures.js");
-  const {
-    getPlayerCollObj,
-    mergePos,
-  } = require("./playerMovCollFunctions.js");
-  const {
-    wallCollision,
-  } = require("./wallCollisionFunctions");
-  const { playerCollision } = require("../evaluationFunctions.js");
+const {
+  deadPositions,
+  movesTillCheck,
+  readingBorders,
+  BordersAbsolute,
+  playerPos,
+  killedPlayers,
+  io,
+} = require("../dataStructures.js");
+const { getPlayerCollObj, mergePos } = require("./playerMovCollFunctions.js");
+const { wallCollision } = require("./wallCollisionFunctions");
+const { playerCollision } = require("../evaluationFunctions.js");
+
+function copy(o) {
+  return JSON.parse(JSON.stringify(o));
+}
 
 module.exports = {
   movePlayer: function movePlayer(
@@ -32,15 +31,15 @@ module.exports = {
         killedPlayers[clientRoomKey] &&
         killedPlayers[clientRoomKey][absClientId] != undefined
       ) {
-        let deadPos = deadPositions[clientRoomKey][socket.id];
+        let deadPos = deadPositions[clientRoomKey][id];
         if (!deadPos) {
-          deadPos = getOwnPosition(socket.id, playerPos[clientRoomKey]);
+          deadPos = getOwnPosition(id, playerPos[clientRoomKey]);
         }
         for (let i = 0; i < speed; i++) {
           let mergedDeadPos = mergePos(deltapos, copy(deadPos));
           deadPos = mergedDeadPos;
         }
-        deadPositions[clientRoomKey][socket.id] = deadPos;
+        deadPositions[clientRoomKey][id] = deadPos;
         io.to(id).emit("deadPlayerPos", deadPos);
         return;
       }
@@ -62,7 +61,7 @@ module.exports = {
           copy(BordersAbsolute[clientRoomKey]),
           playerPos[clientRoomKey]
         );
-        if (movesTillCheck[clientRoomKey][socket.id] - 70 <= 0) {
+        if (true) { //Change when better performance is needed movesTillCheck[clientRoomKey][id]
           let wallColltest = wallCollision(
             copy(mergedPos),
             copy(BordersAbsolute[clientRoomKey])
@@ -70,10 +69,10 @@ module.exports = {
           if (wallColltest.collision) {
             playerPos[clientRoomKey][id] = copy(pos);
           } else {
-            movesTillCheck[clientRoomKey][socket.id] = wallColltest.minDistance;
+            movesTillCheck[clientRoomKey][id] = wallColltest.minDistance;
           }
         }
-        movesTillCheck[clientRoomKey][socket.id]--;
+        movesTillCheck[clientRoomKey][id]--;
       }
     }
   },
