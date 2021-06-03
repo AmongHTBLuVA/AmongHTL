@@ -141,13 +141,8 @@ module.exports = {
         activeGames[clientRoomKey].playerCount
       ) {
         roomGameLoops[clientRoomKey] = setInterval(() => {
-          tick(
-            absClientId,
-            clientRoomKey,
-            speed
-          )},
-          tickSpeed
-        );
+          tick(absClientId, clientRoomKey, speed);
+        }, tickSpeed);
       }
       connectedUsers[absClientId].role =
         activeGames[clientRoomKey].players[socket.id].role;
@@ -195,11 +190,14 @@ module.exports = {
       "[" + socket.id + "] disconnected " + absClientId + " | " + clientName
     );
     if (activeGames[clientRoomKey]) {
-      if (activeGames[clientRoomKey].length == 1 && false) {
-        //!!!!CHANGE!!!!!
-        delete activeGames[clientRoomKey];
-        clearInterval(roomGameLoops[clientRoomKey]);
-        delete roomGameLoops[clientRoomKey];
+      if (activeGames[clientRoomKey].length == 1) {
+        setTimeout(() => {
+          if (activeGames[clientRoomKey].length == 1) {
+            delete activeGames[clientRoomKey];
+            clearInterval(roomGameLoops[clientRoomKey]);
+            delete roomGameLoops[clientRoomKey];
+          }
+        }, 5000);
       } else {
         delete activeGames[clientRoomKey].players[socket.id];
       }
@@ -208,7 +206,13 @@ module.exports = {
       delete socketToSessionID[socket.id];
     }
     if (openLobbies[clientRoomKey]) {
-      //delete openLobbies[clientRoomKey];
+      delete openLobbies[clientRoomKey][socket.id];
+      setTimeout(() => {
+        console.log("lenght.: " + openLobbies[clientRoomKey].length);
+        if (openLobbies[clientRoomKey].length == 1) {
+          delete openLobbies[clientRoomKey];
+        }
+      }, 2000);
     }
     if (playerPos[clientRoomKey]) {
       delete playerPos[clientRoomKey][socket.id];

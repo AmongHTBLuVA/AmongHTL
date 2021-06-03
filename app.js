@@ -23,7 +23,7 @@ const fs = require("fs");
 
 require("./router")(app);
 
-const reconnectionTime = 15000;
+const reconnectionTime = 60000;
 
 //-----------------utility functions------------------------
 
