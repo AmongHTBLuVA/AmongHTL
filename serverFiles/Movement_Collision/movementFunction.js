@@ -37,6 +37,9 @@ module.exports = {
       if (readingBorders[clientRoomKey]) {
         return;
       }
+      if(killedPlayers[clientRoomKey]){
+        killedPlayers[clientRoomKey][absClientId];
+      }
       if (
         killedPlayers[clientRoomKey] &&
         killedPlayers[clientRoomKey][absClientId] != undefined

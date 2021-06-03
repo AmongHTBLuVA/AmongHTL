@@ -78,8 +78,8 @@ module.exports = function (app) {
     });
   });
 
-  app.get("/style/gameStyles.css", function (req, res) {
-    res.sendFile("/public/css/gameStyles.css", {
+  app.get("/style/hudStyles.css", function (req, res) {
+    res.sendFile("/public/css/hudStyles.css", {
       root: "clientFiles",
     });
   });

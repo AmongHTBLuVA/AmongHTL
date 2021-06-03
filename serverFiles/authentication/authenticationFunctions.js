@@ -1,6 +1,5 @@
-const { getStartPoint } = require("./evaluationFunctions.js");
 const fs = require("fs");
-const { tick } = require("./tickFunction.js");
+const { assignRole, setGame, setStartingPosition, gameFull } = require("./authenticationHelperFunctions.js");
 
 const revealTime = 6;
 const tickSpeed = 60;
@@ -9,6 +8,7 @@ const speed = 5;
 const {
   readingBorders,
   BordersAbsolute,
+  movesTillCheck,
   playerPos,
   killedPlayers,
   openLobbies,
@@ -16,7 +16,9 @@ const {
   roomGameLoops,
   connectedUsers,
   socketToSessionID,
-} = require("./dataStructures.js");
+  deadPositions,
+  deltaPositions
+} = require("../dataStructures.js");
 
 function copy(o) {
   return JSON.parse(JSON.stringify(o));
@@ -30,11 +32,6 @@ function getRoomKey(openLobbies) {
     new Date().getMinutes() * 6000
   ).toString(16);
   return first.toUpperCase() + second.toUpperCase();
-}
-
-function getImposter(playerCount) {
-  let rand = Math.random();
-  return Math.floor(playerCount * rand);
 }
 
 module.exports = {
@@ -73,23 +70,7 @@ module.exports = {
     if (parts.length != 1 && parts[0] == "game") {
       clientRoomKey = parts[1];
       if (!activeGames[clientRoomKey]) {
-        console.log(
-          "lobby: " + openLobbies[clientRoomKey] + " | " + clientRoomKey
-        );
-        activeGames[clientRoomKey] = {};
-        activeGames[clientRoomKey].players = {};
-        activeGames[clientRoomKey].playerCount =
-          openLobbies[clientRoomKey].length;
-        activeGames[clientRoomKey].imposterIndex = getImposter(
-          activeGames[clientRoomKey].playerCount
-        );
-        console.log(
-          "Imposter Index: " + activeGames[clientRoomKey].imposterIndex
-        );
-        let time = new Date();
-        time.setSeconds(time.getSeconds() + revealTime);
-        activeGames[clientRoomKey].startTime = time;
-        playerPos[clientRoomKey] = {};
+        setGame(clientRoomKey, revealTime);
       } else if (BordersAbsolute[clientRoomKey]) {
         socket.emit("translateBorders", copy(BordersAbsolute[clientRoomKey]));
       }
@@ -98,34 +79,12 @@ module.exports = {
         name: username,
         role: undefined,
       };
-      if (connectedUsers[absClientId].role) {
-        activeGames[clientRoomKey].players[socket.id].role =
-          connectedUsers[absClientId].role;
-      } else {
-        console.log(
-          "lenght: " + Object.keys(activeGames[clientRoomKey].players).length
-        );
-        activeGames[clientRoomKey].players[socket.id].role =
-          activeGames[clientRoomKey].imposterIndex + 1 ==
-          Object.keys(activeGames[clientRoomKey].players).length
-            ? "imposter"
-            : "crewmate";
-      }
-      if (
-        killedPlayers[clientRoomKey] &&
-        killedPlayers[clientRoomKey][absClientId]
-      ) {
-        playerPos[clientRoomKey][socket.id] =
-          killedPlayers[clientRoomKey][absClientId];
-      } else {
-        playerPos[clientRoomKey][socket.id] = getStartPoint(
-          playerPos[clientRoomKey]
-        );
-      }
+      assignRole(absClientId, socket.id, clientRoomKey);
+      setStartingPosition(clientRoomKey, absClientId, socket.id);
       if (!BordersAbsolute[clientRoomKey] && !readingBorders[clientRoomKey]) {
         let path = "./serverFiles/borders/" + mapName + ".json";
         if (fs.existsSync(path)) {
-          BordersAbsolute[clientRoomKey] = require("./borders/" +
+          BordersAbsolute[clientRoomKey] = require("../borders/" +
             mapName +
             ".json");
         } else {
@@ -140,18 +99,7 @@ module.exports = {
         Object.keys(activeGames[clientRoomKey].players).length ==
         activeGames[clientRoomKey].playerCount
       ) {
-        let imposter = false;
-        Object.keys(activeGames[clientRoomKey].players).forEach((playerId) => {
-          if (activeGames[clientRoomKey].players[playerId].role == "imposter") {
-            imposter = true;
-          }
-        });
-        if (!imposter) {
-          activeGames[clientRoomKey].players[socket.id].role = "imposter";
-        }
-        roomGameLoops[clientRoomKey] = setInterval(() => {
-          tick(absClientId, clientRoomKey, speed);
-        }, tickSpeed);
+        gameFull(clientRoomKey, socket.id, speed, tickSpeed);
       }
       connectedUsers[absClientId].role =
         activeGames[clientRoomKey].players[socket.id].role;
@@ -179,18 +127,9 @@ module.exports = {
   },
   cleanUp: function cleanUp(
     socket,
-    connectedUsers,
-    killedPlayers,
     absClientId,
-    activeGames,
     clientRoomKey,
-    openLobbies,
-    playerPos,
-    clientName,
-    socketToSessionID,
-    deadPositions,
-    deltaPositions,
-    movesTillCheck
+    clientName
   ) {
     if (connectedUsers[absClientId]) {
       connectedUsers[absClientId].dctime = Date.now();
@@ -199,17 +138,17 @@ module.exports = {
       "[" + socket.id + "] disconnected " + absClientId + " | " + clientName
     );
     if (activeGames[clientRoomKey]) {
-      if (activeGames[clientRoomKey].length == 1) {
+      delete activeGames[clientRoomKey].players[socket.id];
+      connectedUsers[absClientId].role = undefined;
+      if (activeGames[clientRoomKey].length == 0) {
         setTimeout(() => {
-          if (activeGames[clientRoomKey].length == 1) {
+          if (activeGames[clientRoomKey].length == 0) {
             delete activeGames[clientRoomKey];
             clearInterval(roomGameLoops[clientRoomKey]);
             delete roomGameLoops[clientRoomKey];
           }
         }, 5000);
-      } else {
-        delete activeGames[clientRoomKey].players[socket.id];
-      }
+      } 
     }
     if (socketToSessionID[socket.id]) {
       delete socketToSessionID[socket.id];
@@ -220,6 +159,7 @@ module.exports = {
         if (openLobbies[clientRoomKey]) {
           if (openLobbies[clientRoomKey].length == 1) {
             delete openLobbies[clientRoomKey];
+            delete killedPlayers[clientRoomKey];
           }
         }
       }, 2000);
