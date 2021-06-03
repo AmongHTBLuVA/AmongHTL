@@ -1,5 +1,10 @@
 const fs = require("fs");
-const { assignRole, setGame, setStartingPosition, gameFull } = require("./authenticationHelperFunctions.js");
+const {
+  assignRole,
+  setGame,
+  setStartingPosition,
+  gameFull,
+} = require("./authenticationHelperFunctions.js");
 
 const revealTime = 6;
 const tickSpeed = 60;
@@ -17,11 +22,17 @@ const {
   connectedUsers,
   socketToSessionID,
   deadPositions,
-  deltaPositions
+  deltaPositions,
 } = require("../dataStructures.js");
 
 function copy(o) {
   return JSON.parse(JSON.stringify(o));
+}
+
+function arrayRemove(arr, value) {
+  return arr.filter(function (ele) {
+    return ele != value;
+  });
 }
 
 function getRoomKey(openLobbies) {
@@ -125,12 +136,7 @@ module.exports = {
     }
     return { clientRoomKey: clientRoomKey, clientName: clientName };
   },
-  cleanUp: function cleanUp(
-    socket,
-    absClientId,
-    clientRoomKey,
-    clientName
-  ) {
+  cleanUp: function cleanUp(socket, absClientId, clientRoomKey, clientName) {
     if (connectedUsers[absClientId]) {
       connectedUsers[absClientId].dctime = Date.now();
     }
@@ -148,13 +154,18 @@ module.exports = {
             delete roomGameLoops[clientRoomKey];
           }
         }, 5000);
-      } 
+      }
     }
     if (socketToSessionID[socket.id]) {
       delete socketToSessionID[socket.id];
     }
     if (openLobbies[clientRoomKey]) {
-      delete openLobbies[clientRoomKey][socket.id];
+      for (var i = 0; i < openLobbies[clientRoomKey].length; i++) {
+        if (openLobbies[clientRoomKey][i].id === socket.id) {
+          openLobbies[clientRoomKey].splice(i, 1);
+          i--;
+        }
+      }
       setTimeout(() => {
         if (openLobbies[clientRoomKey]) {
           if (openLobbies[clientRoomKey].length == 1) {
