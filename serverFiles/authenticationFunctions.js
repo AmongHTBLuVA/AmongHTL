@@ -140,6 +140,15 @@ module.exports = {
         Object.keys(activeGames[clientRoomKey].players).length ==
         activeGames[clientRoomKey].playerCount
       ) {
+        let imposter = false;
+        Object.keys(activeGames[clientRoomKey].players).forEach((playerId) => {
+          if (activeGames[clientRoomKey].players[playerId].role == "imposter") {
+            imposter = true;
+          }
+        });
+        if (!imposter) {
+          activeGames[clientRoomKey].players[socket.id].role = "imposter";
+        }
         roomGameLoops[clientRoomKey] = setInterval(() => {
           tick(absClientId, clientRoomKey, speed);
         }, tickSpeed);
@@ -208,9 +217,10 @@ module.exports = {
     if (openLobbies[clientRoomKey]) {
       delete openLobbies[clientRoomKey][socket.id];
       setTimeout(() => {
-        console.log("lenght.: " + openLobbies[clientRoomKey].length);
-        if (openLobbies[clientRoomKey].length == 1) {
-          delete openLobbies[clientRoomKey];
+        if (openLobbies[clientRoomKey]) {
+          if (openLobbies[clientRoomKey].length == 1) {
+            delete openLobbies[clientRoomKey];
+          }
         }
       }, 2000);
     }
