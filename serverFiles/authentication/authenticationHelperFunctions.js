@@ -17,7 +17,6 @@ function getImposter(playerCount) {
 module.exports = {
   assignRole: function assignRole(absClientId, id, clientRoomKey) {
     if (connectedUsers[absClientId].role) {
-      console.log("Existing Role: " + connectedUsers[absClientId].role);
       activeGames[clientRoomKey].players[id].role =
         connectedUsers[absClientId].role;
     } else {
@@ -26,6 +25,8 @@ module.exports = {
         Object.keys(activeGames[clientRoomKey].players).length
           ? "imposter"
           : "crewmate";
+      connectedUsers[absClientId].role =
+        activeGames[clientRoomKey].players[id].role;
     }
   },
   setGame: function setGame(clientRoomKey, revealTime) {

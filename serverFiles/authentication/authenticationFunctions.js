@@ -118,6 +118,9 @@ module.exports = {
         activeGames[clientRoomKey].startTime
       );
     } else {
+      if(connectedUsers[absClientId]){
+        connectedUsers[absClientId].role = undefined;
+      }
       if (!clientName) {
         clientName = username;
       }
@@ -143,7 +146,6 @@ module.exports = {
     if (activeGames[clientRoomKey]) {
       if (activeGames[clientRoomKey].players) {
         delete activeGames[clientRoomKey].players[socket.id];
-        connectedUsers[absClientId].role = undefined;
         if (Object.keys(activeGames[clientRoomKey].players).length == 0) {
           setTimeout(() => {
             if (Object.keys(activeGames[clientRoomKey].players).length == 0) {
