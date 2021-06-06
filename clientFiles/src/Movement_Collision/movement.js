@@ -81,7 +81,6 @@ document.addEventListener("keyup", function (event) {
     //S
     keyPressed.s = false;
   }
-  console.log("up");
   if (
     event.keyCode == 87 ||
     event.keyCode == 65 ||
@@ -139,7 +138,6 @@ function setPlayerPositions(playerPos) {
   }
   Object.keys(playerPos).forEach((id) => {
     if (id != getId() || deadPlayerPos) {
-      console.log("playerPos: " + playerPos[id]);
       let relativPos = translatePlayerPosistion(playerPos[id], pos);
       ctx.drawImage(player, relativPos.x, relativPos.y, 70, 70);
     }

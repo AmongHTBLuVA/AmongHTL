@@ -8,6 +8,7 @@ $(document).on("ready", () => {
 });
 
 socket.on("assignRole", (role, playerCount, time) => {
+  console.log("TIME: " + time);
   playerCount--;
   if(role == "imposter"){
     $("#roleReveal").html("Imposter");

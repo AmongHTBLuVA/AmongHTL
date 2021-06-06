@@ -29,9 +29,9 @@ module.exports = {
     }
   },
   setGame: function setGame(clientRoomKey, revealTime) {
-    activeGames[clientRoomKey] = {};
+    //activeGames[clientRoomKey] = {};
     activeGames[clientRoomKey].players = {};
-    activeGames[clientRoomKey].playerCount = openLobbies[clientRoomKey].length;
+    //activeGames[clientRoomKey].playerCount = openLobbies[clientRoomKey].length;
     activeGames[clientRoomKey].imposterIndex = getImposter(
       activeGames[clientRoomKey].playerCount
     );
@@ -64,8 +64,10 @@ module.exports = {
     if (!imposter) {
       activeGames[clientRoomKey].players[id].role = "imposter";
     }
-    roomGameLoops[clientRoomKey] = setInterval(() => {
-      tick(clientRoomKey, speed);
-    }, tickSpeed);
+    if (!roomGameLoops[clientRoomKey]) {
+      roomGameLoops[clientRoomKey] = setInterval(() => {
+        tick(clientRoomKey, speed);
+      }, tickSpeed);
+    }
   },
 };

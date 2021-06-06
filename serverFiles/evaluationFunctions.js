@@ -54,12 +54,12 @@ module.exports = {
     }
   },
   getStartPoint : function getStartPoint(playerPos) {
-    let pos0 = { x: 150, y: 600 };
+    let pos0 = { x: 920, y: 100 };
     if (Object.keys(playerPos).length == 0) {
       return pos0;
     }
     while (getPlayerCollObj(pos0, { x: 0, y: 0 }, "", playerPos).length != 0) {
-      pos0.x = pos0.x + 1;
+      pos0.y = pos0.y + 15;
     }
     return pos0;
   },
