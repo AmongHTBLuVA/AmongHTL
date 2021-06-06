@@ -21,9 +21,6 @@ module.exports = {
       activeGames[clientRoomKey].players[id].role =
         connectedUsers[absClientId].role;
     } else {
-      console.log(
-        "lenght: " + Object.keys(activeGames[clientRoomKey].players).length
-      );
       activeGames[clientRoomKey].players[id].role =
         activeGames[clientRoomKey].imposterIndex + 1 ==
         Object.keys(activeGames[clientRoomKey].players).length

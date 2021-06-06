@@ -4,6 +4,8 @@ var player = new Image();
 const playerImageUrl = "/img/Wieser.png";
 
 var background = new Image();
+var backgroundTopLayer = new Image();
+const backgroundTopLayerUrl = "/img/"+mapName+"Top.png";
 const backgroundImageUrl = "/img/"+mapName+".png";
 
 var canvas;
@@ -48,6 +50,7 @@ $(document).on("ready", () => {
   player.height = 70;
   player.src = playerImageUrl;
   background.src = backgroundImageUrl;
+  backgroundTopLayer.src = backgroundTopLayerUrl;
   height = window.innerHeight;
   width = window.innerWidth;
   canvas.width = width;
@@ -57,6 +60,7 @@ $(document).on("ready", () => {
 export {
   player,
   background,
+  backgroundTopLayer,
   ctx,
   canvas,
   setReadingBorders,

@@ -6,6 +6,7 @@ import {
   canvas,
   getWidth,
   getHeight,
+  backgroundTopLayer
 } from "/script/main.js";
 
 var keyPressed = { w: false, s: false, d: false, a: false };
@@ -153,6 +154,14 @@ function setPlayerPositions(playerPos) {
       70
     );
     ctx.globalAlpha = 1.0;
+  }else{
+  ctx.drawImage(
+    backgroundTopLayer,
+    backgroundPos.x,
+    backgroundPos.y,
+    background.width,
+    background.height
+  );
   }
 }
 

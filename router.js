@@ -96,6 +96,18 @@ module.exports = function (app) {
     res.sendFile("/images/Wieser.png", { root: "serverFiles" });
   });
 
+  app.get("/img/HTL3Floor.png", function (req, res) {
+    res.sendFile("/images/HTL3Floor.png", { root: "serverFiles" });
+  });
+
+  app.get("/img/HTL3FloorBorder.png", function (req, res) {
+    res.sendFile("/images/HTL3FloorBorder.png", { root: "serverFiles" });
+  });
+
+  app.get("/img/HTL3FloorTop.png", function (req, res) {
+    res.sendFile("/images/HTL3FloorTop.png", { root: "serverFiles" });
+  });
+
   app.get("/img/testmap.png", function (req, res) {
     res.sendFile("/images/testmap.png", { root: "serverFiles" });
   });

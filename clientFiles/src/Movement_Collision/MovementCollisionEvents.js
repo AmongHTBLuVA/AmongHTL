@@ -30,8 +30,8 @@ socket.on("RequestMapBorders", () => {
   console.log("MapBorders Requested");
   setReadingBorders(true);
   let startPoint = {
-    x: 10,
-    y: 10,
+    x: 150,
+    y: 600,
   };
   setTimeout(() => {
     getMapStartPoint(copy(startPoint));
