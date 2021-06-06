@@ -7,8 +7,8 @@ const {
 } = require("./authenticationHelperFunctions.js");
 
 const revealTime = 6;
-const tickSpeed = 45;
-const speed = 8;
+const tickSpeed = 80;
+const speed = 10;
 
 const {
   readingBorders,
@@ -23,7 +23,7 @@ const {
   socketToSessionID,
   deadPositions,
   deltaPositions,
-  EntityBorders
+  EntityBorders,
 } = require("../dataStructures.js");
 
 function copy(o) {
@@ -75,7 +75,7 @@ module.exports = {
     socketToSessionID[socket.id] = absClientId;
     if (parts.length != 1 && parts[0] == "game") {
       clientRoomKey = parts[1];
-      if (!activeGames[clientRoomKey]) {
+      if (!activeGames[clientRoomKey].players) {
         setGame(clientRoomKey, revealTime);
       } else if (BordersAbsolute[clientRoomKey]) {
         socket.emit("translateBorders", copy(BordersAbsolute[clientRoomKey]));
@@ -90,9 +90,7 @@ module.exports = {
       if (!BordersAbsolute[clientRoomKey] && !readingBorders[clientRoomKey]) {
         let path = "./serverFiles/borders/" + mapName + ".json";
         if (fs.existsSync(path)) {
-          let borders = require("../borders/" +
-            mapName +
-            ".json");
+          let borders = require("../borders/" + mapName + ".json");
           BordersAbsolute[clientRoomKey] = borders.walls;
           EntityBorders[clientRoomKey] = borders.entities;
         } else {
@@ -120,6 +118,9 @@ module.exports = {
         activeGames[clientRoomKey].startTime
       );
     } else {
+      if(connectedUsers[absClientId]){
+        connectedUsers[absClientId].role = undefined;
+      }
       if (!clientName) {
         clientName = username;
       }
@@ -143,38 +144,37 @@ module.exports = {
       "[" + socket.id + "] disconnected " + absClientId + " | " + clientName
     );
     if (activeGames[clientRoomKey]) {
-      delete activeGames[clientRoomKey].players[socket.id];
-      connectedUsers[absClientId].role = undefined;
-      if (Object.keys(activeGames[clientRoomKey].players).length == 0) {
-        setTimeout(() => {
-          if (Object.keys(activeGames[clientRoomKey].players).length == 0) {
-            delete activeGames[clientRoomKey];
-            clearInterval(roomGameLoops[clientRoomKey]);
-            delete roomGameLoops[clientRoomKey];
-          }
-        }, 5000);
+      if (activeGames[clientRoomKey].players) {
+        delete activeGames[clientRoomKey].players[socket.id];
+        if (Object.keys(activeGames[clientRoomKey].players).length == 0) {
+          setTimeout(() => {
+            if (Object.keys(activeGames[clientRoomKey].players).length == 0) {
+              delete activeGames[clientRoomKey];
+              clearInterval(roomGameLoops[clientRoomKey]);
+              delete roomGameLoops[clientRoomKey];
+            }
+          }, 5000);
+        }
       }
     }
     if (socketToSessionID[socket.id]) {
       delete socketToSessionID[socket.id];
     }
     if (openLobbies[clientRoomKey]) {
-      setTimeout(() => {
-        for (var i = 0; i < openLobbies[clientRoomKey].length; i++) {
-          if (openLobbies[clientRoomKey][i].id === socket.id) {
-            openLobbies[clientRoomKey].splice(i, 1);
-            i--;
-          }
+      for (var i = 0; i < openLobbies[clientRoomKey].length; i++) {
+        if (openLobbies[clientRoomKey][i].id === socket.id) {
+          openLobbies[clientRoomKey].splice(i, 1);
+          i--;
         }
-      }, 5000);
+      }
       setTimeout(() => {
         if (openLobbies[clientRoomKey]) {
-          if (openLobbies[clientRoomKey].length == 1) {
+          if (openLobbies[clientRoomKey].length == 0) {
             delete openLobbies[clientRoomKey];
             delete killedPlayers[clientRoomKey];
           }
         }
-      }, 6000);
+      }, 2000);
     }
     if (playerPos[clientRoomKey]) {
       delete playerPos[clientRoomKey][socket.id];

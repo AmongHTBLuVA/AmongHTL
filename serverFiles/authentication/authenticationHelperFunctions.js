@@ -17,7 +17,6 @@ function getImposter(playerCount) {
 module.exports = {
   assignRole: function assignRole(absClientId, id, clientRoomKey) {
     if (connectedUsers[absClientId].role) {
-      console.log("Existing Role: " + connectedUsers[absClientId].role);
       activeGames[clientRoomKey].players[id].role =
         connectedUsers[absClientId].role;
     } else {
@@ -26,12 +25,14 @@ module.exports = {
         Object.keys(activeGames[clientRoomKey].players).length
           ? "imposter"
           : "crewmate";
+      connectedUsers[absClientId].role =
+        activeGames[clientRoomKey].players[id].role;
     }
   },
   setGame: function setGame(clientRoomKey, revealTime) {
-    activeGames[clientRoomKey] = {};
+    //activeGames[clientRoomKey] = {};
     activeGames[clientRoomKey].players = {};
-    activeGames[clientRoomKey].playerCount = openLobbies[clientRoomKey].length;
+    //activeGames[clientRoomKey].playerCount = openLobbies[clientRoomKey].length;
     activeGames[clientRoomKey].imposterIndex = getImposter(
       activeGames[clientRoomKey].playerCount
     );
@@ -64,8 +65,10 @@ module.exports = {
     if (!imposter) {
       activeGames[clientRoomKey].players[id].role = "imposter";
     }
-    roomGameLoops[clientRoomKey] = setInterval(() => {
-      tick(clientRoomKey, speed);
-    }, tickSpeed);
+    if (!roomGameLoops[clientRoomKey]) {
+      roomGameLoops[clientRoomKey] = setInterval(() => {
+        tick(clientRoomKey, speed);
+      }, tickSpeed);
+    }
   },
 };
