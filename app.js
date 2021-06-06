@@ -2,7 +2,7 @@ const {
   authenticate,
   cleanUp,
   getAbsoluteID,
-} = require("./serverFiles/authenticationFunctions.js");
+} = require("./serverFiles/authentication/authenticationFunctions.js");
 const {
   deltaPositions,
   deadPositions,
@@ -23,7 +23,7 @@ const fs = require("fs");
 
 require("./router")(app);
 
-const reconnectionTime = 15000;
+const reconnectionTime = 60000;
 
 //-----------------utility functions------------------------
 
@@ -128,18 +128,9 @@ io.on("connection", (socket) => {
   socket.on("disconnect", () => {
     cleanUp(
       socket,
-      connectedUsers,
-      killedPlayers,
       absClientId,
-      activeGames,
       clientRoomKey,
-      openLobbies,
-      playerPos,
-      clientName,
-      socketToSessionID,
-      deadPositions,
-      deltaPositions,
-      movesTillCheck
+      clientName
     );
     io.to(clientRoomKey).emit("playerMovement", playerPos[clientRoomKey]);
   });
@@ -176,7 +167,6 @@ io.on("connection", (socket) => {
   socket.on("killRequest", (id) => {
     let allPlayerPos = playerPos[clientRoomKey];
     let currPos = allPlayerPos[id];
-
     for (const playerId in allPlayerPos) {
       if (playerId != id) {
         let playerPos = allPlayerPos[playerId];

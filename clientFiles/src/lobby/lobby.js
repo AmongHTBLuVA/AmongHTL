@@ -3,10 +3,8 @@ import { socket } from "/script/socket.js";
 import { members, currLobby} from"/script/lobbyEvents.js";
 
 $(document).on("ready", () => {
-  setTimeout(() => {
-    $(".loading").addClass("hide");
-    $(".content-wrapper").removeClass("hide");
-  }, 500);
+  $(".loading").addClass("hide");
+  $(".content-wrapper").removeClass("hide");
 
   $("#confUserNameBtn").click(() => {
     let userName = $(".form__field").val();

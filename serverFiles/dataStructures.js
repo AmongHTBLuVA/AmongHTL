@@ -13,6 +13,7 @@ var deadPositions = {};
 var movesTillCheck = {};
 var readingBorders = {};
 var BordersAbsolute = {};
+var EntityBorders = {};
 
 var openLobbies = {};
 var activeGames = {};
@@ -43,5 +44,6 @@ module.exports = {
     socketToSessionID : socketToSessionID,
     app: app,
     io: io,
-    server:server
+    server:server,
+    EntityBorders : EntityBorders
   };

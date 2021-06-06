@@ -1,14 +1,19 @@
-const { getStartPoint } = require("./evaluationFunctions.js");
 const fs = require("fs");
-const { tick } = require("./tickFunction.js");
+const {
+  assignRole,
+  setGame,
+  setStartingPosition,
+  gameFull,
+} = require("./authenticationHelperFunctions.js");
 
 const revealTime = 6;
-const tickSpeed = 60;
-const speed = 5;
+const tickSpeed = 45;
+const speed = 8;
 
 const {
   readingBorders,
   BordersAbsolute,
+  movesTillCheck,
   playerPos,
   killedPlayers,
   openLobbies,
@@ -16,7 +21,10 @@ const {
   roomGameLoops,
   connectedUsers,
   socketToSessionID,
-} = require("./dataStructures.js");
+  deadPositions,
+  deltaPositions,
+  EntityBorders
+} = require("../dataStructures.js");
 
 function copy(o) {
   return JSON.parse(JSON.stringify(o));
@@ -30,11 +38,6 @@ function getRoomKey(openLobbies) {
     new Date().getMinutes() * 6000
   ).toString(16);
   return first.toUpperCase() + second.toUpperCase();
-}
-
-function getImposter(playerCount) {
-  let rand = Math.random();
-  return Math.floor(playerCount * rand);
 }
 
 module.exports = {
@@ -73,23 +76,7 @@ module.exports = {
     if (parts.length != 1 && parts[0] == "game") {
       clientRoomKey = parts[1];
       if (!activeGames[clientRoomKey]) {
-        console.log(
-          "lobby: " + openLobbies[clientRoomKey] + " | " + clientRoomKey
-        );
-        activeGames[clientRoomKey] = {};
-        activeGames[clientRoomKey].players = {};
-        activeGames[clientRoomKey].playerCount =
-          openLobbies[clientRoomKey].length;
-        activeGames[clientRoomKey].imposterIndex = getImposter(
-          activeGames[clientRoomKey].playerCount
-        );
-        console.log(
-          "Imposter Index: " + activeGames[clientRoomKey].imposterIndex
-        );
-        let time = new Date();
-        time.setSeconds(time.getSeconds() + revealTime);
-        activeGames[clientRoomKey].startTime = time;
-        playerPos[clientRoomKey] = {};
+        setGame(clientRoomKey, revealTime);
       } else if (BordersAbsolute[clientRoomKey]) {
         socket.emit("translateBorders", copy(BordersAbsolute[clientRoomKey]));
       }
@@ -98,36 +85,16 @@ module.exports = {
         name: username,
         role: undefined,
       };
-      if (connectedUsers[absClientId].role) {
-        activeGames[clientRoomKey].players[socket.id].role =
-          connectedUsers[absClientId].role;
-      } else {
-        console.log(
-          "lenght: " + Object.keys(activeGames[clientRoomKey].players).length
-        );
-        activeGames[clientRoomKey].players[socket.id].role =
-          activeGames[clientRoomKey].imposterIndex + 1 ==
-          Object.keys(activeGames[clientRoomKey].players).length
-            ? "imposter"
-            : "crewmate";
-      }
-      if (
-        killedPlayers[clientRoomKey] &&
-        killedPlayers[clientRoomKey][absClientId]
-      ) {
-        playerPos[clientRoomKey][socket.id] =
-          killedPlayers[clientRoomKey][absClientId];
-      } else {
-        playerPos[clientRoomKey][socket.id] = getStartPoint(
-          playerPos[clientRoomKey]
-        );
-      }
+      assignRole(absClientId, socket.id, clientRoomKey);
+      setStartingPosition(clientRoomKey, absClientId, socket.id);
       if (!BordersAbsolute[clientRoomKey] && !readingBorders[clientRoomKey]) {
         let path = "./serverFiles/borders/" + mapName + ".json";
         if (fs.existsSync(path)) {
-          BordersAbsolute[clientRoomKey] = require("./borders/" +
+          let borders = require("../borders/" +
             mapName +
             ".json");
+          BordersAbsolute[clientRoomKey] = borders.walls;
+          EntityBorders[clientRoomKey] = borders.entities;
         } else {
           console.log("Requesting");
           readingBorders[clientRoomKey] = true;
@@ -140,14 +107,9 @@ module.exports = {
         Object.keys(activeGames[clientRoomKey].players).length ==
         activeGames[clientRoomKey].playerCount
       ) {
-        roomGameLoops[clientRoomKey] = setInterval(() => {
-          tick(
-            absClientId,
-            clientRoomKey,
-            speed
-          )},
-          tickSpeed
-        );
+        if (!readingBorders[clientRoomKey]) {
+          gameFull(clientRoomKey, socket.id, speed, tickSpeed);
+        }
       }
       connectedUsers[absClientId].role =
         activeGames[clientRoomKey].players[socket.id].role;
@@ -173,21 +135,7 @@ module.exports = {
     }
     return { clientRoomKey: clientRoomKey, clientName: clientName };
   },
-  cleanUp: function cleanUp(
-    socket,
-    connectedUsers,
-    killedPlayers,
-    absClientId,
-    activeGames,
-    clientRoomKey,
-    openLobbies,
-    playerPos,
-    clientName,
-    socketToSessionID,
-    deadPositions,
-    deltaPositions,
-    movesTillCheck
-  ) {
+  cleanUp: function cleanUp(socket, absClientId, clientRoomKey, clientName) {
     if (connectedUsers[absClientId]) {
       connectedUsers[absClientId].dctime = Date.now();
     }
@@ -195,20 +143,38 @@ module.exports = {
       "[" + socket.id + "] disconnected " + absClientId + " | " + clientName
     );
     if (activeGames[clientRoomKey]) {
-      if (activeGames[clientRoomKey].length == 1 && false) {
-        //!!!!CHANGE!!!!!
-        delete activeGames[clientRoomKey];
-        clearInterval(roomGameLoops[clientRoomKey]);
-        delete roomGameLoops[clientRoomKey];
-      } else {
-        delete activeGames[clientRoomKey].players[socket.id];
+      delete activeGames[clientRoomKey].players[socket.id];
+      connectedUsers[absClientId].role = undefined;
+      if (Object.keys(activeGames[clientRoomKey].players).length == 0) {
+        setTimeout(() => {
+          if (Object.keys(activeGames[clientRoomKey].players).length == 0) {
+            delete activeGames[clientRoomKey];
+            clearInterval(roomGameLoops[clientRoomKey]);
+            delete roomGameLoops[clientRoomKey];
+          }
+        }, 5000);
       }
     }
     if (socketToSessionID[socket.id]) {
       delete socketToSessionID[socket.id];
     }
     if (openLobbies[clientRoomKey]) {
-      //delete openLobbies[clientRoomKey];
+      setTimeout(() => {
+        for (var i = 0; i < openLobbies[clientRoomKey].length; i++) {
+          if (openLobbies[clientRoomKey][i].id === socket.id) {
+            openLobbies[clientRoomKey].splice(i, 1);
+            i--;
+          }
+        }
+      }, 5000);
+      setTimeout(() => {
+        if (openLobbies[clientRoomKey]) {
+          if (openLobbies[clientRoomKey].length == 1) {
+            delete openLobbies[clientRoomKey];
+            delete killedPlayers[clientRoomKey];
+          }
+        }
+      }, 6000);
     }
     if (playerPos[clientRoomKey]) {
       delete playerPos[clientRoomKey][socket.id];

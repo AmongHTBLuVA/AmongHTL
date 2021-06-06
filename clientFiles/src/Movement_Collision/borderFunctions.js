@@ -18,6 +18,8 @@ function drawBorders(pos0, pos1) {
 }
 
 function getMapStartPoint(pos) {
+  setTimeout(() => {
+  $("#killButton").hide();
   let cpPos = copy(pos);
   let Borders = [];
 
@@ -31,6 +33,7 @@ function getMapStartPoint(pos) {
   while (!isWall(cpPos.x, cpPos.y + 1) && isWall(cpPos.x - 1, cpPos.y - 1)) {
     cpPos.y += 1 * multiplyer;
     multiplyer = Math.min(1, multiplyer++);
+    console.log("Bottom: " + cpPos.y);
   }
   console.log("Wall Found");
   Borders.push(copy(cpPos));
@@ -41,6 +44,7 @@ function getMapStartPoint(pos) {
     copy(searchDirection),
     copy(cpPos)
   );
+  }, 6000);
 }
 
 function readMapBorders(Borders, searchDirection, cpPos) {

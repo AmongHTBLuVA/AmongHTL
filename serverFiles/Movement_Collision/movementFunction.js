@@ -6,6 +6,7 @@ const {
   playerPos,
   killedPlayers,
   io,
+  EntityBorders,
 } = require("../dataStructures.js");
 const { getPlayerCollObj, mergePos } = require("./playerMovCollFunctions.js");
 const { wallCollision } = require("./wallCollisionFunctions");
@@ -36,6 +37,9 @@ module.exports = {
     if (deltapos) {
       if (readingBorders[clientRoomKey]) {
         return;
+      }
+      if(killedPlayers[clientRoomKey]){
+        killedPlayers[clientRoomKey][absClientId];
       }
       if (
         killedPlayers[clientRoomKey] &&
@@ -69,12 +73,14 @@ module.exports = {
           id,
           pos,
           copy(BordersAbsolute[clientRoomKey]),
-          playerPos[clientRoomKey]
+          playerPos[clientRoomKey],
+          copy(EntityBorders[clientRoomKey])
         );
         if (true) { //Change when better performance is needed movesTillCheck[clientRoomKey][id]
           let wallColltest = wallCollision(
             copy(mergedPos),
-            copy(BordersAbsolute[clientRoomKey])
+            copy(BordersAbsolute[clientRoomKey]),
+            copy(EntityBorders[clientRoomKey])
           );
           if (wallColltest.collision) {
             playerPos[clientRoomKey][id] = copy(pos);

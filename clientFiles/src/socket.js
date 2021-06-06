@@ -4,7 +4,7 @@ var socket = io();
 var Clientid = undefined;
 var userName = undefined;
 var playerRole = undefined;
-const mapName = "testmap";
+const mapName = "HTL3Floor";
 
 function setplayerRole(role) {
   playerRole = role;

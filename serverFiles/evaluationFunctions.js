@@ -16,7 +16,7 @@ function copy(o) {
 //Functions
 module.exports = {
   //Movement Collision Functions
-  playerCollision: function playerCollision(collObjs, id, pos, clientBorder, playerPos) {
+  playerCollision: function playerCollision(collObjs, id, pos, clientBorder, playerPos, entityBorder) {
     if (collObjs.length == 0) {
       playerPos[id] = mergedPos;
       return false;
@@ -29,6 +29,7 @@ module.exports = {
         let wallCollObj = wallCollision(
           playerPos[collObj.victimId],
           clientBorder,
+          entityBorder,
           -2
         );
         let victimColl = getPlayerCollObj(
@@ -53,7 +54,7 @@ module.exports = {
     }
   },
   getStartPoint : function getStartPoint(playerPos) {
-    let pos0 = { x: 50, y: 50 };
+    let pos0 = { x: 150, y: 600 };
     if (Object.keys(playerPos).length == 0) {
       return pos0;
     }
