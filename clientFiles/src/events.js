@@ -1,6 +1,10 @@
 import { socket, setId, setName, mapName } from "/script/socket.js";
 
-socket.on("connect", () => {
+socket.on("connect", () => {});
+
+socket.on("pingRequest", (time, ping) => {
+  socket.emit("pingResponse", time);
+  $("#ping").html(ping ? ping : "-");
 });
 
 socket.on("sendClientId", (id, absId) => {
@@ -8,9 +12,9 @@ socket.on("sendClientId", (id, absId) => {
   let prevAbsId = localStorage.getItem("absID");
 
   console.log(id, prevAbsId, absId);
-  if(prevAbsId){
+  if (prevAbsId) {
     socket.emit("checkPreviousLogOn", prevAbsId);
-  }else{
+  } else {
     console.log("RIP: " + prevAbsId);
     localStorage.setItem("absID", absId);
   }
@@ -18,9 +22,9 @@ socket.on("sendClientId", (id, absId) => {
 
 socket.on("checkLogOn", (oldName, absID) => {
   console.log("name: " + oldName);
-  if(oldName){
+  if (oldName) {
     logOn(oldName);
-  }else{
+  } else {
     localStorage.setItem("absID", absID);
   }
 });
@@ -34,12 +38,7 @@ function logOn(userName) {
   let key = path.substr(1, path.length - 1);
   setName(userName);
   console.log(mapName);
-  socket.emit(
-    "authenticated",
-    userName,
-    key,
-    mapName
-  );
+  socket.emit("authenticated", userName, key, mapName);
 }
 
-export {logOn};
+export { logOn };

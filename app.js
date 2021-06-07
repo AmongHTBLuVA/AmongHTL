@@ -54,10 +54,25 @@ io.on("connection", (socket) => {
   var clientRoomKey = undefined;
   var clientName = undefined;
   var role = undefined;
+  var ping = undefined;
 
   let absClientId = getAbsoluteID();
 
   socket.emit("sendClientId", socket.id, absClientId);
+
+  socket.emit("pingRequest", new Date(), ping);
+  
+  socket.on("pingResponse", (time) => {
+    time = new Date(time);
+    let currentTime = new Date();
+    ping =
+      currentTime.getMilliseconds() +
+      currentTime.getSeconds() * 1000 -
+      (time.getMilliseconds() + time.getSeconds() * 1000);
+    setTimeout(() => {
+      socket.emit("pingRequest", new Date(), ping);
+    }, 600);
+  });
 
   socket.on("checkPreviousLogOn", (prevAbsId) => {
     if (prevAbsId && connectedUsers[prevAbsId]) {
@@ -77,28 +92,34 @@ io.on("connection", (socket) => {
   });
 
   socket.on("authenticated", (username, currentRoom, mapName) => {
-    let authentiaction = authenticate(
-      socket,
-      username,
-      currentRoom,
-      absClientId,
-      clientRoomKey,
-      clientName,
-      mapName,
-      role
-    );
-    clientName = authentiaction.clientName;
-    clientRoomKey = authentiaction.clientRoomKey;
-    movesTillCheck[clientRoomKey] = {};
-    movesTillCheck[clientRoomKey][socket.id] = 0;
-    deltaPositions[clientRoomKey] = {};
-    deadPositions[clientRoomKey] = {};
+    while (!ping) {
+      setTimeout(() => {
+        ping = 80;
+      }, 80)
+    }
+      let authentiaction = authenticate(
+        socket,
+        username,
+        currentRoom,
+        absClientId,
+        clientRoomKey,
+        clientName,
+        mapName,
+        role,
+        ping
+      );
+      clientName = authentiaction.clientName;
+      clientRoomKey = authentiaction.clientRoomKey;
+      movesTillCheck[clientRoomKey] = {};
+      movesTillCheck[clientRoomKey][socket.id] = 0;
+      deltaPositions[clientRoomKey] = {};
+      deadPositions[clientRoomKey] = {};
 
-    console.log(socket.id + " authenticated : " + clientName);
-    socket.join(clientRoomKey);
-    socket.emit("assignRoomKey", clientRoomKey);
-    io.to(clientRoomKey).emit("lobbyMembers", openLobbies[clientRoomKey]);
-    io.to(clientRoomKey).emit("playerMovement", playerPos[clientRoomKey]);
+      console.log(socket.id + " authenticated : " + clientName);
+      socket.join(clientRoomKey);
+      socket.emit("assignRoomKey", clientRoomKey);
+      io.to(clientRoomKey).emit("lobbyMembers", openLobbies[clientRoomKey]);
+      io.to(clientRoomKey).emit("playerMovement", playerPos[clientRoomKey]);
   });
 
   socket.on("lobbyStartRequest", (roomKey) => {
@@ -128,12 +149,7 @@ io.on("connection", (socket) => {
   });
 
   socket.on("disconnect", () => {
-    cleanUp(
-      socket,
-      absClientId,
-      clientRoomKey,
-      clientName
-    );
+    cleanUp(socket, absClientId, clientRoomKey, clientName);
     io.to(clientRoomKey).emit("playerMovement", playerPos[clientRoomKey]);
   });
 

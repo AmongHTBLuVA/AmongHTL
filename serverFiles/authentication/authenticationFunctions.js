@@ -7,8 +7,8 @@ const {
 } = require("./authenticationHelperFunctions.js");
 
 const revealTime = 6;
-const tickSpeed = 80;
-const speed = 10;
+const SpeedPro100ms = 20;
+var speed = 6;
 
 const {
   readingBorders,
@@ -28,6 +28,14 @@ const {
 
 function copy(o) {
   return JSON.parse(JSON.stringify(o));
+}
+
+function getTickSpeed(ping) {
+  let tmp = Math.floor(ping / 10);
+  tmp /= 5;
+  let tickSpeed = Math.max(30, Math.min(80, Math.floor(tmp * 10)));
+  speed = tickSpeed / (100 / SpeedPro100ms);
+  return tickSpeed;
 }
 
 function getRoomKey(openLobbies) {
@@ -61,7 +69,8 @@ module.exports = {
     clientRoomKey,
     clientName,
     mapName,
-    role
+    role,
+    ping
   ) {
     let parts = currentRoom.split("/");
     if (!connectedUsers[absClientId]) {
@@ -75,7 +84,7 @@ module.exports = {
     socketToSessionID[socket.id] = absClientId;
     if (parts.length != 1 && parts[0] == "game") {
       clientRoomKey = parts[1];
-      if (!activeGames[clientRoomKey].players) {
+      if (activeGames[clientRoomKey] && !activeGames[clientRoomKey].players) {
         setGame(clientRoomKey, revealTime);
       } else if (BordersAbsolute[clientRoomKey]) {
         socket.emit("translateBorders", copy(BordersAbsolute[clientRoomKey]));
@@ -106,6 +115,7 @@ module.exports = {
         activeGames[clientRoomKey].playerCount
       ) {
         if (!readingBorders[clientRoomKey]) {
+          let tickSpeed = getTickSpeed(ping);
           gameFull(clientRoomKey, socket.id, speed, tickSpeed);
         }
       }
