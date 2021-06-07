@@ -32,10 +32,21 @@ function copy(o) {
 
 function getTickSpeed(ping) {
   let tmp = Math.floor(ping / 10);
-  tmp /= 5;
+  tmp /= 3;
   let tickSpeed = Math.max(30, Math.min(80, Math.floor(tmp * 10)));
   speed = tickSpeed / (100 / SpeedPro100ms);
   return tickSpeed;
+}
+
+function getHighestPing(roomKey) {
+  let max = 0;
+  Object.keys(activeGames[roomKey].players).forEach(id => {
+    let ping = connectedUsers[socketToSessionID[id]].ping;
+    if(ping > max){
+      max = ping;
+    }
+  });
+  return max;
 }
 
 function getRoomKey(openLobbies) {
@@ -81,6 +92,7 @@ module.exports = {
         dctime: undefined,
       };
     }
+    connectedUsers[absClientId].ping = ping;
     socketToSessionID[socket.id] = absClientId;
     if (parts.length != 1 && parts[0] == "game") {
       clientRoomKey = parts[1];
@@ -115,7 +127,7 @@ module.exports = {
         activeGames[clientRoomKey].playerCount
       ) {
         if (!readingBorders[clientRoomKey]) {
-          let tickSpeed = getTickSpeed(ping);
+          let tickSpeed = getTickSpeed(getHighestPing(clientRoomKey));
           gameFull(clientRoomKey, socket.id, speed, tickSpeed);
         }
       }
