@@ -103,6 +103,15 @@ img {
     position: absolute;
 }
 
+.pingDisplay {
+    position: absolute;
+    bottom: -10px;
+    left: 5px;
+    display: flex;
+    font-size: 8pt;
+    color: white;
+}
+
 @keyframes fadeAnimation {
     0% {width: 10%}
     100% {background: 100%}
