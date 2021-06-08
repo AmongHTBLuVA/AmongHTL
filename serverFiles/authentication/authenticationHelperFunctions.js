@@ -1,7 +1,6 @@
 const {
   playerPos,
   killedPlayers,
-  openLobbies,
   activeGames,
   roomGameLoops,
   connectedUsers,
@@ -57,6 +56,7 @@ module.exports = {
   },
   gameFull: function gameFull(clientRoomKey, id, speed, tickSpeed) {
     let imposter = false;
+    console.log("TickSpeed["+clientRoomKey+"]: " + tickSpeed);
     Object.keys(activeGames[clientRoomKey].players).forEach((playerId) => {
       if (activeGames[clientRoomKey].players[playerId].role == "imposter") {
         imposter = true;
