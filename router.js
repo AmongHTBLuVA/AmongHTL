@@ -115,4 +115,11 @@ module.exports = function (app) {
   app.get("/img/testmapKlein.png", function (req, res) {
     res.sendFile("/images/testmapKlein.png", { root: "serverFiles" });
   });
+
+  //tasks
+
+  app.get("/Tasks/:task", function(req, res) {
+    var task = req.params["task"];
+    res.sendFile(`/${task}/`, { root: "Tasks" });
+  });
 };
