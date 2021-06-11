@@ -9,7 +9,13 @@ button:active {
   transform: translateY(4px);
 }
 
-#killButton {
+#buttonContainer {
+  position: absolute;
+  bottom: 20px;
+  right: 10px;
+}
+
+#buttonContainer > button {
   border-radius: 50%;
   border: 5px solid #f00;
   background-color: #000;
@@ -18,9 +24,6 @@ button:active {
 
   height: 150px;
   width: 150px;
-  position: absolute;
-  bottom: 20px;
-  right: 10px;
 
   font-size: 60pt;
   font-weight: bold;
