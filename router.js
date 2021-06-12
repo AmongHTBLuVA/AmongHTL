@@ -39,6 +39,10 @@ module.exports = function (app) {
     res.sendFile("/src/roleReveal.js", { root: "clientFiles" });
   });
 
+  app.get("/script/emergencyMeeting.js", function (req, res) {
+    res.sendFile("/src/emergencyMeeting.js", { root: "clientFiles" });
+  });
+
   //Movement Collision Scripts
   app.get("/script/borderFunctions.js", function (req, res) {
     res.sendFile("/src/Movement_Collision/borderFunctions.js", {
@@ -114,5 +118,16 @@ module.exports = function (app) {
 
   app.get("/img/testmapKlein.png", function (req, res) {
     res.sendFile("/images/testmapKlein.png", { root: "serverFiles" });
+  });
+  
+  app.get("/img/megaphone.png", function (req, res) {
+    res.sendFile("/images/megaphone.png", { root: "serverFiles" });
+  });
+  
+  //tasks
+
+  app.get("/Tasks/:task", function(req, res) {
+    var task = req.params["task"];
+    res.sendFile(`/${task}/`, { root: "Tasks" });
   });
 };

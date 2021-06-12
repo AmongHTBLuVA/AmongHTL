@@ -4,6 +4,7 @@ const {
   activeGames,
   roomGameLoops,
   connectedUsers,
+  deadPositions,
 } = require("../dataStructures.js");
 const { getStartPoint } = require("../evaluationFunctions.js");
 const { tick } = require("../tickFunction.js");
@@ -31,6 +32,7 @@ module.exports = {
   setGame: function setGame(clientRoomKey, revealTime) {
     //activeGames[clientRoomKey] = {};
     activeGames[clientRoomKey].players = {};
+    activeGames[clientRoomKey].state = "alive";
     //activeGames[clientRoomKey].playerCount = openLobbies[clientRoomKey].length;
     activeGames[clientRoomKey].imposterIndex = getImposter(
       activeGames[clientRoomKey].playerCount
@@ -50,13 +52,16 @@ module.exports = {
       killedPlayers[clientRoomKey][absClientId]
     ) {
       playerPos[clientRoomKey][id] = killedPlayers[clientRoomKey][absClientId];
+      if(JSON.stringify(playerPos[clientRoomKey][id]) == JSON.stringify({x:0, y:0})){
+        deadPositions[clientRoomKey][id] = { x: 920, y: 100 };
+      }
     } else {
       playerPos[clientRoomKey][id] = getStartPoint(playerPos[clientRoomKey]);
     }
   },
   gameFull: function gameFull(clientRoomKey, id, speed, tickSpeed) {
     let imposter = false;
-    console.log("TickSpeed["+clientRoomKey+"]: " + tickSpeed);
+    console.log("TickSpeed[" + clientRoomKey + "]: " + tickSpeed);
     Object.keys(activeGames[clientRoomKey].players).forEach((playerId) => {
       if (activeGames[clientRoomKey].players[playerId].role == "imposter") {
         imposter = true;

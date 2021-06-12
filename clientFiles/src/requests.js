@@ -1,7 +1,8 @@
 import { socket, getId, getplayerRole } from "/script/socket.js";
 
 $(document).ready(function () {
-    $("#killButton").hide();
+    $("#buttonContainer").hide();
+    $("#taskFrame").hide();
 
     $("#killButton").click(function (e) { 
         e.preventDefault();
@@ -10,5 +11,15 @@ $(document).ready(function () {
             console.log(`sending kill request`);
             socket.emit("killRequest", id);
         }
+    });
+
+    $("#taskButton").click(function(e) {
+        e.preventDefault();
+        //$("#taskFrame").toggle();
+        socket.emit("actionRequest");
+        $("#tmpUse").prop("disabled", true);
+        setTimeout(() => {
+            $("#tmpUse").prop("disabled", false);
+        },500);
     });
 });
