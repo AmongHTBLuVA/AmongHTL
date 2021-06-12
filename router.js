@@ -43,6 +43,10 @@ module.exports = function (app) {
     res.sendFile("/src/emergencyMeeting.js", { root: "clientFiles" });
   });
 
+  app.get("/script/task.js", function (req, res) {
+    res.sendFile("/src/task.js", { root: "clientFiles" });
+  });
+
   //Movement Collision Scripts
   app.get("/script/borderFunctions.js", function (req, res) {
     res.sendFile("/src/Movement_Collision/borderFunctions.js", {
@@ -128,6 +132,16 @@ module.exports = function (app) {
 
   app.get("/Tasks/:task", function(req, res) {
     var task = req.params["task"];
-    res.sendFile(`/${task}/`, { root: "Tasks" });
+    res.sendFile(`/${task}/`, { root: "Tasks", dotfiles: "allow" });
+  });
+
+  app.get("/Tasks/:task/main.js", function(req, res) {
+    var task = req.params["task"];
+    res.sendFile(`/${task}/main.js`, { root: "Tasks", dotfiles: "allow" });
+  });
+
+  app.get("/Tasks/:task/styles.css", function(req, res) {
+    var task = req.params["task"];
+    res.sendFile(`/${task}/styles.css`, { root: "Tasks", dotfiles: "allow" });
   });
 };

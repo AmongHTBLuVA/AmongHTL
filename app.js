@@ -179,10 +179,11 @@ io.on("connection", (socket) => {
 
   socket.on("actionRequest", () => {
     let interaction = checkInteraction(playerPos[clientRoomKey][socket.id], clientRoomKey);
-    switch(interaction){
-      case -1:
+
+    if (interaction != false) {
+      if (interaction == -1) 
         setMeeting(clientRoomKey, socket.id);
-      default:
+      else 
         socket.emit("task", interaction);
     }
   });

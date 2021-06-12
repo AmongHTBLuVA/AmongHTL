@@ -118,7 +118,8 @@ function getDeltaPos() {
 
 function setPlayerPositions(playerPos) {
   ctx.clearRect(0, 0, canvas.width, canvas.height);
-  console.log(deadPlayerPos);
+  if (deadPlayerPos)
+    console.log(deadPlayerPos);
   let pos = deadPlayerPos ? deadPlayerPos : playerPos[getId()];
   let backgroundPos = translateMapPosistion(pos);
   ctx.drawImage(
