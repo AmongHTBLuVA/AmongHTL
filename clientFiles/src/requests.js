@@ -16,5 +16,10 @@ $(document).ready(function () {
     $("#taskButton").click(function(e) {
         e.preventDefault();
         $("#taskFrame").toggle();
+        socket.emit("actionRequest");
+        $("#tmpUse").prop("disabled", true);
+        setTimeout(() => {
+            $("#tmpUse").prop("disabled", false);
+        },500);
     });
 });

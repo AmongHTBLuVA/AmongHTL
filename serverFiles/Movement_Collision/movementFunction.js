@@ -16,16 +16,6 @@ function copy(o) {
   return JSON.parse(JSON.stringify(o));
 }
 
-function getOwnPosition(id, players) {
-  let pos = undefined;
-  Object.keys(players).forEach((pId) => {
-    if (pId == id) {
-      pos = players[pId];
-    }
-  });
-  return pos;
-}
-
 module.exports = {
   movePlayer: function movePlayer(
     deltapos,
@@ -38,7 +28,7 @@ module.exports = {
       if (readingBorders[clientRoomKey]) {
         return;
       }
-      if(killedPlayers[clientRoomKey]){
+      if (killedPlayers[clientRoomKey]) {
         killedPlayers[clientRoomKey][absClientId];
       }
       if (
@@ -47,7 +37,11 @@ module.exports = {
       ) {
         let deadPos = deadPositions[clientRoomKey][id];
         if (!deadPos) {
-          deadPos = getOwnPosition(id, playerPos[clientRoomKey]);
+          if (JSON.stringify(playerPos[clientRoomKey][id]) == JSON.stringify({x:0, y:0})) {
+            deadPos = { x: 920, y: 100 };
+          } else {
+            deadPos = playerPos[clientRoomKey][id];
+          }
         }
         for (let i = 0; i < speed; i++) {
           let mergedDeadPos = mergePos(deltapos, copy(deadPos));
@@ -76,7 +70,8 @@ module.exports = {
           playerPos[clientRoomKey],
           copy(EntityBorders[clientRoomKey])
         );
-        if (true) { //Change when better performance is needed movesTillCheck[clientRoomKey][id]
+        if (true) {
+          //Change when better performance is needed movesTillCheck[clientRoomKey][id]
           let wallColltest = wallCollision(
             copy(mergedPos),
             copy(BordersAbsolute[clientRoomKey]),

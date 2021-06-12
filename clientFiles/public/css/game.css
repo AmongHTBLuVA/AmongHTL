@@ -1,4 +1,5 @@
 @import url("https://fonts.googleapis.com/css2?family=Amatic+SC:wght@400;700&family=Poppins:wght@100;200;300&display=swap");
+@import url('https://fonts.googleapis.com/css2?family=Exo+2:wght@700&display=swap');
 
 :root {
     --crewmateColor: #38fedc;
@@ -13,6 +14,278 @@
 
 .imposter{
     --selectedColor: var(--imposterColor);
+}
+
+#tmpUse{
+    position: absolute;
+    top: 10px;
+    left: 10px;
+}
+
+.votedFor{
+    position: absolute;
+    display: flex;
+    left: 105px;
+    top: 44px;
+}
+
+#voteForSkip{
+    margin-right: auto;
+    margin-top: 5px;
+}
+
+.votedFor img, #voteForSkip img{
+    position: relative;
+    width: 40px;
+    height: 40px;
+    margin: 0px;
+    margin-right: 5px;
+}
+
+.ejectedDisplay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 15;
+    background-color: black;
+}
+
+.ejectedMessageContainer{
+    position: absolute;
+    top: 45%;
+    left: 44%;
+    z-index: 16;
+    font-size: 30pt;
+    font-weight: bold;
+    display: flex;
+    color: white;
+    font-family: 'Amatic SC';
+}
+
+.ejectedMessageContainer p{
+    margin: 0px 10px;
+}
+
+.emergencyContainer {
+    display: flex;
+    position: absolute;
+    justify-content: flex-start;
+    align-items: center;
+    flex-direction: column;
+    background-color: rgb(107, 165, 192);
+    left: 50%;
+    top: 50%;
+    z-index: 15;
+    width: 1050px;
+    height: 750px;
+    transform: translate(-50%, -50%);
+}
+
+.emergencyContainer h1{
+    font-size: 40pt;
+    color: whitesmoke;
+    text-shadow: 2px 2px 5px black, 1px 0 0 #000, 0 -1px 0 #000, 0 1px 0 #000, -1px 0 0 #000;
+}
+
+.emergencyBottom{
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    width: 100%;
+    margin-bottom: 15px;
+}
+
+#skipButton{
+    font-weight: 700;
+    font-size: 20pt;
+    background-color: rgb(153, 153, 153);
+    width: 150px;
+    margin-right: 10px;
+    margin-left: 20px;
+    font-family: "Amatic SC";
+    height: 40px;
+    border-radius: 10px;
+    border: 2px solid black;
+}
+
+.votingEnds{
+    margin-right: 20px;
+    font-size: 20pt;
+    font-weight: bold;
+    display: flex;
+    color: white;
+    text-shadow: 2px 2px 5px black, 1px 0 0 #000, 0 -1px 0 #000, 0 1px 0 #000, -1px 0 0 #000;
+}
+
+.hasVoted{
+    position: absolute;
+    top: -15px;
+    left: -10px;
+    width: 42px;
+    height: 42px;
+    font-weight: bold;
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 20;
+    color: rgb(185, 24, 24);
+    transform: rotate(330deg);
+    background-color: rgb(255, 241, 241);
+    border: 3px rgb(185, 24, 24) solid;
+}
+
+.hasVoted p{
+    margin: 0;
+    letter-spacing: -1px;
+    font-family: "Exo 2";
+    margin-top: -2px;
+}
+
+.votingEnds p:first-child{
+    font-size: 19pt;
+}
+
+.votingEnds p{
+    margin-bottom: 0px;
+}
+
+#votingSecondLeft{
+    margin-left: 15px;
+    margin-right: 5px;
+}
+
+.glass{
+	background: linear-gradient(top,  rgba(255,255,255,1) 0%,rgba(255,255,255,0) 100%);
+	border: 2px solid #DDDBD7;	
+	box-shadow: 		3px 3px 10px rgba(0,0,0,0.4),	inset 0 0 10px rgba(255,255,255, 0.8);
+}
+
+.playerContainer{ 
+    position: relative;
+    width: 450px;
+    height: 90px;
+}
+
+.playerContentContainer{
+    position: absolute;
+    top: 0;
+}
+
+.killFade{
+    background-color: black;
+    width: 100%;
+    height: 100%;
+    opacity: 50%;
+    z-index: 10;
+    border-radius: 10px;
+}
+
+.imgContainer{
+    position: relative;
+    width: auto;
+    height: auto;
+}
+
+#playerImage{
+    width: 80px;
+    height: 70px; 
+    position: absolute;   
+    top: 0px;
+    margin: 10px 5px 10px 10px;
+}
+
+.killedX{
+    position: absolute;
+    top: -25px;
+    left: 25px;
+    font-size: 90px;
+    z-index: 1;
+    color: rgb(99, 1, 1);
+}
+
+#playersContainerSpacer{
+    height: 600px;
+}
+
+#playersContainer{
+    display: flex;
+    align-items: flex-start;
+    width: 950px;
+    flex-wrap: wrap;
+}
+
+.player{
+    display: flex;
+    background-color: rgb(241, 241, 241);
+    justify-content: flex-start;
+    align-items: center;
+    border-radius: 10px;
+    width: 450px;
+    margin: 10px;
+    box-shadow: 2px 2px 5px black;
+}
+
+.VoteButtons {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin: 5px;
+    position: absolute;
+    left: 290px;
+    top: 7px;
+}
+
+.VoteButtons button{
+    width: 65px;
+    height: 65px;
+    font-size: 40px;
+    margin: 0px 5px;
+    border-radius: 5px;
+}
+
+.initiatorSymbol{
+    width: 90px;
+    height: 90px;
+    position: absolute;
+    left: 465px;
+    opacity: 60%;
+    top: 15px;
+}
+
+.killedNameColor{
+    color: grey !important;
+}
+
+.killedImage{
+    filter: brightness(80%);
+}
+
+.playerName {
+    margin: 5px;
+    font-size: 20pt;
+    font-weight: bold;
+    color: white;    
+    text-shadow: 1px 0 0 #000, 0 -1px 0 #000, 0 1px 0 #000, -1px 0 0 #000;
+    width: 350px;
+    position: absolute;
+    left: 100px;
+    overflow: hidden;
+    align-self: flex-start;
+}
+
+.confVoteButton{
+    background-color: rgb(131, 211, 131);
+    border:rgb(70, 153, 70) 5px solid;
+    color: rgb(57, 126, 57);
+}
+
+.cancelVoteButton{
+    background-color: rgb(211, 131, 131);
+    border:rgb(153, 70, 70) 5px solid;
+    color: rgb(126, 57, 57);
 }
 
 body{
@@ -115,4 +388,145 @@ img {
 @keyframes fadeAnimation {
     0% {width: 10%}
     100% {background: 100%}
+  }
+
+.stars{
+    position: absolute;
+    top:0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+}
+
+#ejectedImage{
+    position: absolute;
+    top: 50%;
+    left: 0%;
+    transform: translate(0%, 50%);
+    width: 70px;
+    height: 70px;
+    animation: ejectAnimation;
+    animation-duration: 7s;
+}
+
+@keyframes ejectAnimation {
+    0% {left: 0%;
+        transform: rotate(0deg);}
+    100% {left: 115%;
+        transform: rotate(780deg);}
+  }
+
+.stars1 {
+    width: 100%;
+    height: 200px;
+    animation: space 180s ease-in-out infinite;
+    background-image:
+      radial-gradient(
+        1px 1px at 25px 5px, 
+        white, 
+        rgba(255, 255, 255, 0)
+      ),
+      radial-gradient(
+        1px 1px at 50px 25px, 
+        white, 
+        rgba(255, 255, 255, 0)
+      ),
+      radial-gradient(
+        1px 1px at 125px 20px, 
+        white, 
+        rgba(255, 255, 255, 0)
+      ),
+      radial-gradient(
+        1.5px 1.5px at 50px 75px, 
+        white, 
+        rgba(255, 255, 255, 0)
+      ),
+      radial-gradient(
+        2px 2px at 15px 125px, 
+        white, 
+        rgba(255, 255, 255, 0)
+      ),
+      radial-gradient(
+        2.5px 2.5px at 110px 80px, 
+        white, 
+        rgba(255, 255, 255, 0)
+      );
+      background-size: 200px;
+      background-repeat: repeat;
+  }
+  .stars2 {
+    width: 100%;
+    height: 200px;
+    animation: space 240s ease-in-out infinite;
+    background-image:
+      radial-gradient(
+        1px 1px at 75px 125px, 
+        white, 
+        rgba(255, 255, 255, 0)
+      ),
+      radial-gradient(
+        1px 1px at 100px 75px, 
+        white, 
+        rgba(255, 255, 255, 0)
+      ),
+      radial-gradient(
+        1.5px 1.5px at 199px 100px, 
+        white, 
+        rgba(255, 255, 255, 0)
+      ),
+      radial-gradient(
+        2px 2px at 20px 50px, 
+        white, 
+        rgba(255, 255, 255, 0)
+      ),
+      radial-gradient(
+        2.5px 2.5px at 100px 5px, 
+        white, 
+        rgba(255, 255, 255, 0)
+      ),
+      radial-gradient(
+        2.5px 2.5px at 5px 5px, 
+        white, 
+        rgba(255, 255, 255, 0)
+      );
+      background-size: 200px;
+      background-repeat: repeat;
+  }
+  .stars3 {
+    animation: space 300s ease-in-out infinite;
+    width: 100%;
+    height: 200px;
+    background-image:
+      radial-gradient(
+        1px 1px at 10px 10px, 
+        white, 
+        rgba(255, 255, 255, 0)
+      ),
+      radial-gradient(
+        1px 1px at 150px 150px, 
+        white, 
+        rgba(255, 255, 255, 0)
+      ),
+      radial-gradient(
+        1.5px 1.5px at 60px 170px, 
+        white, 
+        rgba(255, 255, 255, 0)
+      ),
+      radial-gradient(
+        1.5px 1.5px at 175px 180px, 
+        white, 
+        rgba(255, 255, 255, 0)
+      ),
+      radial-gradient(
+        2px 2px at 195px 95px, 
+        white, 
+        rgba(255, 255, 255, 0)
+      ),
+      radial-gradient(
+        2.5px 2.5px at 95px 145px, 
+        white, 
+        rgba(255, 255, 255, 0)
+      );
+      background-size: 200px;
+      background-repeat: repeat;
   }

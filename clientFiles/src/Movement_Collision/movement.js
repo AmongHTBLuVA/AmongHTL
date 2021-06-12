@@ -6,12 +6,12 @@ import {
   canvas,
   getWidth,
   getHeight,
-  backgroundTopLayer
+  backgroundTopLayer,
 } from "/script/main.js";
 
 var keyPressed = { w: false, s: false, d: false, a: false };
 var deadPlayerPos = undefined;
-var previousDelta = {x: -2, y: -2};
+var previousDelta = { x: -2, y: -2 };
 
 function setDeadPos(pos) {
   deadPlayerPos = pos;
@@ -118,6 +118,7 @@ function getDeltaPos() {
 
 function setPlayerPositions(playerPos) {
   ctx.clearRect(0, 0, canvas.width, canvas.height);
+  console.log(deadPlayerPos);
   let pos = deadPlayerPos ? deadPlayerPos : playerPos[getId()];
   let backgroundPos = translateMapPosistion(pos);
   ctx.drawImage(
@@ -137,7 +138,12 @@ function setPlayerPositions(playerPos) {
     );
   }
   Object.keys(playerPos).forEach((id) => {
-    if (id != getId() || deadPlayerPos) {
+    if (
+      (id != getId() || deadPlayerPos) &&
+      pos &&
+      playerPos[id] &&
+      JSON.stringify(playerPos[id]) != JSON.stringify({ x: 0, y: 0 })
+    ) {
       let relativPos = translatePlayerPosistion(playerPos[id], pos);
       ctx.drawImage(player, relativPos.x, relativPos.y, 70, 70);
     }
@@ -152,14 +158,14 @@ function setPlayerPositions(playerPos) {
       70
     );
     ctx.globalAlpha = 1.0;
-  }else{
-  ctx.drawImage(
-    backgroundTopLayer,
-    backgroundPos.x,
-    backgroundPos.y,
-    background.width,
-    background.height
-  );
+  } else {
+    ctx.drawImage(
+      backgroundTopLayer,
+      backgroundPos.x,
+      backgroundPos.y,
+      background.width,
+      background.height
+    );
   }
 }
 
