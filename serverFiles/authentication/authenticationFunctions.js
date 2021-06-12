@@ -25,6 +25,7 @@ const {
   deltaPositions,
   EntityBorders,
 } = require("../dataStructures.js");
+const { setMeeting } = require("../meetingFunctions.js");
 
 function copy(o) {
   return JSON.parse(JSON.stringify(o));
@@ -33,16 +34,16 @@ function copy(o) {
 function getTickSpeed(ping) {
   let tmp = Math.floor(ping / 10);
   tmp /= 3;
-  let tickSpeed = Math.max(30, Math.min(80, Math.floor(tmp * 10)));
+  let tickSpeed = Math.max(40, Math.min(80, Math.floor(tmp * 10)));
   speed = tickSpeed / (100 / SpeedPro100ms);
   return tickSpeed;
 }
 
 function getHighestPing(roomKey) {
   let max = 0;
-  Object.keys(activeGames[roomKey].players).forEach(id => {
+  Object.keys(activeGames[roomKey].players).forEach((id) => {
     let ping = connectedUsers[socketToSessionID[id]].ping;
-    if(ping > max){
+    if (ping > max) {
       max = ping;
     }
   });
@@ -93,6 +94,7 @@ module.exports = {
       };
     }
     connectedUsers[absClientId].ping = ping;
+    connectedUsers[absClientId].socketID = socket.id;
     socketToSessionID[socket.id] = absClientId;
     if (parts.length != 1 && parts[0] == "game") {
       clientRoomKey = parts[1];
@@ -139,8 +141,11 @@ module.exports = {
         activeGames[clientRoomKey].playerCount,
         activeGames[clientRoomKey].startTime
       );
+      if(activeGames[clientRoomKey].state == "meeting"){
+        setMeeting(clientRoomKey, socket.id)
+      }
     } else {
-      if(connectedUsers[absClientId]){
+      if (connectedUsers[absClientId]) {
         connectedUsers[absClientId].role = undefined;
       }
       if (!clientName) {
@@ -170,10 +175,12 @@ module.exports = {
         delete activeGames[clientRoomKey].players[socket.id];
         if (Object.keys(activeGames[clientRoomKey].players).length == 0) {
           setTimeout(() => {
-            if (Object.keys(activeGames[clientRoomKey].players).length == 0) {
-              delete activeGames[clientRoomKey];
-              clearInterval(roomGameLoops[clientRoomKey]);
-              delete roomGameLoops[clientRoomKey];
+            if (activeGames[clientRoomKey]) {
+              if (Object.keys(activeGames[clientRoomKey].players).length == 0) {
+                delete activeGames[clientRoomKey];
+                clearInterval(roomGameLoops[clientRoomKey]);
+                delete roomGameLoops[clientRoomKey];
+              }
             }
           }, 5000);
         }
