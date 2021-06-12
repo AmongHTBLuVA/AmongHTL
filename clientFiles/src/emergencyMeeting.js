@@ -9,11 +9,6 @@ $(document).on("ready", () => {
   $(".emergencyContainer").hide();
   $(".emergencyContainer").removeClass("hide");
 
-  $("#testEmgMeet").click(() => {
-    console.log("Heell");
-    requestEmergencyMeeting();
-  });
-
   $("#playersContainer").on("click", "div", function () {
     $("#playersContainer").find(".VoteButtons").addClass("hide");
     if (
