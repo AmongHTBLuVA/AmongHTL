@@ -10,33 +10,37 @@ $(document).on("ready", () => {
 socket.on("assignRole", (role, playerCount, time) => {
   console.log("TIME: " + time);
   playerCount--;
+  $("#buttonContainer").show();
   if(role == "imposter"){
     $("#roleReveal").html("Imposter");
     $("h3").hide();
     $("body").addClass("imposter");
-    $("#buttonContainer").show();
     playerCount = 1;
-}  
+  } else if (role == "crewmate") {
+    $("#killButton").hide();
+  }
+
   $(".container").removeClass("hide");
-  console.log("role: " + role);
+    console.log("role: " + role);
     setplayerRole(role);
 
-  let size = 230;
-  let sizeOffset = 0.3;
-  let marginOffset = 50;
-  let margin = -(Math.floor(playerCount / 2) * marginOffset);
-  let marginMax = playerCount * marginOffset;
-  for (let i = 0; i < playerCount; i++) {
-    let iSize = Math.floor(
-      size *
-        (1 -
-          ((Math.abs(margin) / marginMax) *
-            (Math.abs(margin) / marginOffset) *
-            sizeOffset))
+    let size = 230;
+    let sizeOffset = 0.3;
+    let marginOffset = 50;
+    let margin = -(Math.floor(playerCount / 2) * marginOffset);
+    let marginMax = playerCount * marginOffset;
+    for (let i = 0; i < playerCount; i++) {
+      let iSize = Math.floor(
+        size *
+          (1 -
+            ((Math.abs(margin) / marginMax) *
+              (Math.abs(margin) / marginOffset) *
+              sizeOffset))
     );
     iSize = iSize == 0 ? 1 : iSize;
     console.log("isize: " + iSize);
     let posneg = margin < 0 ? -1 : 1;
+
     $(".playerDisplay").append(
       "<img src='/img/Wieser.png'" +
         "style='margin-bottom: " +

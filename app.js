@@ -179,11 +179,12 @@ io.on("connection", (socket) => {
 
   socket.on("actionRequest", () => {
     let interaction = checkInteraction(playerPos[clientRoomKey][socket.id], clientRoomKey);
+    let role = connectedUsers[absClientId].role;
 
-    if (interaction != false) {
+    if (interaction) {
       if (interaction == -1) 
         setMeeting(clientRoomKey, socket.id);
-      else 
+      else if (role == "crewmate")
         socket.emit("task", interaction);
     }
   });
@@ -232,7 +233,9 @@ io.on("connection", (socket) => {
   //----------Client Action Events-------------------------------------------
 
   socket.on("killRequest", (id) => {
-    if (activeGames[clientRoomKey] == "alive") {
+    let role = connectedUsers[id].role;
+
+    if (activeGames[clientRoomKey] == "alive" && role == "imposter") {
       let allPlayerPos = playerPos[clientRoomKey];
       let currPos = allPlayerPos[id];
       for (const playerId in allPlayerPos) {
