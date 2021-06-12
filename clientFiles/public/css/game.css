@@ -16,6 +16,12 @@
     --selectedColor: var(--imposterColor);
 }
 
+#tmpUse{
+    position: absolute;
+    top: 10px;
+    left: 10px;
+}
+
 .votedFor{
     position: absolute;
     display: flex;

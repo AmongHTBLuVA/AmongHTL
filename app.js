@@ -16,6 +16,7 @@ const {
   app,
   io,
   server,
+  InteractableLocation
 } = require("./serverFiles/dataStructures.js");
 const fs = require("fs");
 const {
@@ -40,6 +41,30 @@ function calcDist(playerA, playerB) {
   let b = playerA.y - playerB.y;
 
   return Math.sqrt(a * a + b * b);
+}
+
+function checkInteraction(pos, roomKey){
+  var hitbox = 60;
+  let type = false;
+  InteractableLocation[roomKey].forEach(element => {
+    if(element.id == -1){
+      hitbox = 90;
+    }
+    let right = Math.floor(element.x - (pos.x - hitbox));
+    let left = Math.floor(element.x - hitbox - pos.x);
+    let bottom = Math.floor(element.y + hitbox - pos.y);
+    let top = Math.floor(element.y - (pos.y + hitbox));
+    let inside =
+          ((right >= 0 && right <= hitbox) ||
+            (left <= 0 && left >= -(hitbox))) &&
+          ((bottom >= 0 && bottom <= hitbox) ||
+            (top <= 0 && top >= -(hitbox)));
+    if(inside){
+      type = element.id;
+    }
+    hitbox = 60;
+  });
+  return type;
 }
 
 //-----------------socket stuff------------------------------
@@ -148,11 +173,19 @@ io.on("connection", (socket) => {
     io.to(clientRoomKey).emit("playerMovement", playerPos[clientRoomKey]);
   });
 
-  //----------Emergency Meeting Events--------------------------------------
+  //----------Action Request Events-----------------------------------------
 
-  socket.on("requestEmergencyMeeting", () => {
-    setMeeting(clientRoomKey, socket.id);
+  socket.on("actionRequest", () => {
+    let interaction = checkInteraction(playerPos[clientRoomKey][socket.id], clientRoomKey);
+    switch(interaction){
+      case -1:
+        setMeeting(clientRoomKey, socket.id);
+      default:
+        socket.emit("task", interaction);
+    }
   });
+
+  //----------Emergency Meeting Events--------------------------------------
 
   socket.on("voteForImposter", (votedPlayer) => {
     voteImposter(votedPlayer, clientRoomKey, socket.id);

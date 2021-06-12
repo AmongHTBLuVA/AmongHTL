@@ -24,6 +24,7 @@ const {
   deadPositions,
   deltaPositions,
   EntityBorders,
+  InteractableLocation,
 } = require("../dataStructures.js");
 const { setMeeting } = require("../meetingFunctions.js");
 
@@ -116,6 +117,7 @@ module.exports = {
           let borders = require("../borders/" + mapName + ".json");
           BordersAbsolute[clientRoomKey] = borders.walls;
           EntityBorders[clientRoomKey] = borders.entities;
+          InteractableLocation[clientRoomKey] = borders.interactable;
         } else {
           console.log("Requesting");
           readingBorders[clientRoomKey] = true;

@@ -34,10 +34,6 @@ $(document).on("ready", () => {
   });
 });
 
-function requestEmergencyMeeting() {
-  socket.emit("requestEmergencyMeeting");
-}
-
 socket.on("startEmergencyMeeting", (players) => {
   $(".votingEnds").show();
   $(".emergencyContainer").show();

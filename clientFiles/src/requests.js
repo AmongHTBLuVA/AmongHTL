@@ -11,4 +11,12 @@ $(document).ready(function () {
             socket.emit("killRequest", id);
         }
     });
+
+    $("#tmpUse").click(function (e) {
+        socket.emit("actionRequest");
+        $("#tmpUse").prop("disabled", true);
+        setTimeout(() => {
+            $("#tmpUse").prop("disabled", false);
+        },500);
+    });
 });
