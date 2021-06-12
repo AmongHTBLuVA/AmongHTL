@@ -14,6 +14,7 @@ var movesTillCheck = {};
 var readingBorders = {};
 var BordersAbsolute = {};
 var EntityBorders = {};
+var votes = {};
 
 var openLobbies = {};
 var activeGames = {};
@@ -45,5 +46,6 @@ module.exports = {
     app: app,
     io: io,
     server:server,
-    EntityBorders : EntityBorders
+    EntityBorders : EntityBorders,
+    votes : votes
   };
