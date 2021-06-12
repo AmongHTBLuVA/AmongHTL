@@ -1,10 +1,10 @@
 @import url("https://fonts.googleapis.com/css2?family=Amatic+SC:wght@400;700&family=Poppins:wght@100;200;300&display=swap");
 
-button {
+#buttonContainer button {
   box-shadow: 0 12px #999;
 }
 
-button:active {
+#buttonContainer button:active {
   box-shadow: 0 8px #666;
   transform: translateY(4px);
 }

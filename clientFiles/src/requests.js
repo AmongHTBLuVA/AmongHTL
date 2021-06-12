@@ -15,7 +15,7 @@ $(document).ready(function () {
 
     $("#taskButton").click(function(e) {
         e.preventDefault();
-        $("#taskFrame").toggle();
+        //$("#taskFrame").toggle();
         socket.emit("actionRequest");
         $("#tmpUse").prop("disabled", true);
         setTimeout(() => {
