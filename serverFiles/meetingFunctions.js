@@ -121,7 +121,7 @@ module.exports = {
       votes[clientRoomKey].skip = [];
       votes[clientRoomKey].initiator = id;
       votes[clientRoomKey].voteEnds = new Date().setSeconds(
-        new Date().getSeconds() + 200
+        new Date().getSeconds() + votingTime
       );
     }
     activeGames[clientRoomKey].state = "meeting";
