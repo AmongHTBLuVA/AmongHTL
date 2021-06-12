@@ -16,7 +16,8 @@ const {
   app,
   io,
   server,
-  InteractableLocation
+  InteractableLocation,
+  OpenTasks
 } = require("./serverFiles/dataStructures.js");
 const fs = require("fs");
 const {
@@ -148,6 +149,8 @@ io.on("connection", (socket) => {
     if(openLobbies[clientRoomKey]){
       activeGames[clientRoomKey].playerCount = openLobbies[clientRoomKey].length;
       io.to(roomKey).emit("startLobby");
+      socket.emit("sendTaskLocations", InteractableLocation);
+      io.to(clientRoomKey).emit("openTasks", OpenTasks);
     }
   });
 
@@ -187,6 +190,10 @@ io.on("connection", (socket) => {
       else if (role == "crewmate")
         socket.emit("task", interaction);
     }
+  });
+
+  socket.on("taskFinished", (taskId) => {
+    //handle finished task
   });
 
   //----------Emergency Meeting Events--------------------------------------
@@ -233,7 +240,7 @@ io.on("connection", (socket) => {
   //----------Client Action Events-------------------------------------------
 
   socket.on("killRequest", (id) => {
-    let role = connectedUsers[id].role;
+    let role = connectedUsers[absClientId].role;
 
     if (activeGames[clientRoomKey] == "alive" && role == "imposter") {
       let allPlayerPos = playerPos[clientRoomKey];

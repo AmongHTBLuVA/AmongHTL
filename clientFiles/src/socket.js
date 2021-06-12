@@ -4,6 +4,8 @@ var socket = io();
 var Clientid = undefined;
 var userName = undefined;
 var playerRole = undefined;
+var TaskLocations = undefined;
+var OpenTasks = undefined;
 const mapName = "HTL3Floor";
 
 function setplayerRole(role) {
@@ -33,4 +35,26 @@ function getName() {
   return false;
 }
 
-export { socket, setId, getId, setName, getName, getplayerRole, setplayerRole, mapName};
+function setLocations(locations) {
+  TaskLocations = locations;
+}
+
+function getLocations() {
+  if (TaskLocations) {
+    return TaskLocations;
+  }
+  return false;
+}
+
+function setOpenTasks(openTasks) {
+  OpenTasks = openTasks;
+}
+
+function getOpenTasks() {
+  if (OpenTasks) {
+    return OpenTasks;
+  }
+  return false;
+}
+
+export { socket, setId, getId, setName, getName, getplayerRole, setplayerRole, setLocations, getLocations, setOpenTasks, getOpenTasks, mapName};

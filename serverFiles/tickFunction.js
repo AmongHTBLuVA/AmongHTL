@@ -5,6 +5,7 @@ const {
   io,
   socketToSessionID,
   activeGames,
+  OpenTasks,
 } = require("./dataStructures.js");
 
 module.exports = {

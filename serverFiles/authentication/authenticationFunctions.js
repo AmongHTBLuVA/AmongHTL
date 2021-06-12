@@ -25,6 +25,7 @@ const {
   deltaPositions,
   EntityBorders,
   InteractableLocation,
+  OpenTasks,
 } = require("../dataStructures.js");
 const { setMeeting } = require("../meetingFunctions.js");
 
@@ -118,6 +119,11 @@ module.exports = {
           BordersAbsolute[clientRoomKey] = borders.walls;
           EntityBorders[clientRoomKey] = borders.entities;
           InteractableLocation[clientRoomKey] = borders.interactable;
+          OpenTasks[clientRoomKey] = [];
+          InteractableLocation[clientRoomKey].forEach(location => {
+            if (location.id != -1) 
+              OpenTasks[clientRoomKey].push(location.id);
+          });
         } else {
           console.log("Requesting");
           readingBorders[clientRoomKey] = true;

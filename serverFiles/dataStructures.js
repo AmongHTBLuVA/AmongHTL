@@ -15,6 +15,7 @@ var readingBorders = {};
 var BordersAbsolute = {};
 var EntityBorders = {};
 var InteractableLocation = {};
+var OpenTasks = {};
 var votes = {};
 
 var openLobbies = {};
@@ -49,5 +50,6 @@ module.exports = {
     server:server,
     EntityBorders : EntityBorders,
     votes : votes,
-    InteractableLocation : InteractableLocation
+    InteractableLocation : InteractableLocation,
+    OpenTasks : OpenTasks
   };
