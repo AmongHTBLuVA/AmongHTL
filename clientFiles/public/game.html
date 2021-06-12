@@ -76,8 +76,11 @@
     </div>
     <div class="gameContainer hide">
       <canvas id="canvas"> </canvas>
-      <button id="tmpUse">USE</button>
-      <button id="killButton">Kill</button>
+      <div id="buttonContainer">
+        <button id="taskButton">Use</button>
+        <button id="killButton">Kill</button>
+      </div>
+      <iframe id="taskFrame" src="/Tasks/BoardTask"></iframe>
     </div>
     <div class="pingDisplay">
       <p id="ping"></p>

@@ -1,7 +1,8 @@
 import { socket, getId, getplayerRole } from "/script/socket.js";
 
 $(document).ready(function () {
-    $("#killButton").hide();
+    $("#buttonContainer").hide();
+    $("#taskFrame").hide();
 
     $("#killButton").click(function (e) { 
         e.preventDefault();
@@ -12,7 +13,9 @@ $(document).ready(function () {
         }
     });
 
-    $("#tmpUse").click(function (e) {
+    $("#taskButton").click(function(e) {
+        e.preventDefault();
+        $("#taskFrame").toggle();
         socket.emit("actionRequest");
         $("#tmpUse").prop("disabled", true);
         setTimeout(() => {

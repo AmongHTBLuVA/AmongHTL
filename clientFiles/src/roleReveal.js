@@ -14,7 +14,7 @@ socket.on("assignRole", (role, playerCount, time) => {
     $("#roleReveal").html("Imposter");
     $("h3").hide();
     $("body").addClass("imposter");
-    $("#killButton").show();
+    $("#buttonContainer").show();
     playerCount = 1;
 }  
   $(".container").removeClass("hide");
