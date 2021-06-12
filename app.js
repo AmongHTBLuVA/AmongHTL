@@ -145,8 +145,10 @@ io.on("connection", (socket) => {
   socket.on("lobbyStartRequest", (roomKey) => {
     console.log("starting lobby: " + roomKey);
     activeGames[clientRoomKey] = {};
-    activeGames[clientRoomKey].playerCount = openLobbies[clientRoomKey].length;
-    io.to(roomKey).emit("startLobby");
+    if(openLobbies[clientRoomKey]){
+      activeGames[clientRoomKey].playerCount = openLobbies[clientRoomKey].length;
+      io.to(roomKey).emit("startLobby");
+    }
   });
 
   app.get("/:roomKey", function (req, res) {
