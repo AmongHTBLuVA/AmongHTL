@@ -14,6 +14,7 @@ var movesTillCheck = {};
 var readingBorders = {};
 var BordersAbsolute = {};
 var EntityBorders = {};
+var InteractableLocation = {};
 var votes = {};
 
 var openLobbies = {};
@@ -47,5 +48,6 @@ module.exports = {
     io: io,
     server:server,
     EntityBorders : EntityBorders,
-    votes : votes
+    votes : votes,
+    InteractableLocation : InteractableLocation
   };
