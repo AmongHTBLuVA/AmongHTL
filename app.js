@@ -159,6 +159,9 @@ io.on("connection", (socket) => {
     socket.emit("assignRoomKey", clientRoomKey);
     io.to(clientRoomKey).emit("lobbyMembers", openLobbies[clientRoomKey]);
     io.to(clientRoomKey).emit("playerMovement", playerPos[clientRoomKey]);
+    io.to(clientRoomKey).emit("sendTaskLocations", InteractableLocation[clientRoomKey]);
+    io.to(clientRoomKey).emit("openTasks", OpenTasks[clientRoomKey]);
+
   });
 
   socket.on("lobbyStartRequest", (roomKey) => {
@@ -168,8 +171,6 @@ io.on("connection", (socket) => {
       activeGames[clientRoomKey].playerCount =
         openLobbies[clientRoomKey].length;
       io.to(roomKey).emit("startLobby");
-      socket.emit("sendTaskLocations", InteractableLocation);
-      io.to(clientRoomKey).emit("openTasks", OpenTasks);
     }
   });
 
@@ -200,6 +201,7 @@ io.on("connection", (socket) => {
   //----------Action Request Events-----------------------------------------
 
   socket.on("actionRequest", () => {
+    console.log(OpenTasks[clientRoomKey]);
     let interaction = checkInteraction(
       playerPos[clientRoomKey][socket.id],
       clientRoomKey
