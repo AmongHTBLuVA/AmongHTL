@@ -16,7 +16,10 @@ const {
   app,
   io,
   server,
-  InteractableLocation
+  InteractableLocation,
+  OpenTasks,
+  socketToSessionID,
+  killedPlayers,
 } = require("./serverFiles/dataStructures.js");
 const fs = require("fs");
 const {
@@ -43,27 +46,44 @@ function calcDist(playerA, playerB) {
   return Math.sqrt(a * a + b * b);
 }
 
-function checkInteraction(pos, roomKey){
-  var hitbox = 60;
+function checkInteraction(pos, roomKey) {
+  var hitbox = 80;
   let type = false;
-  InteractableLocation[roomKey].forEach(element => {
-    if(element.id == -1){
-      hitbox = 90;
+  Object.keys(playerPos[roomKey]).forEach((playerID) => {
+    if(playerPos[roomKey][playerID].dead){
+      let element = playerPos[roomKey][playerID];
+      let right = Math.floor(element.x - (pos.x - hitbox));
+      let left = Math.floor(element.x - hitbox - pos.x);
+      let bottom = Math.floor(element.y + hitbox - pos.y);
+      let top = Math.floor(element.y - (pos.y + hitbox));
+      let inside =
+      ((right >= 0 && right <= hitbox) || (left <= 0 && left >= -hitbox)) &&
+      ((bottom >= 0 && bottom <= hitbox) || (top <= 0 && top >= -hitbox));
+      if(inside){
+        playerPos[roomKey][playerID] = { x: 0, y: 0 };
+        killedPlayers[roomKey][socketToSessionID[playerID]] = { x: 0, y: 0 };
+        type = -1;
+      }
     }
-    let right = Math.floor(element.x - (pos.x - hitbox));
-    let left = Math.floor(element.x - hitbox - pos.x);
-    let bottom = Math.floor(element.y + hitbox - pos.y);
-    let top = Math.floor(element.y - (pos.y + hitbox));
-    let inside =
-          ((right >= 0 && right <= hitbox) ||
-            (left <= 0 && left >= -(hitbox))) &&
-          ((bottom >= 0 && bottom <= hitbox) ||
-            (top <= 0 && top >= -(hitbox)));
-    if(inside){
-      type = element.id;
-    }
-    hitbox = 60;
   });
+  if(!type){
+    InteractableLocation[roomKey].forEach((element) => {
+      if (element.id == -1) {
+        hitbox = 90;
+      }
+      let right = Math.floor(element.x - (pos.x - hitbox));
+      let left = Math.floor(element.x - hitbox - pos.x);
+      let bottom = Math.floor(element.y + hitbox - pos.y);
+      let top = Math.floor(element.y - (pos.y + hitbox));
+      let inside =
+        ((right >= 0 && right <= hitbox) || (left <= 0 && left >= -hitbox)) &&
+        ((bottom >= 0 && bottom <= hitbox) || (top <= 0 && top >= -hitbox));
+      if (inside) {
+        type = element.id;
+      }
+      hitbox = 60;
+    });
+  }
   return type;
 }
 
@@ -94,7 +114,7 @@ io.on("connection", (socket) => {
     }, 600);
   });
 
-  socket.on("checkPreviousLogOn", (prevAbsId) => {
+  socket.on("checkPreviousLogOn", (prevAbsId, bcheck) => {
     if (prevAbsId && connectedUsers[prevAbsId]) {
       if (
         Date.now() - connectedUsers[prevAbsId].dctime < reconnectionTime &&
@@ -104,6 +124,7 @@ io.on("connection", (socket) => {
         clientName = connectedUsers[prevAbsId].name;
         role = connectedUsers[prevAbsId].role;
         connectedUsers[prevAbsId].dctime = undefined;
+        connectedUsers[prevAbsId].b = bcheck;
         socket.emit("checkLogOn", clientName, absClientId);
         return;
       }
@@ -112,10 +133,8 @@ io.on("connection", (socket) => {
   });
 
   socket.on("authenticated", (username, currentRoom, mapName) => {
-    while (!ping) {
-      setTimeout(() => {
-        ping = 80;
-      }, 80);
+    if(!ping){
+      ping = 300;
     }
     let authentiaction = authenticate(
       socket,
@@ -140,13 +159,17 @@ io.on("connection", (socket) => {
     socket.emit("assignRoomKey", clientRoomKey);
     io.to(clientRoomKey).emit("lobbyMembers", openLobbies[clientRoomKey]);
     io.to(clientRoomKey).emit("playerMovement", playerPos[clientRoomKey]);
+    io.to(clientRoomKey).emit("sendTaskLocations", InteractableLocation[clientRoomKey]);
+    io.to(clientRoomKey).emit("openTasks", OpenTasks[clientRoomKey]);
+
   });
 
   socket.on("lobbyStartRequest", (roomKey) => {
     console.log("starting lobby: " + roomKey);
     activeGames[clientRoomKey] = {};
-    if(openLobbies[clientRoomKey]){
-      activeGames[clientRoomKey].playerCount = openLobbies[clientRoomKey].length;
+    if (openLobbies[clientRoomKey]) {
+      activeGames[clientRoomKey].playerCount =
+        openLobbies[clientRoomKey].length;
       io.to(roomKey).emit("startLobby");
     }
   });
@@ -178,13 +201,21 @@ io.on("connection", (socket) => {
   //----------Action Request Events-----------------------------------------
 
   socket.on("actionRequest", () => {
-    let interaction = checkInteraction(playerPos[clientRoomKey][socket.id], clientRoomKey);
-    switch(interaction){
-      case -1:
-        setMeeting(clientRoomKey, socket.id);
-      default:
-        socket.emit("task", interaction);
+    console.log(OpenTasks[clientRoomKey]);
+    let interaction = checkInteraction(
+      playerPos[clientRoomKey][socket.id],
+      clientRoomKey
+    );
+    let role = connectedUsers[absClientId].role;
+
+    if (interaction) {
+      if (interaction == -1) setMeeting(clientRoomKey, socket.id);
+      else if (role == "crewmate") socket.emit("task", interaction);
     }
+  });
+
+  socket.on("taskFinished", (taskId) => {
+    //handle finished task
   });
 
   //----------Emergency Meeting Events--------------------------------------
@@ -231,7 +262,9 @@ io.on("connection", (socket) => {
   //----------Client Action Events-------------------------------------------
 
   socket.on("killRequest", (id) => {
-    if (activeGames[clientRoomKey] == "alive") {
+    let role = connectedUsers[absClientId].role;
+
+    if (activeGames[clientRoomKey].state == "alive" && role == "imposter") {
       let allPlayerPos = playerPos[clientRoomKey];
       let currPos = allPlayerPos[id];
       for (const playerId in allPlayerPos) {

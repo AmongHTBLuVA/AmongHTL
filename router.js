@@ -43,6 +43,14 @@ module.exports = function (app) {
     res.sendFile("/src/emergencyMeeting.js", { root: "clientFiles" });
   });
 
+  app.get("/script/task.js", function (req, res) {
+    res.sendFile("/src/task.js", { root: "clientFiles" });
+  });
+
+  app.get("/script/skinManagement.js", function (req, res) {
+    res.sendFile("/src/skinManagement.js", { root: "clientFiles" });
+  });
+
   //Movement Collision Scripts
   app.get("/script/borderFunctions.js", function (req, res) {
     res.sendFile("/src/Movement_Collision/borderFunctions.js", {
@@ -96,8 +104,9 @@ module.exports = function (app) {
 
   //images
 
-  app.get("/img/Wieser.png", function (req, res) {
-    res.sendFile("/images/Wieser.png", { root: "serverFiles" });
+  app.get("/img/skin/:type", function(req, res) {
+    var skin = req.params["type"];
+    res.sendFile(`/images/wiesers/${skin}`, { root: "serverFiles", dotfiles: "allow" });
   });
 
   app.get("/img/HTL3Floor.png", function (req, res) {
@@ -123,11 +132,25 @@ module.exports = function (app) {
   app.get("/img/megaphone.png", function (req, res) {
     res.sendFile("/images/megaphone.png", { root: "serverFiles" });
   });
+
+  app.get("/img/WieserDeadOverlay.png", function (req, res) {
+    res.sendFile("/images/WieserDeadOverlay.png", { root: "serverFiles" });
+  });
   
   //tasks
 
   app.get("/Tasks/:task", function(req, res) {
     var task = req.params["task"];
-    res.sendFile(`/${task}/`, { root: "Tasks" });
+    res.sendFile(`/${task}/`, { root: "Tasks", dotfiles: "allow" });
+  });
+
+  app.get("/Tasks/:task/main.js", function(req, res) {
+    var task = req.params["task"];
+    res.sendFile(`/${task}/main.js`, { root: "Tasks", dotfiles: "allow" });
+  });
+
+  app.get("/Tasks/:task/styles.css", function(req, res) {
+    var task = req.params["task"];
+    res.sendFile(`/${task}/styles.css`, { root: "Tasks", dotfiles: "allow" });
   });
 };

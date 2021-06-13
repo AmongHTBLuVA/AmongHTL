@@ -18,9 +18,11 @@
     <script type="module" src="/script/roleReveal.js"></script>
     <script type="module" src="/script/requests.js"></script>
     <script type="module" src="/script/emergencyMeeting.js"></script>
+    <script type="module" src="/script/skinManagement.js"></script>
 
     <script type="module" src="/script/MovementCollisionEvents.js"></script>
     <script type="module" src="/script/Events.js"></script>
+    <script type="module" src="/script/Task.js"></script>
     <title>AmongHTL</title>
   </head>
 
@@ -80,7 +82,29 @@
         <button id="taskButton">Use</button>
         <button id="killButton">Kill</button>
       </div>
-      <iframe id="taskFrame" src="/Tasks/BoardTask"></iframe>
+      <iframe id="taskFrame"></iframe>
+
+      <div id="compassContainer">
+        <!-- to do: add containers through js -->
+        <div class="triangleContainer" id="triangleContainer0">
+          <div class="triangle"></div>
+        </div>
+        <div class="triangleContainer" id="triangleContainer1">
+          <div class="triangle"></div>
+        </div>
+        <div class="triangleContainer" id="triangleContainer2">
+          <div class="triangle"></div>
+        </div>
+        <div class="triangleContainer" id="triangleContainer3">
+          <div class="triangle"></div>
+        </div>
+        <div class="triangleContainer" id="triangleContainer4">
+          <div class="triangle"></div>
+        </div>
+        <div class="triangleContainer" id="triangleContainer5">
+          <div class="triangle"></div>
+        </div>
+      </div>
     </div>
     <div class="pingDisplay">
       <p id="ping"></p>

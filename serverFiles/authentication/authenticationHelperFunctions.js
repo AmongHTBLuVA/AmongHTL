@@ -33,6 +33,7 @@ module.exports = {
     //activeGames[clientRoomKey] = {};
     activeGames[clientRoomKey].players = {};
     activeGames[clientRoomKey].state = "alive";
+    activeGames[clientRoomKey].skins = {};
     //activeGames[clientRoomKey].playerCount = openLobbies[clientRoomKey].length;
     activeGames[clientRoomKey].imposterIndex = getImposter(
       activeGames[clientRoomKey].playerCount
@@ -52,7 +53,7 @@ module.exports = {
       killedPlayers[clientRoomKey][absClientId]
     ) {
       playerPos[clientRoomKey][id] = killedPlayers[clientRoomKey][absClientId];
-      if(JSON.stringify(playerPos[clientRoomKey][id]) == JSON.stringify({x:0, y:0})){
+      if(playerPos[clientRoomKey][id].x == 0 && playerPos[clientRoomKey][id].y == 0){
         deadPositions[clientRoomKey][id] = { x: 920, y: 100 };
       }
     } else {

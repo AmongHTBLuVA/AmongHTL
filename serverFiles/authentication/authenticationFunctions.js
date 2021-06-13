@@ -25,6 +25,8 @@ const {
   deltaPositions,
   EntityBorders,
   InteractableLocation,
+  OpenTasks,
+  io,
 } = require("../dataStructures.js");
 const { setMeeting } = require("../meetingFunctions.js");
 
@@ -109,6 +111,18 @@ module.exports = {
         name: username,
         role: undefined,
       };
+      if (activeGames[clientRoomKey].skins[absClientId] == undefined) {
+         if(connectedUsers[absClientId].b == "yes"){
+          activeGames[clientRoomKey].skins[absClientId] = 9;
+        }else if(connectedUsers[absClientId].b == "thnd"){
+          activeGames[clientRoomKey].skins[absClientId] = 10;
+        }else{
+          activeGames[clientRoomKey].skins[absClientId] = Math.min(
+            8,
+            Object.keys(activeGames[clientRoomKey].skins).length
+          );
+        }
+      }
       assignRole(absClientId, socket.id, clientRoomKey);
       setStartingPosition(clientRoomKey, absClientId, socket.id);
       if (!BordersAbsolute[clientRoomKey] && !readingBorders[clientRoomKey]) {
@@ -118,6 +132,10 @@ module.exports = {
           BordersAbsolute[clientRoomKey] = borders.walls;
           EntityBorders[clientRoomKey] = borders.entities;
           InteractableLocation[clientRoomKey] = borders.interactable;
+          OpenTasks[clientRoomKey] = [];
+          InteractableLocation[clientRoomKey].forEach((location) => {
+            if (location.id != -1) OpenTasks[clientRoomKey].push(location.id);
+          });
         } else {
           console.log("Requesting");
           readingBorders[clientRoomKey] = true;
@@ -131,8 +149,32 @@ module.exports = {
         activeGames[clientRoomKey].playerCount
       ) {
         if (!readingBorders[clientRoomKey]) {
+          console.log("Full");
           let tickSpeed = getTickSpeed(getHighestPing(clientRoomKey));
           gameFull(clientRoomKey, socket.id, speed, tickSpeed);
+          io.to(clientRoomKey).emit(
+            "assignSkins",
+            activeGames[clientRoomKey].skins,
+            connectedUsers
+          );
+          socket.emit(
+            "assignSkins",
+            activeGames[clientRoomKey].skins,
+            connectedUsers
+          );
+          setTimeout(() => {
+            console.log("start");
+            io.to(clientRoomKey).emit(
+              "showRoleReveal",
+              activeGames[clientRoomKey].players,
+              activeGames[clientRoomKey].startTime
+            );
+            socket.emit(
+              "showRoleReveal",
+              activeGames[clientRoomKey].players,
+              activeGames[clientRoomKey].startTime
+            );
+          }, 500);
         }
       }
       connectedUsers[absClientId].role =
@@ -140,11 +182,11 @@ module.exports = {
       socket.emit(
         "assignRole",
         activeGames[clientRoomKey].players[socket.id].role,
-        activeGames[clientRoomKey].playerCount,
+        activeGames[clientRoomKey].players,
         activeGames[clientRoomKey].startTime
       );
-      if(activeGames[clientRoomKey].state == "meeting"){
-        setMeeting(clientRoomKey, socket.id)
+      if (activeGames[clientRoomKey].state == "meeting") {
+        setMeeting(clientRoomKey, socket.id);
       }
     } else {
       if (connectedUsers[absClientId]) {

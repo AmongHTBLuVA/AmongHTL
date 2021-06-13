@@ -77,6 +77,7 @@ module.exports = {
       killedPlayers[roomId] = {};
     }
     let absId = socketToSessionID[playerId];
+    playerPos[roomId][playerId].dead = true;
     killedPlayers[roomId][absId] = playerPos[roomId][playerId];
   },
   //

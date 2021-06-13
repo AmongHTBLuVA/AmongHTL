@@ -1,12 +1,12 @@
 import {mapName} from "/script/socket.js"
 
-var player = new Image();
-const playerImageUrl = "/img/Wieser.png";
-
 var background = new Image();
 var backgroundTopLayer = new Image();
 const backgroundTopLayerUrl = "/img/"+mapName+"Top.png";
 const backgroundImageUrl = "/img/"+mapName+".png";
+
+var killedOverlay = new Image();
+const killedOverlayURL = "/img/WieserDeadOverlay.png";
 
 var canvas;
 var ctx;
@@ -46,9 +46,7 @@ function getReadingBorders() {
 $(document).on("ready", () => {
   canvas = document.getElementById("canvas");
   ctx = canvas.getContext("2d");
-  player.width = 70;
-  player.height = 70;
-  player.src = playerImageUrl;
+  killedOverlay.src = killedOverlayURL;
   background.src = backgroundImageUrl;
   backgroundTopLayer.src = backgroundTopLayerUrl;
   height = window.innerHeight;
@@ -58,8 +56,8 @@ $(document).on("ready", () => {
 });
 
 export {
-  player,
   background,
+  killedOverlay,
   backgroundTopLayer,
   ctx,
   canvas,
