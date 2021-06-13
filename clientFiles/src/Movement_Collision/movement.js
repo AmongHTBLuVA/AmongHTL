@@ -1,4 +1,4 @@
-import { socket, getId } from "/script/socket.js";
+import { socket, getId, getLocations, getOpenTasks } from "/script/socket.js";
 import {
   background,
   killedOverlay,
@@ -190,4 +190,35 @@ function translatePlayerPosistion(ppos, cpos) {
   return { x: getWidth() / 2 - 30 + xdiff, y: getHeight() / 2 - 30 + ydiff };
 }
 
-export { getDeltaPos, setPlayerPositions, setDeadPos };
+
+// task compass functions - update at every tick
+
+function getAngle(cx, cy, ex, ey) {
+  let dy = ey - cy;
+  let dx = ex - cx;
+  let theta = Math.atan2(dy, dx);
+  theta *= 180 / Math.PI; 
+  return theta;
+}
+
+function updateCompass(playerPos) {
+  let taskIdx = 0;
+  let openTasks = getOpenTasks();
+  let locations = getLocations();
+  
+  if (openTasks) {
+    $("[id*=triangleContainer]").each(function () { 
+      if (openTasks.includes(taskIdx)) {
+          let location = locations[taskIdx + 1];
+
+          let angle = getAngle(location.x, location.y, playerPos.x, playerPos.y);
+          $("#triangleContainer" + taskIdx).css("transform", `rotate(${angle}deg)`);
+      } else {
+        $("#triangleContainer" + taskIdx).hide();
+      }
+      taskIdx++;
+    });
+  }
+}
+
+export { getDeltaPos, setPlayerPositions, setDeadPos, updateCompass };

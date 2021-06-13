@@ -46,3 +46,27 @@
 
   background-color: #d4d4d4;
 }
+
+
+.triangleContainer {
+  position: absolute;
+  top: 48vh;
+  left: 42vw;
+
+  margin: 0;
+  width: 320px;
+
+  transform-origin: center;
+}
+
+.triangle {
+  flex-grow: 1;
+  width: 0;
+  height: 0;
+  border-left: 15px solid transparent;
+  border-right: 15px solid transparent;
+
+  border-bottom: 30px solid gold;
+
+  transform: rotate(-90deg);
+}

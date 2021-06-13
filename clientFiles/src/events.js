@@ -9,6 +9,7 @@ socket.on("pingRequest", (time, ping) => {
 
 socket.on("sendTaskLocations", (locations) => {
   setLocations(locations);
+  console.log(locations);
 });
 
 socket.on("sendClientId", (id, absId) => {
@@ -34,6 +35,7 @@ socket.on("checkLogOn", (oldName, absID) => {
 
 socket.on("openTasks", (tasks) => {
   setOpenTasks(tasks);
+  console.log("open tasks: " + tasks);
 });
 
 function logOn(userName) {
