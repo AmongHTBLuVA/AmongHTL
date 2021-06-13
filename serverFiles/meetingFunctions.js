@@ -101,6 +101,7 @@ function eject(roomKey) {
     player.name = connectedUsers[ejected].name;
     player.role =
       activeGames[roomKey].players[connectedUsers[ejected].socketID].role;
+    player.id = ejected;
     ejected = player;
   }
   return ejected;

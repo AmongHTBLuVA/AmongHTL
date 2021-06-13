@@ -47,6 +47,10 @@ module.exports = function (app) {
     res.sendFile("/src/task.js", { root: "clientFiles" });
   });
 
+  app.get("/script/skinManagement.js", function (req, res) {
+    res.sendFile("/src/skinManagement.js", { root: "clientFiles" });
+  });
+
   //Movement Collision Scripts
   app.get("/script/borderFunctions.js", function (req, res) {
     res.sendFile("/src/Movement_Collision/borderFunctions.js", {
@@ -100,8 +104,9 @@ module.exports = function (app) {
 
   //images
 
-  app.get("/img/Wieser.png", function (req, res) {
-    res.sendFile("/images/Wieser.png", { root: "serverFiles" });
+  app.get("/img/skin/:type", function(req, res) {
+    var skin = req.params["type"];
+    res.sendFile(`/images/wiesers/${skin}`, { root: "serverFiles", dotfiles: "allow" });
   });
 
   app.get("/img/HTL3Floor.png", function (req, res) {

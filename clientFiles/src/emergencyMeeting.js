@@ -1,5 +1,5 @@
 import { socket } from "/script/socket.js";
-import { player } from "/script/main.js";
+import { sessionIdToSkin, idToSkin } from "/script/skinManagement.js";
 
 var ableToVote = true;
 var voteEnds = undefined;
@@ -42,7 +42,9 @@ socket.on("startEmergencyMeeting", (players) => {
   $("#playersContainer").empty();
   players.forEach((p) => {
     let playerID = p.id;
-    let playerImage = player.src;
+    console.log("dic: " + sessionIdToSkin);
+    console.log("id: " + p.id);
+    let playerImage = sessionIdToSkin[p.id].src;
     let playerName = p.name;
     const playerElement = `<div class="player" id="${playerID}"><div class="playerContainer"><div class="hasVoted hide"><p>Voted</p></div><div class="killFade hide"></div><div class="playerContentContainer"><img class="initiatorSymbol hide" src="/img/megaphone.png"><div class="imgContainer"><span class="killedX hide">&#10007</span><img src="${playerImage}" alt="" id="playerImage"></div><p class="playerName">${playerName}</p><div class="votedFor"></div><div class="VoteButtons hide"><button class="confVoteButton">&#10003</button><button class="cancelVoteButton">&#10006</button></div></div></div></div>`;
     $("#playersContainer").append(playerElement);
@@ -130,13 +132,13 @@ socket.on("showVoteResults", (votes, ejected) => {
       votes[susPlayer].forEach((votedPlayer) => {
         $("#" + susPlayer)
           .find(".votedFor")
-          .append(`<img src="${player.src}">`);
+          .append(`<img src="${sessionIdToSkin[susPlayer].src}">`);
       });
     }
   });
   $("#voteForSkip").empty();
   votes.skip.forEach((votedPlayer) => {
-    $("#voteForSkip").append(`<img src="${player.src}">`);
+    $("#voteForSkip").append(`<img src="${sessionIdToSkin[votedPlayer].src}">`);
   });
   $(".votingEnds").hide();
   setTimeout(() => {
@@ -162,7 +164,7 @@ function ejectScreen(ejected){
     }else{
         $("#ejectedRoleMessage").html("not Imposter");
     }
-    $(".ejectedDisplay").append(`<img src="${player.src}" alt="" id="ejectedImage">`);
+    $(".ejectedDisplay").append(`<img src="${sessionIdToSkin[ejected.id].src}" alt="" id="ejectedImage">`);
     setTimeout(() => {
         $(".ejectedDisplay").addClass("hide");
         socket.emit("continueGame");

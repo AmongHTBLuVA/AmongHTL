@@ -17,7 +17,8 @@ const {
   io,
   server,
   InteractableLocation,
-  OpenTasks
+  OpenTasks,
+  socketToSessionID,
 } = require("./serverFiles/dataStructures.js");
 const fs = require("fs");
 const {
@@ -44,11 +45,11 @@ function calcDist(playerA, playerB) {
   return Math.sqrt(a * a + b * b);
 }
 
-function checkInteraction(pos, roomKey){
+function checkInteraction(pos, roomKey) {
   var hitbox = 60;
   let type = false;
-  InteractableLocation[roomKey].forEach(element => {
-    if(element.id == -1){
+  InteractableLocation[roomKey].forEach((element) => {
+    if (element.id == -1) {
       hitbox = 90;
     }
     let right = Math.floor(element.x - (pos.x - hitbox));
@@ -56,11 +57,9 @@ function checkInteraction(pos, roomKey){
     let bottom = Math.floor(element.y + hitbox - pos.y);
     let top = Math.floor(element.y - (pos.y + hitbox));
     let inside =
-          ((right >= 0 && right <= hitbox) ||
-            (left <= 0 && left >= -(hitbox))) &&
-          ((bottom >= 0 && bottom <= hitbox) ||
-            (top <= 0 && top >= -(hitbox)));
-    if(inside){
+      ((right >= 0 && right <= hitbox) || (left <= 0 && left >= -hitbox)) &&
+      ((bottom >= 0 && bottom <= hitbox) || (top <= 0 && top >= -hitbox));
+    if (inside) {
       type = element.id;
     }
     hitbox = 60;
@@ -113,10 +112,8 @@ io.on("connection", (socket) => {
   });
 
   socket.on("authenticated", (username, currentRoom, mapName) => {
-    while (!ping) {
-      setTimeout(() => {
-        ping = 80;
-      }, 80);
+    if(!ping){
+      ping = 300;
     }
     let authentiaction = authenticate(
       socket,
@@ -146,8 +143,9 @@ io.on("connection", (socket) => {
   socket.on("lobbyStartRequest", (roomKey) => {
     console.log("starting lobby: " + roomKey);
     activeGames[clientRoomKey] = {};
-    if(openLobbies[clientRoomKey]){
-      activeGames[clientRoomKey].playerCount = openLobbies[clientRoomKey].length;
+    if (openLobbies[clientRoomKey]) {
+      activeGames[clientRoomKey].playerCount =
+        openLobbies[clientRoomKey].length;
       io.to(roomKey).emit("startLobby");
       socket.emit("sendTaskLocations", InteractableLocation);
       io.to(clientRoomKey).emit("openTasks", OpenTasks);
@@ -181,14 +179,15 @@ io.on("connection", (socket) => {
   //----------Action Request Events-----------------------------------------
 
   socket.on("actionRequest", () => {
-    let interaction = checkInteraction(playerPos[clientRoomKey][socket.id], clientRoomKey);
+    let interaction = checkInteraction(
+      playerPos[clientRoomKey][socket.id],
+      clientRoomKey
+    );
     let role = connectedUsers[absClientId].role;
 
     if (interaction) {
-      if (interaction == -1) 
-        setMeeting(clientRoomKey, socket.id);
-      else if (role == "crewmate")
-        socket.emit("task", interaction);
+      if (interaction == -1) setMeeting(clientRoomKey, socket.id);
+      else if (role == "crewmate") socket.emit("task", interaction);
     }
   });
 
