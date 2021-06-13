@@ -19,6 +19,7 @@ const {
   InteractableLocation,
   OpenTasks,
   socketToSessionID,
+  killedPlayers,
 } = require("./serverFiles/dataStructures.js");
 const fs = require("fs");
 const {
@@ -46,24 +47,43 @@ function calcDist(playerA, playerB) {
 }
 
 function checkInteraction(pos, roomKey) {
-  var hitbox = 60;
+  var hitbox = 80;
   let type = false;
-  InteractableLocation[roomKey].forEach((element) => {
-    if (element.id == -1) {
-      hitbox = 90;
-    }
-    let right = Math.floor(element.x - (pos.x - hitbox));
-    let left = Math.floor(element.x - hitbox - pos.x);
-    let bottom = Math.floor(element.y + hitbox - pos.y);
-    let top = Math.floor(element.y - (pos.y + hitbox));
-    let inside =
+  Object.keys(playerPos[roomKey]).forEach((playerID) => {
+    if(playerPos[roomKey][playerID].dead){
+      let element = playerPos[roomKey][playerID];
+      let right = Math.floor(element.x - (pos.x - hitbox));
+      let left = Math.floor(element.x - hitbox - pos.x);
+      let bottom = Math.floor(element.y + hitbox - pos.y);
+      let top = Math.floor(element.y - (pos.y + hitbox));
+      let inside =
       ((right >= 0 && right <= hitbox) || (left <= 0 && left >= -hitbox)) &&
       ((bottom >= 0 && bottom <= hitbox) || (top <= 0 && top >= -hitbox));
-    if (inside) {
-      type = element.id;
+      if(inside){
+        playerPos[roomKey][playerID] = { x: 0, y: 0 };
+        killedPlayers[roomKey][socketToSessionID[playerID]] = { x: 0, y: 0 };
+        type = -1;
+      }
     }
-    hitbox = 60;
   });
+  if(!type){
+    InteractableLocation[roomKey].forEach((element) => {
+      if (element.id == -1) {
+        hitbox = 90;
+      }
+      let right = Math.floor(element.x - (pos.x - hitbox));
+      let left = Math.floor(element.x - hitbox - pos.x);
+      let bottom = Math.floor(element.y + hitbox - pos.y);
+      let top = Math.floor(element.y - (pos.y + hitbox));
+      let inside =
+        ((right >= 0 && right <= hitbox) || (left <= 0 && left >= -hitbox)) &&
+        ((bottom >= 0 && bottom <= hitbox) || (top <= 0 && top >= -hitbox));
+      if (inside) {
+        type = element.id;
+      }
+      hitbox = 60;
+    });
+  }
   return type;
 }
 

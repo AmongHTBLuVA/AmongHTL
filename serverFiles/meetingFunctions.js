@@ -7,13 +7,13 @@ const {
   killedPlayers,
   playerPos,
 } = require("./dataStructures");
-const { addKilledPlayer, getStartPoint} = require("./evaluationFunctions");
+const { addKilledPlayer, getStartPoint } = require("./evaluationFunctions");
 
 const votingTime = 200;
 
 function copy(o) {
-    return JSON.parse(JSON.stringify(o));
-  }
+  return JSON.parse(JSON.stringify(o));
+}
 
 function getMeetingPlayerObj(roomKey, initiator) {
   let playerObjArr = [];
@@ -48,10 +48,10 @@ function getSkippedPlayers(clientRoomKey) {
   let playersVoted = [];
   Object.keys(votes[clientRoomKey]).forEach((sus) => {
     if (
-        sus != "skip" &&
-        sus != "totalVotes" &&
-        sus != "voteEnds" &&
-        sus != "initiator"
+      sus != "skip" &&
+      sus != "totalVotes" &&
+      sus != "voteEnds" &&
+      sus != "initiator"
     ) {
       votes[clientRoomKey][sus].forEach((voted) => {
         playersVoted.push(voted);
@@ -109,8 +109,15 @@ function eject(roomKey) {
 
 module.exports = {
   setMeeting: function setMeeting(clientRoomKey, id) {
-    Object.keys(playerPos[clientRoomKey]).forEach(playerID => {
-      playerPos[clientRoomKey][playerID] = getStartPoint(playerPos[clientRoomKey]);
+    Object.keys(playerPos[clientRoomKey]).forEach((playerID) => {
+      if (
+        playerPos[clientRoomKey][playerID].x != 0 ||
+        playerPos[clientRoomKey][playerID].y != 0
+      ) {
+        playerPos[clientRoomKey][playerID] = getStartPoint(
+          playerPos[clientRoomKey]
+        );
+      }
     });
     let meetingPlayerObj = getMeetingPlayerObj(
       clientRoomKey,

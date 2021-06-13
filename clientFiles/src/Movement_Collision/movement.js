@@ -1,6 +1,7 @@
 import { socket, getId } from "/script/socket.js";
 import {
   background,
+  killedOverlay,
   ctx,
   canvas,
   getWidth,
@@ -142,10 +143,13 @@ function setPlayerPositions(playerPos) {
         (id != getId() || deadPlayerPos) &&
         pos &&
         playerPos[id] &&
-        JSON.stringify(playerPos[id]) != JSON.stringify({ x: 0, y: 0 })
+        (playerPos[id].x != 0 || playerPos[id].y != 0)
       ) {
         let relativPos = translatePlayerPosistion(playerPos[id], pos);
         ctx.drawImage(idToSkin[id], relativPos.x, relativPos.y, 70, 70);
+        if (playerPos[id].dead) {
+          ctx.drawImage(killedOverlay, relativPos.x, relativPos.y, 70, 70);
+        }
       }
     });
     if (deadPlayerPos) {
