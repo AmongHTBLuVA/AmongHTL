@@ -10,18 +10,31 @@ socket.on("task", (type) => {
     *  4  | WettexTask
     *  5  | BoardTask
     */
-   switch(type){
-       case 0:
 
-       case 1:
+    var url = ""
 
-       case 2:
+    switch(type){
+        case 0:
+            url = "/Tasks/ClockTask";
+            break;
+        case 1:
+            url = "/Tasks/LockerTask";
+            break;
+        case 2:
+            url = "/Tasks/CodeTask";
+            break;
+        case 3:
+            url = "/Tasks/FishTask";
+            break;
+        case 4:
+            url = "/Tasks/WettexTask";
+            break;
+        case 5:
+            url = "/Tasks/BoardTask";
+            break;
+    }
 
-       case 3:
-
-       case 4:
-
-       case 5:
-
-   }
+    console.log(url);
+    $("#taskFrame").attr('src', url);
+    $("#taskFrame").show();
 });

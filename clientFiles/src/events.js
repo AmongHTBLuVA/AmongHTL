@@ -1,10 +1,14 @@
-import { socket, setId, setName, mapName } from "/script/socket.js";
+import { socket, setId, setName, mapName, setLocations, getLocations, setOpenTasks, getOpenTasks } from "/script/socket.js";
 
 socket.on("connect", () => {});
 
 socket.on("pingRequest", (time, ping) => {
   socket.emit("pingResponse", time);
   $("#ping").html(ping ? ping : "-");
+});
+
+socket.on("sendTaskLocations", (locations) => {
+  setLocations(locations);
 });
 
 socket.on("sendClientId", (id, absId) => {
@@ -27,6 +31,10 @@ socket.on("checkLogOn", (oldName, absID) => {
   } else {
     localStorage.setItem("absID", absID);
   }
+});
+
+socket.on("openTasks", (tasks) => {
+  setOpenTasks(tasks);
 });
 
 function logOn(userName) {

@@ -1,6 +1,5 @@
 import { socket, getId } from "/script/socket.js";
 import {
-  player,
   background,
   ctx,
   canvas,
@@ -8,6 +7,7 @@ import {
   getHeight,
   backgroundTopLayer,
 } from "/script/main.js";
+import { idToSkin } from "/script/skinManagement.js";
 
 var keyPressed = { w: false, s: false, d: false, a: false };
 var deadPlayerPos = undefined;
@@ -117,55 +117,56 @@ function getDeltaPos() {
 }
 
 function setPlayerPositions(playerPos) {
-  ctx.clearRect(0, 0, canvas.width, canvas.height);
-  console.log(deadPlayerPos);
-  let pos = deadPlayerPos ? deadPlayerPos : playerPos[getId()];
-  let backgroundPos = translateMapPosistion(pos);
-  ctx.drawImage(
-    background,
-    backgroundPos.x,
-    backgroundPos.y,
-    background.width,
-    background.height
-  );
-  if (!deadPlayerPos) {
+  if (idToSkin) {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    let pos = deadPlayerPos ? deadPlayerPos : playerPos[getId()];
+    let backgroundPos = translateMapPosistion(pos);
     ctx.drawImage(
-      player,
-      round(getWidth() / 2) - 30,
-      round(getHeight() / 2) - 30,
-      70,
-      70
-    );
-  }
-  Object.keys(playerPos).forEach((id) => {
-    if (
-      (id != getId() || deadPlayerPos) &&
-      pos &&
-      playerPos[id] &&
-      JSON.stringify(playerPos[id]) != JSON.stringify({ x: 0, y: 0 })
-    ) {
-      let relativPos = translatePlayerPosistion(playerPos[id], pos);
-      ctx.drawImage(player, relativPos.x, relativPos.y, 70, 70);
-    }
-  });
-  if (deadPlayerPos) {
-    ctx.globalAlpha = 0.7;
-    ctx.drawImage(
-      player,
-      round(getWidth() / 2) - 30,
-      round(getHeight() / 2) - 30,
-      70,
-      70
-    );
-    ctx.globalAlpha = 1.0;
-  } else {
-    ctx.drawImage(
-      backgroundTopLayer,
+      background,
       backgroundPos.x,
       backgroundPos.y,
       background.width,
       background.height
     );
+    if (!deadPlayerPos) {
+      ctx.drawImage(
+        idToSkin[getId()],
+        round(getWidth() / 2) - 30,
+        round(getHeight() / 2) - 30,
+        70,
+        70
+      );
+    }
+    Object.keys(playerPos).forEach((id) => {
+      if (
+        (id != getId() || deadPlayerPos) &&
+        pos &&
+        playerPos[id] &&
+        JSON.stringify(playerPos[id]) != JSON.stringify({ x: 0, y: 0 })
+      ) {
+        let relativPos = translatePlayerPosistion(playerPos[id], pos);
+        ctx.drawImage(idToSkin[id], relativPos.x, relativPos.y, 70, 70);
+      }
+    });
+    if (deadPlayerPos) {
+      ctx.globalAlpha = 0.7;
+      ctx.drawImage(
+        idToSkin[getId()],
+        round(getWidth() / 2) - 30,
+        round(getHeight() / 2) - 30,
+        70,
+        70
+      );
+      ctx.globalAlpha = 1.0;
+    } else {
+      ctx.drawImage(
+        backgroundTopLayer,
+        backgroundPos.x,
+        backgroundPos.y,
+        background.width,
+        background.height
+      );
+    }
   }
 }
 
