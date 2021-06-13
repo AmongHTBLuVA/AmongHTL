@@ -39,6 +39,9 @@ function setSkins(skins, sessionToSocketID) {
       case 9:
         img.src = "/img/skin/WieserTrip.png";
         break;
+      case 10:
+        img.src = "/img/skin/Zenitsu.png";
+        break;
     }
     img.width = 70;
     img.height = 70;

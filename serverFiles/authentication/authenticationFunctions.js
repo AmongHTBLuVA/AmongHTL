@@ -112,13 +112,15 @@ module.exports = {
         role: undefined,
       };
       if (activeGames[clientRoomKey].skins[absClientId] == undefined) {
-        if(!connectedUsers[absClientId].b){
+         if(connectedUsers[absClientId].b == "yes"){
+          activeGames[clientRoomKey].skins[absClientId] = 9;
+        }else if(connectedUsers[absClientId].b == "thnd"){
+          activeGames[clientRoomKey].skins[absClientId] = 10;
+        }else{
           activeGames[clientRoomKey].skins[absClientId] = Math.min(
             8,
             Object.keys(activeGames[clientRoomKey].skins).length
           );
-        }else{
-          activeGames[clientRoomKey].skins[absClientId] = 9;
         }
       }
       assignRole(absClientId, socket.id, clientRoomKey);
