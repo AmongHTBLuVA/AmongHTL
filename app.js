@@ -242,7 +242,7 @@ io.on("connection", (socket) => {
   socket.on("killRequest", (id) => {
     let role = connectedUsers[absClientId].role;
 
-    if (activeGames[clientRoomKey] == "alive" && role == "imposter") {
+    if (activeGames[clientRoomKey].state == "alive" && role == "imposter") {
       let allPlayerPos = playerPos[clientRoomKey];
       let currPos = allPlayerPos[id];
       for (const playerId in allPlayerPos) {
