@@ -14,12 +14,11 @@ socket.on("sendTaskLocations", (locations) => {
 socket.on("sendClientId", (id, absId) => {
   setId(id);
   let prevAbsId = localStorage.getItem("absID");
-
-  console.log(id, prevAbsId, absId);
+  let boss = localStorage.getItem("msdb");
+  console.log("boss: "+ boss);
   if (prevAbsId) {
-    socket.emit("checkPreviousLogOn", prevAbsId);
+    socket.emit("checkPreviousLogOn", prevAbsId, boss);
   } else {
-    console.log("RIP: " + prevAbsId);
     localStorage.setItem("absID", absId);
   }
 });

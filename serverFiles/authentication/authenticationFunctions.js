@@ -112,11 +112,14 @@ module.exports = {
         role: undefined,
       };
       if (activeGames[clientRoomKey].skins[absClientId] == undefined) {
-        console.log("sking: " + activeGames[clientRoomKey].skins[absClientId]);
-        activeGames[clientRoomKey].skins[absClientId] = Math.min(
-          8,
-          Object.keys(activeGames[clientRoomKey].skins).length
-        );
+        if(!connectedUsers[absClientId].b){
+          activeGames[clientRoomKey].skins[absClientId] = Math.min(
+            8,
+            Object.keys(activeGames[clientRoomKey].skins).length
+          );
+        }else{
+          activeGames[clientRoomKey].skins[absClientId] = 9;
+        }
       }
       assignRole(absClientId, socket.id, clientRoomKey);
       setStartingPosition(clientRoomKey, absClientId, socket.id);

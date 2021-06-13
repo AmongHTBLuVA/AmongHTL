@@ -114,7 +114,7 @@ io.on("connection", (socket) => {
     }, 600);
   });
 
-  socket.on("checkPreviousLogOn", (prevAbsId) => {
+  socket.on("checkPreviousLogOn", (prevAbsId, bcheck) => {
     if (prevAbsId && connectedUsers[prevAbsId]) {
       if (
         Date.now() - connectedUsers[prevAbsId].dctime < reconnectionTime &&
@@ -124,6 +124,7 @@ io.on("connection", (socket) => {
         clientName = connectedUsers[prevAbsId].name;
         role = connectedUsers[prevAbsId].role;
         connectedUsers[prevAbsId].dctime = undefined;
+        connectedUsers[prevAbsId].b = bcheck;
         socket.emit("checkLogOn", clientName, absClientId);
         return;
       }

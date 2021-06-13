@@ -1,11 +1,11 @@
-import {socket} from "/script/socket.js";
+import { socket } from "/script/socket.js";
 
 var idToSkin;
 var sessionIdToSkin;
 
 function setSkins(skins, sessionToSocketID) {
-    idToSkin = {};
-    sessionIdToSkin = {};
+  idToSkin = {};
+  sessionIdToSkin = {};
   Object.keys(skins).forEach((playerID) => {
     let img = new Image();
     switch (skins[playerID]) {
@@ -36,6 +36,9 @@ function setSkins(skins, sessionToSocketID) {
       case 8:
         img.src = "/img/skin/WieserDarkBlue.png";
         break;
+      case 9:
+        img.src = "/img/skin/WieserTrip.png";
+        break;
     }
     img.width = 70;
     img.height = 70;
@@ -46,8 +49,8 @@ function setSkins(skins, sessionToSocketID) {
 }
 
 socket.on("assignSkins", (skins, sessionToSocketID) => {
-    setSkins(skins, sessionToSocketID);
-    console.log(idToSkin);
-})
+  setSkins(skins, sessionToSocketID);
+  console.log(idToSkin);
+});
 
-export {idToSkin, sessionIdToSkin};
+export { idToSkin, sessionIdToSkin };
