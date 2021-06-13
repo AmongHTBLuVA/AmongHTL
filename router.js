@@ -132,6 +132,10 @@ module.exports = function (app) {
   app.get("/img/megaphone.png", function (req, res) {
     res.sendFile("/images/megaphone.png", { root: "serverFiles" });
   });
+
+  app.get("/img/WieserDeadOverlay.png", function (req, res) {
+    res.sendFile("/images/WieserDeadOverlay.png", { root: "serverFiles" });
+  });
   
   //tasks
 
