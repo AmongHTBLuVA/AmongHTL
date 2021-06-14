@@ -33,6 +33,7 @@ require("./router")(app);
 
 const reconnectionTime = 60000;
 const baseCooldown = 100000;
+const emergencyCooldown = 65000;
 
 //-----------------utility functions------------------------
 
@@ -67,7 +68,7 @@ function checkInteraction(pos, roomKey, id) {
       if (inside) {
         playerPos[roomKey][playerID] = { x: 0, y: 0 };
         killedPlayers[roomKey][socketToSessionID[playerID]] = { x: 0, y: 0 };
-        type = -1;
+        type = -2;
       }
     }
   });
@@ -218,12 +219,20 @@ io.on("connection", (socket) => {
       socket.id
     );
     let role = connectedUsers[absClientId].role;
-
-    console.log(interaction);
-
+    let now = new Date();
     if (interaction != undefined) {
-      if (interaction == -1) {
+      if (
+        interaction == -2 ||
+        (interaction == -1 &&
+          (!activeGames[clientRoomKey].meetingCooldown ||
+            activeGames[clientRoomKey].meetingCooldown - now.getTime()<= 0))
+      ) {
         setMeeting(clientRoomKey, socket.id);
+      } else if (interaction == -1) {
+        socket.emit(
+          "meetingCooldown",
+          Math.floor((activeGames[clientRoomKey].meetingCooldown - now.getTime()) / 1000)
+        );
       } else if (role == "crewmate") {
         socket.emit("task", interaction);
       }
@@ -238,10 +247,18 @@ io.on("connection", (socket) => {
 
   socket.on("voteForImposter", (votedPlayer) => {
     voteImposter(votedPlayer, clientRoomKey, socket.id);
+    now = new Date();
+    activeGames[clientRoomKey].meetingCooldown = now.setTime(
+      now.getTime() + emergencyCooldown
+    );
   });
 
   socket.on("votingTimeUp", () => {
     votingTimeUp(clientRoomKey);
+    now = new Date();
+    activeGames[clientRoomKey].meetingCooldown = now.setTime(
+      now.getTime() + emergencyCooldown
+    );
   });
 
   //----------Movement Collision Events-------------------------------------
@@ -285,7 +302,7 @@ io.on("connection", (socket) => {
       let nextKill = new Date(nextKillTime);
       timeTillkill = nextKill.getTime() - now.getTime();
     }
-    
+
     if (!timeTillkill || timeTillkill <= 0) {
       if (activeGames[clientRoomKey].state == "alive" && role == "imposter") {
         let allPlayerPos = playerPos[clientRoomKey];
@@ -308,7 +325,7 @@ io.on("connection", (socket) => {
           }
         }
       }
-    }else{
+    } else {
       socket.emit("killCooldown", Math.floor(timeTillkill / 1000));
     }
   });

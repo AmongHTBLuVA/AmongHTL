@@ -34,6 +34,7 @@ module.exports = {
     activeGames[clientRoomKey].players = {};
     activeGames[clientRoomKey].state = "alive";
     activeGames[clientRoomKey].skins = {};
+    activeGames[clientRoomKey].meetingCooldown = 0;
     //activeGames[clientRoomKey].playerCount = openLobbies[clientRoomKey].length;
     activeGames[clientRoomKey].imposterIndex = getImposter(
       activeGames[clientRoomKey].playerCount
