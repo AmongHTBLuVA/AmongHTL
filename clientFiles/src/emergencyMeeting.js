@@ -77,10 +77,7 @@ socket.on("voteUpdate", (votes) => {
   if (!votingEndsTick) {
     votingEndsTick = setInterval(() => {
       let now = new Date();
-      let secondsTillEnd =
-        voteEnds.getSeconds() +
-        voteEnds.getMinutes() * 60 -
-        (now.getSeconds() + now.getMinutes() * 60);
+      let secondsTillEnd = Math.floor((voteEnds.getTime() - now.getTime()) / 1000);
        if(secondsTillEnd <= 0){
            socket.emit("votingTimeUp");
        }

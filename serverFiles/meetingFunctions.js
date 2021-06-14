@@ -128,8 +128,8 @@ module.exports = {
       votes[clientRoomKey].totalVotes = 0;
       votes[clientRoomKey].skip = [];
       votes[clientRoomKey].initiator = id;
-      votes[clientRoomKey].voteEnds = new Date().setSeconds(
-        new Date().getSeconds() + votingTime
+      votes[clientRoomKey].voteEnds = new Date().setTime(
+        new Date().getTime() + (votingTime * 1000)
       );
     }
     activeGames[clientRoomKey].state = "meeting";
