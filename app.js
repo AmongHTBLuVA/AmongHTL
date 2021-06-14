@@ -221,10 +221,6 @@ io.on("connection", (socket) => {
     );
     let role = connectedUsers[absClientId].role;
     let now = new Date();
-    //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-        socket.emit("task", 3);
-        return;
-    //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
     if (interaction != undefined) {
       if (
         interaction == -2 ||
