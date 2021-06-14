@@ -33,10 +33,8 @@ $("#canvas").mousemove((e) => {
         ctx.drawImage(fish, pos.x, pos.y, 150, 50);
         let xSpeed = prev.x - pos.x;
         let ySpeed = prev.y - pos.y;
-        console.log(xSpeed);
         let now = new Date();
         let diff = now.getTime() - time.getTime();
-        console.log(diff);
         if(Math.abs(xSpeed) > 1 || Math.abs(ySpeed) > 1 || diff < 1){
             drag = false;
             ctx.clearRect(0, 0, canvas.width, canvas.height);
