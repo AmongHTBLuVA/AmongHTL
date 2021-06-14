@@ -16,6 +16,14 @@
     --selectedColor: var(--imposterColor);
 }
 
+.blue{
+    --selectedColor: var(--crewmateColor) !important;
+}
+
+.red{
+    --selectedColor: var(--imposterColor) !important;
+}
+
 .cooldownContainer{
     font-size: 25pt;
     color: rgb(204, 9, 9);

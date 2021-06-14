@@ -9,10 +9,30 @@ const {
   getPlayerCollObj,
   movePlayer,
 } = require("./Movement_Collision/playerMovCollFunctions.js");
-const { killedPlayers, socketToSessionID, playerPos } = require("./dataStructures.js");
+const { killedPlayers, socketToSessionID, playerPos, io, activeGames } = require("./dataStructures.js");
 
 function copy(o) {
   return JSON.parse(JSON.stringify(o));
+}
+
+function checkKilledGameEnd(roomKey) {
+  let i = true;
+  let c = activeGames[roomKey].playerCount - 1;
+  Object.keys(playerPos[roomKey]).forEach(playerID => {
+    if(playerPos[roomKey][playerID].dead){
+      if(activeGames[roomKey].players[playerID].role == "imposter"){
+        i = false;
+      }else{
+        c--;
+      }
+    }
+  });
+  if(i && c == 0){
+    return "i";
+  }if(!i){
+    return "c";
+  }
+  return undefined;
 }
 
 //Functions
@@ -79,6 +99,11 @@ module.exports = {
     let absId = socketToSessionID[playerId];
     playerPos[roomId][playerId].dead = true;
     killedPlayers[roomId][absId] = playerPos[roomId][playerId];
+    let gameEnd = checkKilledGameEnd(roomId);
+    if(gameEnd){
+      io.to(roomId).emit("gameEnd", gameEnd, activeGames[roomId].players);
+      activeGames[roomId].state = "over";
+    }
   },
   //
 };

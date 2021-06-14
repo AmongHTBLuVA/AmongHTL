@@ -240,7 +240,17 @@ io.on("connection", (socket) => {
   });
 
   socket.on("taskFinished", (taskId) => {
-    //handle finished task
+    if(OpenTasks[clientRoomKey].length == 1){
+      io.to(clientRoomKey).emit("gameEnd", "c", activeGames[clientRoomKey].players);
+      activeGames[roomId].state = "over";
+    }
+    let tmp = [];
+    taskId.forEach(e => {
+      if(e != taskId){
+        tmp.push(e);
+      }
+    })
+    OpenTasks = tmp;
   });
 
   //----------Emergency Meeting Events--------------------------------------
