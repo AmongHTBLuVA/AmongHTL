@@ -63,6 +63,24 @@ socket.on("killCooldown", (timeTillKill) => {
   }, 1000);
 });
 
+var cooldownDsp2 = 0;
+socket.on("meetingCooldown", (timeTillMeeting) => {
+  $(".cooldownContainer").removeClass("hide");
+  $(".cooldownContainer").removeClass("fade");
+  $("#cooldownLeft").html(timeTillMeeting);
+  cooldownDsp2++;
+  setTimeout(() => {
+    $(".cooldownContainer").addClass("fade");
+    setTimeout(() => {
+      if (cooldownDsp2 == 1) {
+        $(".cooldownContainer").removeClass("fade");
+        $(".cooldownContainer").addClass("hide");
+      }
+      cooldownDsp2--;
+    }, 3000);
+  }, 1000);
+});
+
 function logOn(userName) {
   $(".userNamePopup").hide();
   $(".container").removeClass("popUpBackground");
