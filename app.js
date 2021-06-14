@@ -254,6 +254,7 @@ io.on("connection", (socket) => {
     })
     OpenTasks = tmp;*/
     console.log("done");
+    socket.emit("closeTask");
   });
 
   //----------Emergency Meeting Events--------------------------------------

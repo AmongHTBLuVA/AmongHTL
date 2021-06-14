@@ -45,6 +45,11 @@ socket.on("openTasks", (tasks) => {
   setOpenTasks(tasks);
 });
 
+socket.on("closeTask", () => {
+  console.log("hide");
+  $("#taskFrame").hide();
+});
+
 var cooldownDsp = 0;
 socket.on("killCooldown", (timeTillKill) => {
   $(".cooldownContainer").removeClass("hide");

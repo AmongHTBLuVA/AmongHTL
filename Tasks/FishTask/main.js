@@ -25,6 +25,7 @@ function getMousePos(canvas, evt) {
 }
 
 var prev = {x :0, y: 0};
+var time = new Date();
 $("#canvas").mousemove((e) => {
     if(drag){
         let pos = getMousePos(canvas, e);
@@ -32,12 +33,17 @@ $("#canvas").mousemove((e) => {
         ctx.drawImage(fish, pos.x, pos.y, 150, 50);
         let xSpeed = prev.x - pos.x;
         let ySpeed = prev.y - pos.y;
-        if(Math.abs(xSpeed) > 1 || Math.abs(ySpeed) > 1){
+        console.log(xSpeed);
+        let now = new Date();
+        let diff = now.getTime() - time.getTime();
+        console.log(diff);
+        if(Math.abs(xSpeed) > 1 || Math.abs(ySpeed) > 1 || diff < 1){
             drag = false;
             ctx.clearRect(0, 0, canvas.width, canvas.height);
             ctx.drawImage(fish, 200, 420, 150, 50);
         }
         prev = pos;
+        time = new Date();
     }
 });
 
@@ -93,4 +99,5 @@ $("#canvas").mousedown((e) => {
   });
   drag = inside;
   prev = element;
+  time = new Date()
 });
