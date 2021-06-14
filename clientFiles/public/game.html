@@ -5,21 +5,24 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
-    <link rel="stylesheet" href="/style/game.css">
-    <link rel="stylesheet" href="/style/buffer.css">
+    <link rel="stylesheet" href="/style/game.css" />
+    <link rel="stylesheet" href="/style/buffer.css" />
     <link rel="stylesheet" href="/style/hudStyles.css" />
-  
+
     <script src="//code.jquery.com/jquery-1.12.0.min.js"></script>
     <script src="//code.jquery.com/jquery-migrate-1.2.1.min.js"></script>
 
-    <script type="module" src='/script/borderFunctions.js'></script>
-    <script type="module" src='/script/movement.js'></script>
-    <script type="module" src='/script/main.js'></script>
+    <script type="module" src="/script/borderFunctions.js"></script>
+    <script type="module" src="/script/movement.js"></script>
+    <script type="module" src="/script/main.js"></script>
     <script type="module" src="/script/roleReveal.js"></script>
     <script type="module" src="/script/requests.js"></script>
+    <script type="module" src="/script/emergencyMeeting.js"></script>
+    <script type="module" src="/script/skinManagement.js"></script>
 
     <script type="module" src="/script/MovementCollisionEvents.js"></script>
     <script type="module" src="/script/Events.js"></script>
+    <script type="module" src="/script/Task.js"></script>
     <title>AmongHTL</title>
   </head>
 
@@ -27,20 +30,85 @@
     <div class="container hide">
       <div class="textContainer">
         <h2 id="roleReveal">Crewmate</h2>
-        <h3 class="crwMateText">There is <span class="imposterDsp">1 Imposter</span> among htl</h3>
+        <h3 class="crwMateText">
+          There is <span class="imposterDsp">1 Imposter</span> among htl
+        </h3>
       </div>
       <div class="playerDisplayContainer">
-        <div class="bkgFade fadeInital">
-        </div>
+        <div class="bkgFade fadeInital"></div>
         <div class="bkgFadeNarrow fadeInital"></div>
-        <div class="playerDisplay">
-          
+        <div class="playerDisplay"></div>
+      </div>
+    </div>
+    <div class="ejectedDisplay hide">
+      <div class="stars">
+        <div class="stars1"></div>
+        <div class="stars2"></div>
+        <div class="stars3"></div>
+        <div class="stars2"></div>
+        <div class="stars3"></div>
+      </div>
+      <div class="stars">
+        <div class="stars2"></div>
+        <div class="stars3"></div>
+        <div class="stars1"></div>
+        <div class="stars3"></div>
+        <div class="stars2"></div>
+      </div>
+      <div class="ejectedMessageContainer">
+        <p id="ejectedName"></p>
+        <p>was</p>
+        <p id="ejectedRoleMessage"></p>
+      </div>
+    </div>
+    <div class="emergencyContainer glass hide">
+      <h1>Who is the Imposter?</h1>
+      <div id="playersContainerSpacer">
+        <div id="playersContainer"></div>
+      </div>
+      <div class="emergencyBottom">
+        <button id="skipButton">Skip Vote</button>
+        <div id="voteForSkip"></div>
+        <div class="votingEnds">
+          <p>Voting Ends in:</p>
+          <p id="votingSecondLeft">-</p>
+          <p>s</p>
         </div>
       </div>
     </div>
     <div class="gameContainer hide">
       <canvas id="canvas"> </canvas>
-      <button id="killButton">Kill</button>
+      <div id="buttonContainer">
+        <button id="taskButton">Use</button>
+        <button id="killButton">Kill</button>
+      </div>
+      <iframe id="taskFrame"></iframe>
+
+      <div id="compassContainer">
+        <!-- to do: add containers through js -->
+        <div class="triangleContainer" id="triangleContainer0">
+          <div class="triangle"></div>
+        </div>
+        <div class="triangleContainer" id="triangleContainer1">
+          <div class="triangle"></div>
+        </div>
+        <div class="triangleContainer" id="triangleContainer2">
+          <div class="triangle"></div>
+        </div>
+        <div class="triangleContainer" id="triangleContainer3">
+          <div class="triangle"></div>
+        </div>
+        <div class="triangleContainer" id="triangleContainer4">
+          <div class="triangle"></div>
+        </div>
+        <div class="triangleContainer" id="triangleContainer5">
+          <div class="triangle"></div>
+        </div>
+      </div>
+    </div>
+    <div class="pingDisplay">
+      <p id="ping"></p>
+      <p>ms</p>
     </div>
   </body>
 </html>

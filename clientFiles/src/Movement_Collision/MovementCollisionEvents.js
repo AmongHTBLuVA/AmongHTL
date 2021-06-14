@@ -1,4 +1,4 @@
-import { socket } from "/script/socket.js";
+import { socket, getId } from "/script/socket.js";
 import {
   background,
   ctx,
@@ -8,7 +8,7 @@ import {
   copy
 } from "/script/main.js";
 import { getMapStartPoint, readMapBorders } from "/script/borderFunctions.js";
-import { setPlayerPositions, setDeadPos } from "/script/movement.js";
+import { setPlayerPositions, setDeadPos, updateCompass } from "/script/movement.js";
 
 socket.on("drawBorders", (Borders, pos) => {
   let b0;
@@ -45,6 +45,8 @@ socket.on("playerMovement", (playerPositions) => {
     return;
   }
   setPlayerPositions(playerPositions);
+  let playerPos = playerPositions[getId()];
+  updateCompass(JSON.parse(JSON.stringify(playerPos)));
 });
 
 socket.on("requestWallCollision", (pos) => {

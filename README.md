@@ -1,4 +1,4 @@
-# AmongHTL
+# [AmongHTL](https://github.com/AmongHTBLuVA/AmongHTL)
 
 A "little" game for our "great" little school.
 Currently deployed via AWS on [www.amonghtl.games](https://www.amonghtl.games).

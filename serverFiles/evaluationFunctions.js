@@ -1,22 +1,31 @@
 /*This file contains Functions that directly influence Player behaivor
 For Example the player Collision function directly alters the player position*/
 
-
 //Requiers
-const { wallCollision } = require("./Movement_Collision/wallCollisionFunctions.js");
+const {
+  wallCollision,
+} = require("./Movement_Collision/wallCollisionFunctions.js");
 const {
   getPlayerCollObj,
   movePlayer,
 } = require("./Movement_Collision/playerMovCollFunctions.js");
+const { killedPlayers, socketToSessionID, playerPos } = require("./dataStructures.js");
 
 function copy(o) {
-    return JSON.parse(JSON.stringify(o));
+  return JSON.parse(JSON.stringify(o));
 }
 
 //Functions
 module.exports = {
   //Movement Collision Functions
-  playerCollision: function playerCollision(collObjs, id, pos, clientBorder, playerPos, entityBorder) {
+  playerCollision: function playerCollision(
+    collObjs,
+    id,
+    pos,
+    clientBorder,
+    playerPos,
+    entityBorder
+  ) {
     if (collObjs.length == 0) {
       playerPos[id] = mergedPos;
       return false;
@@ -53,7 +62,7 @@ module.exports = {
       });
     }
   },
-  getStartPoint : function getStartPoint(playerPos) {
+  getStartPoint: function getStartPoint(playerPos) {
     let pos0 = { x: 920, y: 100 };
     if (Object.keys(playerPos).length == 0) {
       return pos0;
@@ -62,6 +71,14 @@ module.exports = {
       pos0.y = pos0.y + 15;
     }
     return pos0;
+  },
+  addKilledPlayer: function addKilledPlayer(roomId, playerId) {
+    if (killedPlayers[roomId] == undefined) {
+      killedPlayers[roomId] = {};
+    }
+    let absId = socketToSessionID[playerId];
+    playerPos[roomId][playerId].dead = true;
+    killedPlayers[roomId][absId] = playerPos[roomId][playerId];
   },
   //
 };

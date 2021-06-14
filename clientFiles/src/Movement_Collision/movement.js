@@ -1,17 +1,18 @@
-import { socket, getId } from "/script/socket.js";
+import { socket, getId, getLocations, getOpenTasks } from "/script/socket.js";
 import {
-  player,
   background,
+  killedOverlay,
   ctx,
   canvas,
   getWidth,
   getHeight,
-  backgroundTopLayer
+  backgroundTopLayer,
 } from "/script/main.js";
+import { idToSkin } from "/script/skinManagement.js";
 
 var keyPressed = { w: false, s: false, d: false, a: false };
 var deadPlayerPos = undefined;
-var previousDelta = {x: -2, y: -2};
+var previousDelta = { x: -2, y: -2 };
 
 function setDeadPos(pos) {
   deadPlayerPos = pos;
@@ -117,49 +118,59 @@ function getDeltaPos() {
 }
 
 function setPlayerPositions(playerPos) {
-  ctx.clearRect(0, 0, canvas.width, canvas.height);
-  let pos = deadPlayerPos ? deadPlayerPos : playerPos[getId()];
-  let backgroundPos = translateMapPosistion(pos);
-  ctx.drawImage(
-    background,
-    backgroundPos.x,
-    backgroundPos.y,
-    background.width,
-    background.height
-  );
-  if (!deadPlayerPos) {
+  if (idToSkin) {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    let pos = deadPlayerPos ? deadPlayerPos : playerPos[getId()];
+    let backgroundPos = translateMapPosistion(pos);
     ctx.drawImage(
-      player,
-      round(getWidth() / 2) - 30,
-      round(getHeight() / 2) - 30,
-      70,
-      70
+      background,
+      backgroundPos.x,
+      backgroundPos.y,
+      background.width,
+      background.height
     );
-  }
-  Object.keys(playerPos).forEach((id) => {
-    if (id != getId() || deadPlayerPos) {
-      let relativPos = translatePlayerPosistion(playerPos[id], pos);
-      ctx.drawImage(player, relativPos.x, relativPos.y, 70, 70);
+    if (!deadPlayerPos) {
+      ctx.drawImage(
+        idToSkin[getId()],
+        round(getWidth() / 2) - 30,
+        round(getHeight() / 2) - 30,
+        70,
+        70
+      );
     }
-  });
-  if (deadPlayerPos) {
-    ctx.globalAlpha = 0.7;
-    ctx.drawImage(
-      player,
-      round(getWidth() / 2) - 30,
-      round(getHeight() / 2) - 30,
-      70,
-      70
-    );
-    ctx.globalAlpha = 1.0;
-  }else{
-  ctx.drawImage(
-    backgroundTopLayer,
-    backgroundPos.x,
-    backgroundPos.y,
-    background.width,
-    background.height
-  );
+    Object.keys(playerPos).forEach((id) => {
+      if (
+        (id != getId() || deadPlayerPos) &&
+        pos &&
+        playerPos[id] &&
+        (playerPos[id].x != 0 || playerPos[id].y != 0)
+      ) {
+        let relativPos = translatePlayerPosistion(playerPos[id], pos);
+        ctx.drawImage(idToSkin[id], relativPos.x, relativPos.y, 70, 70);
+        if (playerPos[id].dead) {
+          ctx.drawImage(killedOverlay, relativPos.x, relativPos.y, 70, 70);
+        }
+      }
+    });
+    if (deadPlayerPos) {
+      ctx.globalAlpha = 0.7;
+      ctx.drawImage(
+        idToSkin[getId()],
+        round(getWidth() / 2) - 30,
+        round(getHeight() / 2) - 30,
+        70,
+        70
+      );
+      ctx.globalAlpha = 1.0;
+    } else {
+      ctx.drawImage(
+        backgroundTopLayer,
+        backgroundPos.x,
+        backgroundPos.y,
+        background.width,
+        background.height
+      );
+    }
   }
 }
 
@@ -179,4 +190,37 @@ function translatePlayerPosistion(ppos, cpos) {
   return { x: getWidth() / 2 - 30 + xdiff, y: getHeight() / 2 - 30 + ydiff };
 }
 
-export { getDeltaPos, setPlayerPositions, setDeadPos };
+
+// task compass functions - update at every tick
+
+function getAngle(cx, cy, ex, ey) {
+  let dy = ey - cy;
+  let dx = ex - cx;
+  let theta = Math.atan2(dy, dx);
+  theta *= 180 / Math.PI; 
+  return theta;
+}
+
+function updateCompass(playerPos) {
+  let taskIdx = 0;
+  let openTasks = getOpenTasks();
+  let locations = getLocations();
+
+  if (deadPlayerPos) 
+    playerPos = deadPlayerPos;
+  
+  if (openTasks) {
+    $("[id*=triangleContainer]").each(function () { 
+      if (openTasks.includes(taskIdx)) {
+          let location = locations[taskIdx + 1];
+          let angle = getAngle(location.x, location.y, playerPos.x, playerPos.y);
+          $("#triangleContainer" + taskIdx).css("transform", `rotate(${angle}deg)`);
+      } else {
+        $("#triangleContainer" + taskIdx).hide();
+      }
+      taskIdx++;
+    });
+  }
+}
+
+export { getDeltaPos, setPlayerPositions, setDeadPos, updateCompass };

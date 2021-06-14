@@ -7,8 +7,8 @@ const {
 } = require("./authenticationHelperFunctions.js");
 
 const revealTime = 6;
-const tickSpeed = 80;
-const speed = 10;
+const SpeedPro100ms = 20;
+var speed = 6;
 
 const {
   readingBorders,
@@ -24,10 +24,33 @@ const {
   deadPositions,
   deltaPositions,
   EntityBorders,
+  InteractableLocation,
+  OpenTasks,
+  io,
 } = require("../dataStructures.js");
+const { setMeeting } = require("../meetingFunctions.js");
 
 function copy(o) {
   return JSON.parse(JSON.stringify(o));
+}
+
+function getTickSpeed(ping) {
+  let tmp = Math.floor(ping / 10);
+  tmp /= 3;
+  let tickSpeed = Math.max(40, Math.min(80, Math.floor(tmp * 10)));
+  speed = tickSpeed / (100 / SpeedPro100ms);
+  return tickSpeed;
+}
+
+function getHighestPing(roomKey) {
+  let max = 0;
+  Object.keys(activeGames[roomKey].players).forEach((id) => {
+    let ping = connectedUsers[socketToSessionID[id]].ping;
+    if (ping > max) {
+      max = ping;
+    }
+  });
+  return max;
 }
 
 function getRoomKey(openLobbies) {
@@ -61,7 +84,8 @@ module.exports = {
     clientRoomKey,
     clientName,
     mapName,
-    role
+    role,
+    ping
   ) {
     let parts = currentRoom.split("/");
     if (!connectedUsers[absClientId]) {
@@ -72,10 +96,12 @@ module.exports = {
         dctime: undefined,
       };
     }
+    connectedUsers[absClientId].ping = ping;
+    connectedUsers[absClientId].socketID = socket.id;
     socketToSessionID[socket.id] = absClientId;
     if (parts.length != 1 && parts[0] == "game") {
       clientRoomKey = parts[1];
-      if (!activeGames[clientRoomKey].players) {
+      if (activeGames[clientRoomKey] && !activeGames[clientRoomKey].players) {
         setGame(clientRoomKey, revealTime);
       } else if (BordersAbsolute[clientRoomKey]) {
         socket.emit("translateBorders", copy(BordersAbsolute[clientRoomKey]));
@@ -85,6 +111,18 @@ module.exports = {
         name: username,
         role: undefined,
       };
+      if (activeGames[clientRoomKey].skins[absClientId] == undefined) {
+         if(connectedUsers[absClientId].b == "yes"){
+          activeGames[clientRoomKey].skins[absClientId] = 9;
+        }else if(connectedUsers[absClientId].b == "thnd"){
+          activeGames[clientRoomKey].skins[absClientId] = 10;
+        }else{
+          activeGames[clientRoomKey].skins[absClientId] = Math.min(
+            8,
+            Object.keys(activeGames[clientRoomKey].skins).length
+          );
+        }
+      }
       assignRole(absClientId, socket.id, clientRoomKey);
       setStartingPosition(clientRoomKey, absClientId, socket.id);
       if (!BordersAbsolute[clientRoomKey] && !readingBorders[clientRoomKey]) {
@@ -93,6 +131,11 @@ module.exports = {
           let borders = require("../borders/" + mapName + ".json");
           BordersAbsolute[clientRoomKey] = borders.walls;
           EntityBorders[clientRoomKey] = borders.entities;
+          InteractableLocation[clientRoomKey] = borders.interactable;
+          OpenTasks[clientRoomKey] = [];
+          InteractableLocation[clientRoomKey].forEach((location) => {
+            if (location.id != -1) OpenTasks[clientRoomKey].push(location.id);
+          });
         } else {
           console.log("Requesting");
           readingBorders[clientRoomKey] = true;
@@ -106,7 +149,32 @@ module.exports = {
         activeGames[clientRoomKey].playerCount
       ) {
         if (!readingBorders[clientRoomKey]) {
+          console.log("Full");
+          let tickSpeed = getTickSpeed(getHighestPing(clientRoomKey));
           gameFull(clientRoomKey, socket.id, speed, tickSpeed);
+          io.to(clientRoomKey).emit(
+            "assignSkins",
+            activeGames[clientRoomKey].skins,
+            connectedUsers
+          );
+          socket.emit(
+            "assignSkins",
+            activeGames[clientRoomKey].skins,
+            connectedUsers
+          );
+          setTimeout(() => {
+            console.log("start");
+            io.to(clientRoomKey).emit(
+              "showRoleReveal",
+              activeGames[clientRoomKey].players,
+              activeGames[clientRoomKey].startTime
+            );
+            socket.emit(
+              "showRoleReveal",
+              activeGames[clientRoomKey].players,
+              activeGames[clientRoomKey].startTime
+            );
+          }, 500);
         }
       }
       connectedUsers[absClientId].role =
@@ -114,11 +182,14 @@ module.exports = {
       socket.emit(
         "assignRole",
         activeGames[clientRoomKey].players[socket.id].role,
-        activeGames[clientRoomKey].playerCount,
+        activeGames[clientRoomKey].players,
         activeGames[clientRoomKey].startTime
       );
+      if (activeGames[clientRoomKey].state == "meeting") {
+        setMeeting(clientRoomKey, socket.id);
+      }
     } else {
-      if(connectedUsers[absClientId]){
+      if (connectedUsers[absClientId]) {
         connectedUsers[absClientId].role = undefined;
       }
       if (!clientName) {
@@ -148,10 +219,12 @@ module.exports = {
         delete activeGames[clientRoomKey].players[socket.id];
         if (Object.keys(activeGames[clientRoomKey].players).length == 0) {
           setTimeout(() => {
-            if (Object.keys(activeGames[clientRoomKey].players).length == 0) {
-              delete activeGames[clientRoomKey];
-              clearInterval(roomGameLoops[clientRoomKey]);
-              delete roomGameLoops[clientRoomKey];
+            if (activeGames[clientRoomKey]) {
+              if (Object.keys(activeGames[clientRoomKey].players).length == 0) {
+                delete activeGames[clientRoomKey];
+                clearInterval(roomGameLoops[clientRoomKey]);
+                delete roomGameLoops[clientRoomKey];
+              }
             }
           }, 5000);
         }
