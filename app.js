@@ -32,6 +32,7 @@ const { addKilledPlayer } = require("./serverFiles/evaluationFunctions.js");
 require("./router")(app);
 
 const reconnectionTime = 60000;
+const baseCooldown = 100000;
 
 //-----------------utility functions------------------------
 
@@ -50,27 +51,27 @@ function checkInteraction(pos, roomKey, id) {
   var hitbox = 80;
   let type = false;
 
-  if(pos.dead){
+  if (pos.dead) {
     pos = deadPositions[roomKey][id];
   }
   Object.keys(playerPos[roomKey]).forEach((playerID) => {
-    if(playerPos[roomKey][playerID].dead && id != playerID){
+    if (playerPos[roomKey][playerID].dead && id != playerID) {
       let element = playerPos[roomKey][playerID];
       let right = Math.floor(element.x - (pos.x - hitbox));
       let left = Math.floor(element.x - hitbox - pos.x);
       let bottom = Math.floor(element.y + hitbox - pos.y);
       let top = Math.floor(element.y - (pos.y + hitbox));
       let inside =
-      ((right >= 0 && right <= hitbox) || (left <= 0 && left >= -hitbox)) &&
-      ((bottom >= 0 && bottom <= hitbox) || (top <= 0 && top >= -hitbox));
-      if(inside){
+        ((right >= 0 && right <= hitbox) || (left <= 0 && left >= -hitbox)) &&
+        ((bottom >= 0 && bottom <= hitbox) || (top <= 0 && top >= -hitbox));
+      if (inside) {
         playerPos[roomKey][playerID] = { x: 0, y: 0 };
         killedPlayers[roomKey][socketToSessionID[playerID]] = { x: 0, y: 0 };
         type = -1;
       }
     }
   });
-  if(!type){
+  if (!type) {
     InteractableLocation[roomKey].forEach((element) => {
       if (element.id == -1) {
         hitbox = 90;
@@ -89,7 +90,6 @@ function checkInteraction(pos, roomKey, id) {
     });
   }
 
-
   return type;
 }
 
@@ -97,6 +97,9 @@ function checkInteraction(pos, roomKey, id) {
 
 io.on("connection", (socket) => {
   console.log("[" + socket.id + "] connected on");
+  var nextKillTime = undefined;
+  var killCooldown = undefined;
+
   var clientRoomKey = undefined;
   var clientName = undefined;
   var role = undefined;
@@ -139,7 +142,7 @@ io.on("connection", (socket) => {
   });
 
   socket.on("authenticated", (username, currentRoom, mapName) => {
-    if(!ping){
+    if (!ping) {
       ping = 300;
     }
     let authentiaction = authenticate(
@@ -165,9 +168,11 @@ io.on("connection", (socket) => {
     socket.emit("assignRoomKey", clientRoomKey);
     io.to(clientRoomKey).emit("lobbyMembers", openLobbies[clientRoomKey]);
     io.to(clientRoomKey).emit("playerMovement", playerPos[clientRoomKey]);
-    io.to(clientRoomKey).emit("sendTaskLocations", InteractableLocation[clientRoomKey]);
+    io.to(clientRoomKey).emit(
+      "sendTaskLocations",
+      InteractableLocation[clientRoomKey]
+    );
     io.to(clientRoomKey).emit("openTasks", OpenTasks[clientRoomKey]);
-
   });
 
   socket.on("lobbyStartRequest", (roomKey) => {
@@ -274,20 +279,37 @@ io.on("connection", (socket) => {
 
   socket.on("killRequest", (id) => {
     let role = connectedUsers[absClientId].role;
+    let now = new Date();
+    let timeTillkill = undefined;
+    if (nextKillTime) {
+      let nextKill = new Date(nextKillTime);
+      timeTillkill = nextKill.getTime() - now.getTime();
+    }
+    
+    if (!timeTillkill || timeTillkill <= 0) {
+      if (activeGames[clientRoomKey].state == "alive" && role == "imposter") {
+        let allPlayerPos = playerPos[clientRoomKey];
+        let currPos = allPlayerPos[id];
+        for (const playerId in allPlayerPos) {
+          if (playerId != id) {
+            let playerPos = allPlayerPos[playerId];
+            let dist = calcDist(currPos, playerPos);
 
-    if (activeGames[clientRoomKey].state == "alive" && role == "imposter") {
-      let allPlayerPos = playerPos[clientRoomKey];
-      let currPos = allPlayerPos[id];
-      for (const playerId in allPlayerPos) {
-        if (playerId != id) {
-          let playerPos = allPlayerPos[playerId];
-          let dist = calcDist(currPos, playerPos);
-
-          if (dist <= 100) {
-            addKilledPlayer(clientRoomKey, playerId);
+            if (dist <= 100) {
+              addKilledPlayer(clientRoomKey, playerId);
+              if (!killCooldown) {
+                killCooldown =
+                  baseCooldown / activeGames[clientRoomKey].playerCount;
+              }
+              now = new Date();
+              nextKillTime = now.setTime(now.getTime() + killCooldown);
+              return;
+            }
           }
         }
       }
+    }else{
+      socket.emit("killCooldown", Math.floor(timeTillkill / 1000));
     }
   });
 });

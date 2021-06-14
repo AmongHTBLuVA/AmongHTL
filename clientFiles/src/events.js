@@ -1,4 +1,13 @@
-import { socket, setId, setName, mapName, setLocations, getLocations, setOpenTasks, getOpenTasks } from "/script/socket.js";
+import {
+  socket,
+  setId,
+  setName,
+  mapName,
+  setLocations,
+  getLocations,
+  setOpenTasks,
+  getOpenTasks,
+} from "/script/socket.js";
 
 socket.on("connect", () => {});
 
@@ -15,7 +24,7 @@ socket.on("sendClientId", (id, absId) => {
   setId(id);
   let prevAbsId = localStorage.getItem("absID");
   let boss = localStorage.getItem("msdb");
-  console.log("boss: "+ boss);
+  console.log("boss: " + boss);
   if (prevAbsId) {
     socket.emit("checkPreviousLogOn", prevAbsId, boss);
   } else {
@@ -34,6 +43,24 @@ socket.on("checkLogOn", (oldName, absID) => {
 
 socket.on("openTasks", (tasks) => {
   setOpenTasks(tasks);
+});
+
+var cooldownDsp = 0;
+socket.on("killCooldown", (timeTillKill) => {
+  $(".cooldownContainer").removeClass("hide");
+  $(".cooldownContainer").removeClass("fade");
+  $("#cooldownLeft").html(timeTillKill);
+  cooldownDsp++;
+  setTimeout(() => {
+    $(".cooldownContainer").addClass("fade");
+    setTimeout(() => {
+      if (cooldownDsp == 1) {
+        $(".cooldownContainer").removeClass("fade");
+        $(".cooldownContainer").addClass("hide");
+      }
+      cooldownDsp--;
+    }, 3000);
+  }, 1000);
 });
 
 function logOn(userName) {
