@@ -13,6 +13,7 @@ socket.on("task", (type) => {
 
     var url = ""
 
+    console.log("task type: " + type);
     switch(type){
         case 0:
             url = "/Tasks/ClockTask";

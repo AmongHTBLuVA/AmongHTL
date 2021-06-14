@@ -46,11 +46,15 @@ function calcDist(playerA, playerB) {
   return Math.sqrt(a * a + b * b);
 }
 
-function checkInteraction(pos, roomKey) {
+function checkInteraction(pos, roomKey, id) {
   var hitbox = 80;
   let type = false;
+
+  if(pos.dead){
+    pos = deadPositions[roomKey][id];
+  }
   Object.keys(playerPos[roomKey]).forEach((playerID) => {
-    if(playerPos[roomKey][playerID].dead){
+    if(playerPos[roomKey][playerID].dead && id != playerID){
       let element = playerPos[roomKey][playerID];
       let right = Math.floor(element.x - (pos.x - hitbox));
       let left = Math.floor(element.x - hitbox - pos.x);
@@ -84,6 +88,8 @@ function checkInteraction(pos, roomKey) {
       hitbox = 60;
     });
   }
+
+
   return type;
 }
 
@@ -201,16 +207,19 @@ io.on("connection", (socket) => {
   //----------Action Request Events-----------------------------------------
 
   socket.on("actionRequest", () => {
-    console.log(OpenTasks[clientRoomKey]);
     let interaction = checkInteraction(
-      playerPos[clientRoomKey][socket.id],
-      clientRoomKey
+      copy(playerPos[clientRoomKey][socket.id]),
+      clientRoomKey,
+      socket.id
     );
     let role = connectedUsers[absClientId].role;
 
     if (interaction) {
-      if (interaction == -1) setMeeting(clientRoomKey, socket.id);
-      else if (role == "crewmate") socket.emit("task", interaction);
+      if (interaction == -1) {
+        setMeeting(clientRoomKey, socket.id);
+      } else if (role == "crewmate") {
+        socket.emit("task", interaction);
+      }
     }
   });
 

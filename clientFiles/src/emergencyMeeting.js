@@ -40,10 +40,9 @@ socket.on("startEmergencyMeeting", (players) => {
   $(".emergencyContainer").removeClass("hide");
   $("#voteForSkip").empty();
   $("#playersContainer").empty();
+  $("#skipButton").prop("disabled", false);
   players.forEach((p) => {
     let playerID = p.id;
-    console.log("dic: " + sessionIdToSkin);
-    console.log("id: " + p.id);
     let playerImage = sessionIdToSkin[p.id].src;
     let playerName = p.name;
     const playerElement = `<div class="player" id="${playerID}"><div class="playerContainer"><div class="hasVoted hide"><p>Voted</p></div><div class="killFade hide"></div><div class="playerContentContainer"><img class="initiatorSymbol hide" src="/img/megaphone.png"><div class="imgContainer"><span class="killedX hide">&#10007</span><img src="${playerImage}" alt="" id="playerImage"></div><p class="playerName">${playerName}</p><div class="votedFor"></div><div class="VoteButtons hide"><button class="confVoteButton">&#10003</button><button class="cancelVoteButton">&#10006</button></div></div></div></div>`;
