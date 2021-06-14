@@ -32,7 +32,7 @@ const { addKilledPlayer } = require("./serverFiles/evaluationFunctions.js");
 require("./router")(app);
 
 const reconnectionTime = 60000;
-const baseCooldown = 100000;
+const baseCooldown = 100000; //killcooldown = basecooldown / playerCount
 const emergencyCooldown = 65000;
 
 //-----------------utility functions------------------------
