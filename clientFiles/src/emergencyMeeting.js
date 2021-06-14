@@ -132,7 +132,7 @@ socket.on("showVoteResults", (votes, ejected) => {
       votes[susPlayer].forEach((votedPlayer) => {
         $("#" + susPlayer)
           .find(".votedFor")
-          .append(`<img src="${sessionIdToSkin[susPlayer].src}">`);
+          .append(`<img src="${sessionIdToSkin[votedPlayer].src}">`);
       });
     }
   });
