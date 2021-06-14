@@ -226,6 +226,7 @@ io.on("connection", (socket) => {
   });
 
   socket.on("taskFinished", (taskId) => {
+    console.log("finished: " + taskId);
     //handle finished task
   });
 
