@@ -11,6 +11,11 @@ If you wish to contribute please follow this guide to start developing :)
 
 ## Quick Start
 
+1.  **Clone the Repository**
+    ```sh
+    git clone https://github.com/AmongHTBLuVA/AmongHTL.git
+    ```
+
 2.  **Start developing.**
 
     Navigate into your new site’s directory and start it up.
