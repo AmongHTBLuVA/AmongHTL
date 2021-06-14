@@ -214,7 +214,9 @@ io.on("connection", (socket) => {
     );
     let role = connectedUsers[absClientId].role;
 
-    if (interaction) {
+    console.log(interaction);
+
+    if (interaction != undefined) {
       if (interaction == -1) {
         setMeeting(clientRoomKey, socket.id);
       } else if (role == "crewmate") {

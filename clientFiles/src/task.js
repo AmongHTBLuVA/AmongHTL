@@ -35,7 +35,9 @@ socket.on("task", (type) => {
             break;
     }
 
-    console.log(url);
-    $("#taskFrame").attr('src', url);
-    $("#taskFrame").show();
+    if (url.length > 0) {
+        console.log(url);
+        $("#taskFrame").attr('src', url);
+        $("#taskFrame").show();
+    }
 });
