@@ -159,6 +159,7 @@ io.on("connection", (socket) => {
     );
     clientName = authentiaction.clientName;
     clientRoomKey = authentiaction.clientRoomKey;
+    console.log("roomkey: " + clientRoomKey);
     movesTillCheck[clientRoomKey] = {};
     movesTillCheck[clientRoomKey][socket.id] = 0;
     deltaPositions[clientRoomKey] = {};
@@ -220,6 +221,10 @@ io.on("connection", (socket) => {
     );
     let role = connectedUsers[absClientId].role;
     let now = new Date();
+    //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+        socket.emit("task", 3);
+        return;
+    //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
     if (interaction != undefined) {
       if (
         interaction == -2 ||
@@ -240,7 +245,8 @@ io.on("connection", (socket) => {
   });
 
   socket.on("taskFinished", (taskId) => {
-    if(OpenTasks[clientRoomKey].length == 1){
+    console.log(OpenTasks + " | " + clientRoomKey + " | " + OpenTasks[clientRoomKey]);
+    /*if(OpenTasks[clientRoomKey].length == 1){
       io.to(clientRoomKey).emit("gameEnd", "c", activeGames[clientRoomKey].players);
       activeGames[roomId].state = "over";
     }
@@ -250,7 +256,8 @@ io.on("connection", (socket) => {
         tmp.push(e);
       }
     })
-    OpenTasks = tmp;
+    OpenTasks = tmp;*/
+    console.log("done");
   });
 
   //----------Emergency Meeting Events--------------------------------------
