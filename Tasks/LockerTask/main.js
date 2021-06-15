@@ -1,10 +1,9 @@
 import { socket } from "/script/socket.js";
 
-
-function myFunction() {
-  var x = document.getElementById("bread");
-  x.style.display = "none";
-  socket.emit("taskFinished", 1);
-}
-
-export { myFunction };
+$(document).ready(function () {
+  $("#bread").click(function (e) { 
+    e.preventDefault();
+    this.style.display = "none";
+    socket.emit("taskFinished", 1);
+  });
+});

@@ -6,7 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
     <link rel="stylesheet" href="/Tasks/CodeTask/styles.css" />
-    <script src="/Tasks/CodeTask/main.js"></script>
+    <script src="/Tasks/CodeTask/main.js" type="module"></script>
 
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
     <script src="https://cdn.rawgit.com/google/code-prettify/master/loader/run_prettify.js?lang=css&amp%3Bskin=doxy"></script>
@@ -47,28 +47,11 @@
          </pre
       >
       <p>What is missing?</p>
-      <button
-        type="button"
-        class="btn btn-outline-success"
-        id="wrong "
-        onclick="game(false)"
-      >
+      <button type="button" class="btn btn-outline-success" id="false">
         (
       </button>
-      <button
-        type="button"
-        class="btn btn-outline-success"
-        id="true"
-        onclick="game(true)"
-      >
-        ;
-      </button>
-      <button
-        type="button"
-        class="btn btn-outline-success"
-        id="no"
-        onclick="game(false)"
-      >
+      <button type="button" class="btn btn-outline-success" id="true">;</button>
+      <button type="button" class="btn btn-outline-success" id="false">
         .
       </button>
     </div>

@@ -2,6 +2,7 @@ body {
   user-select: none;
 
   background-image: url(./images/wall.jpg);
+  background-size: auto;
 }
 
 #wallContainer {
