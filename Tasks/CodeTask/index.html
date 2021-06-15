@@ -1,14 +1,59 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="CodeTask/styles.css" />
-    <script src="CodeTask/main.js"></script>
-    <title>Document</title>
-</head>
-<body>
-    
-</body>
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <link rel="stylesheet" href="/Tasks/CodeTask/styles.css" />
+    <script src="/Tasks/CodeTask/main.js" type="module"></script>
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="https://cdn.rawgit.com/google/code-prettify/master/loader/run_prettify.js?lang=css&amp%3Bskin=doxy"></script>
+    <link
+      rel="stylesheet"
+      href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css"
+      integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm"
+      crossorigin="anonymous"
+    />
+
+    <title>CodeTask</title>
+  </head>
+  <body>
+    <div id="code">
+      <pre class="prettyprint">
+            using System;
+            using System.IO;
+            using System.Text;
+            
+            namespace IncludeHelp
+            {
+                //Find the error
+                class Test
+                {
+                    // Main Method 
+                    static void Main(string[] args)
+                    {
+            
+                        Console.WriteLine("This is line1"); 
+                        Console.WriteLine("This is line2")
+                        Console.Write("This is line3");
+                        Console.Write("This is line4");            
+                        
+                        Console.ReadLine();
+                    }
+                }
+            }
+         </pre
+      >
+      <p>What is missing?</p>
+      <button type="button" class="btn btn-outline-success" id="false">
+        (
+      </button>
+      <button type="button" class="btn btn-outline-success" id="true">;</button>
+      <button type="button" class="btn btn-outline-success" id="false">
+        .
+      </button>
+    </div>
+  </body>
 </html>

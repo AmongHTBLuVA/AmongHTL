@@ -152,18 +152,28 @@ module.exports = function (app) {
   
   //tasks
 
+  app.get("/Tasks/scratchcard.js", function(req, res) {
+    res.sendFile('/scratchcard.min.js', { root: "Tasks"});
+  });
+
   app.get("/Tasks/:task", function(req, res) {
     var task = req.params["task"];
-    res.sendFile(`/${task}/`, { root: "Tasks", dotfiles: "allow" });
+    res.sendFile(`/${task}/`, { root: "Tasks" });
   });
 
   app.get("/Tasks/:task/main.js", function(req, res) {
     var task = req.params["task"];
-    res.sendFile(`/${task}/main.js`, { root: "Tasks", dotfiles: "allow" });
+    res.sendFile(`/${task}/main.js`, { root: "Tasks" });
   });
 
   app.get("/Tasks/:task/styles.css", function(req, res) {
     var task = req.params["task"];
-    res.sendFile(`/${task}/styles.css`, { root: "Tasks", dotfiles: "allow" });
+    res.sendFile(`/${task}/styles.css`, { root: "Tasks" });
   });
+
+  app.get("/Tasks/:task/images/:image", function (req,res) { 
+    var task = req.params["task"];
+    var image = req.params["image"];
+    res.sendFile(`/${task}/images/${image}`, { root: "Tasks" });
+   });
 };
