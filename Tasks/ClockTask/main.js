@@ -6,14 +6,6 @@ let dragHour = false;
 let dragMinute = false;
 const center = { x: 600, y: 300 };
 
-function getMousePos(canvas, evt) {
-  var rect = canvas.getBoundingClientRect();
-  return {
-    x: evt.clientX - rect.left,
-    y: evt.clientY - rect.top,
-  };
-}
-
 function getAngle(center, pos) {
   let dy = pos.y - center.y;
   let dx = pos.x - center.x;
@@ -60,7 +52,8 @@ $(".container").mousemove((e) => {
 $(".container").mouseup((e) => {
   dragHour = false;
   dragMinute = false;
-  let hour = degToHour(hourAngle)
+  let hour = degToHour(hourAngle) > 12 ? degToHour(hourAngle) - 1 : degToHour(hourAngle);
+  hour = hour == 0 ? 12 : hour;
   let min = degToMin(minuteAngle);
   let now = new Date();
   if(hour == now.getHours() && (min >= now.getMinutes()-1 && min <= now.getMinutes()+1)){

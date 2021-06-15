@@ -241,6 +241,8 @@ io.on("connection", (socket) => {
   });
 
   socket.on("taskFinished", (taskId) => {
+    console.log(socket.id);
+    console.log(clientName);
     console.log(OpenTasks + " | " + clientRoomKey + " | " + OpenTasks[clientRoomKey]);
     /*if(OpenTasks[clientRoomKey].length == 1){
       io.to(clientRoomKey).emit("gameEnd", "c", activeGames[clientRoomKey].players);
