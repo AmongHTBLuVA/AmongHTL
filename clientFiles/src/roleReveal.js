@@ -14,7 +14,7 @@ socket.on("assignRole", (role) => {
     $("#roleReveal").html("Imposter");
     $("h3").hide();
     $("body").addClass("imposter");
-    //$("#compassContainer").hide();
+    $("#compassContainer").hide();
   } else if (role == "crewmate") {
     $("#killButton").hide();
   }

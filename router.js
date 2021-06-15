@@ -51,6 +51,10 @@ module.exports = function (app) {
     res.sendFile("/src/skinManagement.js", { root: "clientFiles" });
   });
 
+  app.get("/script/fish", function(req, res) {
+    res.sendFile(`/FishTask/main.js`, { root: "Tasks", dotfiles: "allow" });
+  });
+
   //Movement Collision Scripts
   app.get("/script/borderFunctions.js", function (req, res) {
     res.sendFile("/src/Movement_Collision/borderFunctions.js", {
@@ -71,6 +75,10 @@ module.exports = function (app) {
   });
 
   //css
+
+  app.get("/style/fish", function(req, res) {
+    res.sendFile(`/FishTask/styles.css`, { root: "Tasks", dotfiles: "allow" });
+  });
 
   app.get("/style/lobbyStyles.css", function (req, res) {
     res.sendFile("/public/css/lobbyStyles.css", {
@@ -109,6 +117,16 @@ module.exports = function (app) {
     res.sendFile(`/images/wiesers/${skin}`, { root: "serverFiles", dotfiles: "allow" });
   });
 
+  app.get("/img/fish/:type", function(req, res) {
+    var skin = req.params["type"];
+    res.sendFile(`/FishTask/images/${skin}`, { root: "Tasks", dotfiles: "allow" });
+  });
+
+  app.get("/img/clock/:type", function(req, res) {
+    var skin = req.params["type"];
+    res.sendFile(`/ClockTask/images/${skin}`, { root: "Tasks", dotfiles: "allow" });
+  });
+
   app.get("/img/HTL3Floor.png", function (req, res) {
     res.sendFile("/images/HTL3Floor.png", { root: "serverFiles" });
   });
@@ -139,18 +157,28 @@ module.exports = function (app) {
   
   //tasks
 
+  app.get("/Tasks/scratchcard.js", function(req, res) {
+    res.sendFile('/scratchcard.min.js', { root: "Tasks"});
+  });
+
   app.get("/Tasks/:task", function(req, res) {
     var task = req.params["task"];
-    res.sendFile(`/${task}/`, { root: "Tasks", dotfiles: "allow" });
+    res.sendFile(`/${task}/`, { root: "Tasks" });
   });
 
   app.get("/Tasks/:task/main.js", function(req, res) {
     var task = req.params["task"];
-    res.sendFile(`/${task}/main.js`, { root: "Tasks", dotfiles: "allow" });
+    res.sendFile(`/${task}/main.js`, { root: "Tasks" });
   });
 
   app.get("/Tasks/:task/styles.css", function(req, res) {
     var task = req.params["task"];
-    res.sendFile(`/${task}/styles.css`, { root: "Tasks", dotfiles: "allow" });
+    res.sendFile(`/${task}/styles.css`, { root: "Tasks" });
   });
+
+  app.get("/Tasks/:task/images/:image", function (req,res) { 
+    var task = req.params["task"];
+    var image = req.params["image"];
+    res.sendFile(`/${task}/images/${image}`, { root: "Tasks" });
+   });
 };

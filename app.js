@@ -32,6 +32,8 @@ const { addKilledPlayer } = require("./serverFiles/evaluationFunctions.js");
 require("./router")(app);
 
 const reconnectionTime = 60000;
+const baseCooldown = 100000; //killcooldown = basecooldown / playerCount
+const emergencyCooldown = 65000;
 
 //-----------------utility functions------------------------
 
@@ -46,27 +48,31 @@ function calcDist(playerA, playerB) {
   return Math.sqrt(a * a + b * b);
 }
 
-function checkInteraction(pos, roomKey) {
+function checkInteraction(pos, roomKey, id) {
   var hitbox = 80;
   let type = false;
+
+  if (pos.dead) {
+    pos = deadPositions[roomKey][id];
+  }
   Object.keys(playerPos[roomKey]).forEach((playerID) => {
-    if(playerPos[roomKey][playerID].dead){
+    if (playerPos[roomKey][playerID].dead && id != playerID) {
       let element = playerPos[roomKey][playerID];
       let right = Math.floor(element.x - (pos.x - hitbox));
       let left = Math.floor(element.x - hitbox - pos.x);
       let bottom = Math.floor(element.y + hitbox - pos.y);
       let top = Math.floor(element.y - (pos.y + hitbox));
       let inside =
-      ((right >= 0 && right <= hitbox) || (left <= 0 && left >= -hitbox)) &&
-      ((bottom >= 0 && bottom <= hitbox) || (top <= 0 && top >= -hitbox));
-      if(inside){
+        ((right >= 0 && right <= hitbox) || (left <= 0 && left >= -hitbox)) &&
+        ((bottom >= 0 && bottom <= hitbox) || (top <= 0 && top >= -hitbox));
+      if (inside) {
         playerPos[roomKey][playerID] = { x: 0, y: 0 };
         killedPlayers[roomKey][socketToSessionID[playerID]] = { x: 0, y: 0 };
-        type = -1;
+        type = -2;
       }
     }
   });
-  if(!type){
+  if (!type) {
     InteractableLocation[roomKey].forEach((element) => {
       if (element.id == -1) {
         hitbox = 90;
@@ -84,6 +90,7 @@ function checkInteraction(pos, roomKey) {
       hitbox = 60;
     });
   }
+
   return type;
 }
 
@@ -91,6 +98,9 @@ function checkInteraction(pos, roomKey) {
 
 io.on("connection", (socket) => {
   console.log("[" + socket.id + "] connected on");
+  var nextKillTime = undefined;
+  var killCooldown = undefined;
+
   var clientRoomKey = undefined;
   var clientName = undefined;
   var role = undefined;
@@ -133,7 +143,7 @@ io.on("connection", (socket) => {
   });
 
   socket.on("authenticated", (username, currentRoom, mapName) => {
-    if(!ping){
+    if (!ping) {
       ping = 300;
     }
     let authentiaction = authenticate(
@@ -149,6 +159,7 @@ io.on("connection", (socket) => {
     );
     clientName = authentiaction.clientName;
     clientRoomKey = authentiaction.clientRoomKey;
+    console.log("roomkey: " + clientRoomKey);
     movesTillCheck[clientRoomKey] = {};
     movesTillCheck[clientRoomKey][socket.id] = 0;
     deltaPositions[clientRoomKey] = {};
@@ -159,9 +170,11 @@ io.on("connection", (socket) => {
     socket.emit("assignRoomKey", clientRoomKey);
     io.to(clientRoomKey).emit("lobbyMembers", openLobbies[clientRoomKey]);
     io.to(clientRoomKey).emit("playerMovement", playerPos[clientRoomKey]);
-    io.to(clientRoomKey).emit("sendTaskLocations", InteractableLocation[clientRoomKey]);
+    io.to(clientRoomKey).emit(
+      "sendTaskLocations",
+      InteractableLocation[clientRoomKey]
+    );
     io.to(clientRoomKey).emit("openTasks", OpenTasks[clientRoomKey]);
-
   });
 
   socket.on("lobbyStartRequest", (roomKey) => {
@@ -201,31 +214,67 @@ io.on("connection", (socket) => {
   //----------Action Request Events-----------------------------------------
 
   socket.on("actionRequest", () => {
-    console.log(OpenTasks[clientRoomKey]);
     let interaction = checkInteraction(
-      playerPos[clientRoomKey][socket.id],
-      clientRoomKey
+      copy(playerPos[clientRoomKey][socket.id]),
+      clientRoomKey,
+      socket.id
     );
     let role = connectedUsers[absClientId].role;
-
-    if (interaction) {
-      if (interaction == -1) setMeeting(clientRoomKey, socket.id);
-      else if (role == "crewmate") socket.emit("task", interaction);
+    let now = new Date();
+    if (interaction != undefined) {
+      if (
+        interaction == -2 ||
+        (interaction == -1 &&
+          (!activeGames[clientRoomKey].meetingCooldown ||
+            activeGames[clientRoomKey].meetingCooldown - now.getTime()<= 0))
+      ) {
+        setMeeting(clientRoomKey, socket.id);
+      } else if (interaction == -1) {
+        socket.emit(
+          "meetingCooldown",
+          Math.floor((activeGames[clientRoomKey].meetingCooldown - now.getTime()) / 1000)
+        );
+      } else if (role == "crewmate") {
+        socket.emit("task", interaction);
+      }
     }
   });
 
   socket.on("taskFinished", (taskId) => {
-    //handle finished task
+    console.log(socket.id);
+    console.log(clientName);
+    console.log(OpenTasks + " | " + clientRoomKey + " | " + OpenTasks[clientRoomKey]);
+    /*if(OpenTasks[clientRoomKey].length == 1){
+      io.to(clientRoomKey).emit("gameEnd", "c", activeGames[clientRoomKey].players);
+      activeGames[roomId].state = "over";
+    }
+    let tmp = [];
+    taskId.forEach(e => {
+      if(e != taskId){
+        tmp.push(e);
+      }
+    })
+    OpenTasks = tmp;*/
+    console.log("done");
+    socket.emit("closeTask");
   });
 
   //----------Emergency Meeting Events--------------------------------------
 
   socket.on("voteForImposter", (votedPlayer) => {
     voteImposter(votedPlayer, clientRoomKey, socket.id);
+    now = new Date();
+    activeGames[clientRoomKey].meetingCooldown = now.setTime(
+      now.getTime() + emergencyCooldown
+    );
   });
 
   socket.on("votingTimeUp", () => {
     votingTimeUp(clientRoomKey);
+    now = new Date();
+    activeGames[clientRoomKey].meetingCooldown = now.setTime(
+      now.getTime() + emergencyCooldown
+    );
   });
 
   //----------Movement Collision Events-------------------------------------
@@ -263,20 +312,37 @@ io.on("connection", (socket) => {
 
   socket.on("killRequest", (id) => {
     let role = connectedUsers[absClientId].role;
+    let now = new Date();
+    let timeTillkill = undefined;
+    if (nextKillTime) {
+      let nextKill = new Date(nextKillTime);
+      timeTillkill = nextKill.getTime() - now.getTime();
+    }
 
-    if (activeGames[clientRoomKey].state == "alive" && role == "imposter") {
-      let allPlayerPos = playerPos[clientRoomKey];
-      let currPos = allPlayerPos[id];
-      for (const playerId in allPlayerPos) {
-        if (playerId != id) {
-          let playerPos = allPlayerPos[playerId];
-          let dist = calcDist(currPos, playerPos);
+    if (!timeTillkill || timeTillkill <= 0) {
+      if (activeGames[clientRoomKey].state == "alive" && role == "imposter") {
+        let allPlayerPos = playerPos[clientRoomKey];
+        let currPos = allPlayerPos[id];
+        for (const playerId in allPlayerPos) {
+          if (playerId != id) {
+            let playerPos = allPlayerPos[playerId];
+            let dist = calcDist(currPos, playerPos);
 
-          if (dist <= 100) {
-            addKilledPlayer(clientRoomKey, playerId);
+            if (dist <= 100) {
+              addKilledPlayer(clientRoomKey, playerId);
+              if (!killCooldown) {
+                killCooldown =
+                  baseCooldown / activeGames[clientRoomKey].playerCount;
+              }
+              now = new Date();
+              nextKillTime = now.setTime(now.getTime() + killCooldown);
+              return;
+            }
           }
         }
       }
+    } else {
+      socket.emit("killCooldown", Math.floor(timeTillkill / 1000));
     }
   });
 });

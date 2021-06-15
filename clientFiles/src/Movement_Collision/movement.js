@@ -205,12 +205,14 @@ function updateCompass(playerPos) {
   let taskIdx = 0;
   let openTasks = getOpenTasks();
   let locations = getLocations();
+
+  if (deadPlayerPos) 
+    playerPos = deadPlayerPos;
   
   if (openTasks) {
     $("[id*=triangleContainer]").each(function () { 
       if (openTasks.includes(taskIdx)) {
           let location = locations[taskIdx + 1];
-
           let angle = getAngle(location.x, location.y, playerPos.x, playerPos.y);
           $("#triangleContainer" + taskIdx).css("transform", `rotate(${angle}deg)`);
       } else {

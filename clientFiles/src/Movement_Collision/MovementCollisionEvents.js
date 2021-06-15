@@ -45,7 +45,8 @@ socket.on("playerMovement", (playerPositions) => {
     return;
   }
   setPlayerPositions(playerPositions);
-  updateCompass(playerPositions[getId()]);
+  let playerPos = playerPositions[getId()];
+  updateCompass(JSON.parse(JSON.stringify(playerPos)));
 });
 
 socket.on("requestWallCollision", (pos) => {
