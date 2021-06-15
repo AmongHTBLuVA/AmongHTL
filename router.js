@@ -122,6 +122,11 @@ module.exports = function (app) {
     res.sendFile(`/FishTask/images/${skin}`, { root: "Tasks", dotfiles: "allow" });
   });
 
+  app.get("/img/clock/:type", function(req, res) {
+    var skin = req.params["type"];
+    res.sendFile(`/ClockTask/images/${skin}`, { root: "Tasks", dotfiles: "allow" });
+  });
+
   app.get("/img/HTL3Floor.png", function (req, res) {
     res.sendFile("/images/HTL3Floor.png", { root: "serverFiles" });
   });
