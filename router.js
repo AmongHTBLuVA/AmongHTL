@@ -51,6 +51,10 @@ module.exports = function (app) {
     res.sendFile("/src/skinManagement.js", { root: "clientFiles" });
   });
 
+  app.get("/script/fish", function(req, res) {
+    res.sendFile(`/FishTask/main.js`, { root: "Tasks", dotfiles: "allow" });
+  });
+
   //Movement Collision Scripts
   app.get("/script/borderFunctions.js", function (req, res) {
     res.sendFile("/src/Movement_Collision/borderFunctions.js", {
@@ -71,6 +75,10 @@ module.exports = function (app) {
   });
 
   //css
+
+  app.get("/style/fish", function(req, res) {
+    res.sendFile(`/FishTask/styles.css`, { root: "Tasks", dotfiles: "allow" });
+  });
 
   app.get("/style/lobbyStyles.css", function (req, res) {
     res.sendFile("/public/css/lobbyStyles.css", {
@@ -107,6 +115,11 @@ module.exports = function (app) {
   app.get("/img/skin/:type", function(req, res) {
     var skin = req.params["type"];
     res.sendFile(`/images/wiesers/${skin}`, { root: "serverFiles", dotfiles: "allow" });
+  });
+
+  app.get("/img/fish/:type", function(req, res) {
+    var skin = req.params["type"];
+    res.sendFile(`/FishTask/images/${skin}`, { root: "Tasks", dotfiles: "allow" });
   });
 
   app.get("/img/HTL3Floor.png", function (req, res) {
