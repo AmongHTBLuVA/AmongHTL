@@ -32,7 +32,6 @@ socket.on("sendClientId", (id, absId) => {
   setId(id);
   let prevAbsId = localStorage.getItem("absID");
   let boss = localStorage.getItem("msdb");
-  console.log("boss: " + boss);
   if (prevAbsId) {
     socket.emit("checkPreviousLogOn", prevAbsId, boss);
   } else {
@@ -41,7 +40,6 @@ socket.on("sendClientId", (id, absId) => {
 });
 
 socket.on("checkLogOn", (oldName, absID) => {
-  console.log("name: " + oldName);
   if (oldName) {
     logOn(oldName);
   } else {
@@ -143,9 +141,7 @@ function gameEnd(players, outcome) {
   $("#roleReveal").html(text);
   $(".crwMateText").hide();
   $(".playerDisplay").empty();
-  console.log(Object.keys(players).length);
   Object.keys(players).forEach((playerID) => {
-    console.log(players[playerID]);
     if (
       (outcome == "c" && players[playerID].role != "imposter") ||
       (outcome == "i" && players[playerID].role == "imposter")

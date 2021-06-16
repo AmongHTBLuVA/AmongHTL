@@ -9,7 +9,6 @@ socket.on("assignRoomKey", (roomKey) => {
 });
 
 socket.on("startLobby", () => {
-    console.log("starting lobby " + currLobby);
     window.location.href = "/game/" + currLobby;
 });
 
@@ -18,7 +17,6 @@ socket.on("lobbyMembers", (roomMembers) => {
     if (roomMembers.length > 1) {
         $(".playerJoined").empty();
         roomMembers.forEach((element, i) => {
-            console.log("element: " + element.id);
             if (element.id != getId()) {
                 if (i == 0) {
                     $(".playerJoined").append("<p style='font-weight: 600;'>" + element.name + "</p>");

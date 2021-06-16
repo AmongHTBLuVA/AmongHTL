@@ -22,7 +22,6 @@ socket.on("assignRole", (role) => {
 
 
   $(".container").removeClass("hide");
-  console.log("role: " + role);
   setplayerRole(role);
 });
 
@@ -96,7 +95,6 @@ function roleReveal(players, time) {
   let now = new Date();
   let timeTill = startTimeSeconds - (now.getSeconds() + now.getMinutes() * 60);
 
-  console.log("start: " + timeTill);
   setTimeout(() => {
     $(".container").hide();
     $(".gameContainer").removeClass("hide");

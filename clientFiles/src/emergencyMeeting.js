@@ -93,9 +93,7 @@ socket.on("voteUpdate", (votes) => {
         susPlayer != "initiator"
       ) {
         votes[susPlayer].forEach((votedPlayer) => {
-          console.log("session: " + sessionId + " voted: " + votedPlayer);
           ableToVote = !(sessionId == votedPlayer);
-          console.log("voteted: " + votedPlayer);
           $("#" + votedPlayer)
             .find(".hasVoted")
             .removeClass("hide");
@@ -103,7 +101,6 @@ socket.on("voteUpdate", (votes) => {
       }
     });
     votes.skip.forEach((votedPlayer) => {
-      console.log("session: " + sessionId + " voted: " + votedPlayer);
       ableToVote = !(sessionId == votedPlayer);
       $("#" + votedPlayer)
         .find(".hasVoted")
