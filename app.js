@@ -236,6 +236,7 @@ io.on("connection", (socket) => {
         );
       } else if (role == "crewmate") {
         socket.emit("task", interaction);
+        activeGames[clientRoomKey].players[socket.id].using = true;
       }
     }
   });
@@ -251,6 +252,7 @@ io.on("connection", (socket) => {
       }
     })
     io.to(clientRoomKey).emit("openTasks", OpenTasks[clientRoomKey]);
+    activeGames[clientRoomKey].players[socket.id].using = false;
   });
 
   //----------Emergency Meeting Events--------------------------------------

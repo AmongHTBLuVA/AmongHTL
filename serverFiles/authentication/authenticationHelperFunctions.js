@@ -25,6 +25,7 @@ module.exports = {
         Object.keys(activeGames[clientRoomKey].players).length
           ? "imposter"
           : "crewmate";
+      activeGames[clientRoomKey].players[id].using = false;
       connectedUsers[absClientId].role =
         activeGames[clientRoomKey].players[id].role;
     }
