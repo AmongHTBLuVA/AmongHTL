@@ -230,6 +230,7 @@ io.on("connection", (socket) => {
       ) {
         setMeeting(clientRoomKey, socket.id);
       } else if (interaction == -1) {
+        playerPos[clientRoomKey][socket.id].dead = "none";
         socket.emit(
           "meetingCooldown",
           Math.floor((activeGames[clientRoomKey].meetingCooldown - now.getTime()) / 1000)
