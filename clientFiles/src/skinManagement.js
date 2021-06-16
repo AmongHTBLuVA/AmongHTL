@@ -45,7 +45,6 @@ function setSkins(skins, sessionToSocketID) {
     }
     img.width = 70;
     img.height = 70;
-    console.log("session: " + sessionToSocketID[playerID].socketID);
     idToSkin[sessionToSocketID[playerID].socketID] = img;
     sessionIdToSkin[playerID] = img;
   });
@@ -53,7 +52,6 @@ function setSkins(skins, sessionToSocketID) {
 
 socket.on("assignSkins", (skins, sessionToSocketID) => {
   setSkins(skins, sessionToSocketID);
-  console.log(idToSkin);
 });
 
 export { idToSkin, sessionIdToSkin };

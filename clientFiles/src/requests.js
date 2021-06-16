@@ -8,7 +8,6 @@ $(document).ready(function () {
         e.preventDefault();
         if(getplayerRole() == "imposter"){
             let id = getId()
-            console.log(`sending kill request`);
             socket.emit("killRequest", id);
         }
     });

@@ -6,6 +6,7 @@ var userName = undefined;
 var playerRole = undefined;
 var TaskLocations = undefined;
 var OpenTasks = undefined;
+var roomKey = undefined;
 const mapName = "HTL3Floor";
 
 function setplayerRole(role) {
@@ -14,6 +15,14 @@ function setplayerRole(role) {
 
 function getplayerRole() {
   return playerRole;
+}
+
+function setRoomKey(key) {
+  roomKey = key;
+}
+
+function getRoomKey() {
+  return roomKey;
 }
 
 function setId(id) {
@@ -57,4 +66,19 @@ function getOpenTasks() {
   return false;
 }
 
-export { socket, setId, getId, setName, getName, getplayerRole, setplayerRole, setLocations, getLocations, setOpenTasks, getOpenTasks, mapName};
+export {
+  socket,
+  setId,
+  getId,
+  setName,
+  getName,
+  getplayerRole,
+  setplayerRole,
+  setLocations,
+  getLocations,
+  setOpenTasks,
+  getOpenTasks,
+  setRoomKey,
+  getRoomKey,
+  mapName,
+};

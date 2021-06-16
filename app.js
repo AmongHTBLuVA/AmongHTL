@@ -32,7 +32,7 @@ const { addKilledPlayer } = require("./serverFiles/evaluationFunctions.js");
 require("./router")(app);
 
 const reconnectionTime = 60000;
-const baseCooldown = 100000; //killcooldown = basecooldown / playerCount
+const baseCooldown = 200000; //killcooldown = basecooldown / playerCount
 const emergencyCooldown = 65000;
 
 //-----------------utility functions------------------------
@@ -241,22 +241,16 @@ io.on("connection", (socket) => {
   });
 
   socket.on("taskFinished", (taskId) => {
-    console.log(socket.id);
-    console.log(clientName);
-    console.log(OpenTasks + " | " + clientRoomKey + " | " + OpenTasks[clientRoomKey]);
-    /*if(OpenTasks[clientRoomKey].length == 1){
+    if(OpenTasks[clientRoomKey].length == 1){
       io.to(clientRoomKey).emit("gameEnd", "c", activeGames[clientRoomKey].players);
-      activeGames[roomId].state = "over";
+      activeGames[clientRoomKey].state = "over";
     }
-    let tmp = [];
-    taskId.forEach(e => {
-      if(e != taskId){
-        tmp.push(e);
+    OpenTasks[clientRoomKey].forEach((e, i) => {
+      if(e == taskId){
+        OpenTasks[clientRoomKey].splice(i, 1);
       }
     })
-    OpenTasks = tmp;*/
-    console.log("done");
-    socket.emit("closeTask");
+    io.to(clientRoomKey).emit("openTasks", OpenTasks[clientRoomKey]);
   });
 
   //----------Emergency Meeting Events--------------------------------------

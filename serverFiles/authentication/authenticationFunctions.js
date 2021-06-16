@@ -37,7 +37,7 @@ function copy(o) {
 function getTickSpeed(ping) {
   let tmp = Math.floor(ping / 10);
   tmp /= 3;
-  let tickSpeed = Math.max(40, Math.min(80, Math.floor(tmp * 10)));
+  let tickSpeed = Math.max(40, Math.min(60, Math.floor(tmp * 10)));
   speed = tickSpeed / (100 / SpeedPro100ms);
   return tickSpeed;
 }

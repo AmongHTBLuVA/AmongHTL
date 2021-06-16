@@ -13,7 +13,6 @@ socket.on("task", (type) => {
 
     var url = ""
 
-    console.log("task type: " + type);
     switch(type){
         case 0:
             url = "/Tasks/ClockTask";
@@ -36,7 +35,6 @@ socket.on("task", (type) => {
     }
 
     if (url.length > 0) {
-        console.log(url);
         $("#taskFrame").attr('src', url);
         $("#taskFrame").show();
     }

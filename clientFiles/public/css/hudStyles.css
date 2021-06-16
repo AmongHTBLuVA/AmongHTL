@@ -13,6 +13,7 @@
   position: absolute;
   bottom: 20px;
   right: 10px;
+  z-index: 23;
 }
 
 #buttonContainer > button {
@@ -52,8 +53,6 @@
 
 .triangleContainer {
   position: absolute;
-  top: 48vh;
-  left: 42vw;
 
   margin: 0;
   width: 320px;
@@ -71,4 +70,15 @@
   border-bottom: 30px solid gold;
 
   transform: rotate(-90deg);
+}
+
+#compassContainer{
+  position: absolute;
+  left:0;
+  top:0;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
