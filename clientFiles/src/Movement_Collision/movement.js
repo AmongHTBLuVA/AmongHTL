@@ -191,15 +191,15 @@ function setPlayerPositions(playerPos) {
         70
       );
       ctx.globalAlpha = 1.0;
+    } else {
+      ctx.drawImage(
+        backgroundTopLayer,
+        backgroundPos.x,
+        backgroundPos.y,
+        background.width,
+        background.height
+      );
     }
-  } else {
-    ctx.drawImage(
-      backgroundTopLayer,
-      backgroundPos.x,
-      backgroundPos.y,
-      background.width,
-      background.height
-    );
   }
 }
 
