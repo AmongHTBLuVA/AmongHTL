@@ -1,4 +1,10 @@
-import { socket, getId, getLocations, getOpenTasks, getRoomKey } from "/script/socket.js";
+import {
+  socket,
+  getId,
+  getLocations,
+  getOpenTasks,
+  getRoomKey,
+} from "/script/socket.js";
 import {
   background,
   killedOverlay,
@@ -117,6 +123,27 @@ function getDeltaPos() {
   return deltaPos;
 }
 
+function orderPlayers(playerPos) {
+  let tmp = [];
+  Object.keys(playerPos).forEach((e) => {
+    if (tmp[0]) {
+      let curr = playerPos[e];
+      let i = 0;
+      while (tmp[i] && curr.y > playerPos[tmp[i]].y) {
+        i++;
+      }
+      if (!tmp[i]) {
+        tmp.push(e);
+      } else {
+        tmp.splice(i, 0, e);
+      }
+    } else {
+      tmp.push(e);
+    }
+  });
+  return tmp;
+}
+
 function setPlayerPositions(playerPos) {
   if (idToSkin) {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
@@ -129,16 +156,8 @@ function setPlayerPositions(playerPos) {
       background.width,
       background.height
     );
-    if (!deadPlayerPos) {
-      ctx.drawImage(
-        idToSkin[getId()],
-        round(getWidth() / 2) - 30,
-        round(getHeight() / 2) - 30,
-        70,
-        70
-      );
-    }
-    Object.keys(playerPos).forEach((id) => {
+    let playerOrder = orderPlayers(playerPos);
+    playerOrder.forEach((id) => {
       if (
         (id != getId() || deadPlayerPos) &&
         pos &&
@@ -149,6 +168,16 @@ function setPlayerPositions(playerPos) {
         ctx.drawImage(idToSkin[id], relativPos.x, relativPos.y, 70, 70);
         if (playerPos[id].dead) {
           ctx.drawImage(killedOverlay, relativPos.x, relativPos.y, 70, 70);
+        }
+      } else if (id == getId()) {
+        if (!deadPlayerPos) {
+          ctx.drawImage(
+            idToSkin[getId()],
+            round(getWidth() / 2) - 30,
+            round(getHeight() / 2) - 30,
+            70,
+            70
+          );
         }
       }
     });
@@ -162,15 +191,15 @@ function setPlayerPositions(playerPos) {
         70
       );
       ctx.globalAlpha = 1.0;
-    } else {
-      ctx.drawImage(
-        backgroundTopLayer,
-        backgroundPos.x,
-        backgroundPos.y,
-        background.width,
-        background.height
-      );
     }
+  } else {
+    ctx.drawImage(
+      backgroundTopLayer,
+      backgroundPos.x,
+      backgroundPos.y,
+      background.width,
+      background.height
+    );
   }
 }
 
@@ -190,14 +219,13 @@ function translatePlayerPosistion(ppos, cpos) {
   return { x: getWidth() / 2 - 30 + xdiff, y: getHeight() / 2 - 30 + ydiff };
 }
 
-
 // task compass functions - update at every tick
 
 function getAngle(cx, cy, ex, ey) {
   let dy = ey - cy;
   let dx = ex - cx;
   let theta = Math.atan2(dy, dx);
-  theta *= 180 / Math.PI; 
+  theta *= 180 / Math.PI;
   let dist = Math.sqrt(Math.pow(dy, 2) + Math.pow(dx, 2));
   theta = dist <= 160 ? false : theta;
   return theta;
@@ -208,20 +236,22 @@ function updateCompass(playerPos) {
   let openTasks = getOpenTasks();
   let locations = getLocations();
 
-  if (deadPlayerPos) 
-    playerPos = deadPlayerPos;
-  
+  if (deadPlayerPos) playerPos = deadPlayerPos;
+
   if (openTasks) {
-    $("[id*=triangleContainer]").each(function () { 
+    $("[id*=triangleContainer]").each(function () {
       if (openTasks.includes(taskIdx)) {
-          let location = locations[taskIdx + 1];
-          let angle = getAngle(location.x, location.y, playerPos.x, playerPos.y);
-          if(angle){
-            $("#triangleContainer" + taskIdx).show();
-            $("#triangleContainer" + taskIdx).css("transform", `rotate(${angle}deg)`);
-          }else{
-            $("#triangleContainer" + taskIdx).hide();
-          }
+        let location = locations[taskIdx + 1];
+        let angle = getAngle(location.x, location.y, playerPos.x, playerPos.y);
+        if (angle) {
+          $("#triangleContainer" + taskIdx).show();
+          $("#triangleContainer" + taskIdx).css(
+            "transform",
+            `rotate(${angle}deg)`
+          );
+        } else {
+          $("#triangleContainer" + taskIdx).hide();
+        }
       } else {
         $("#triangleContainer" + taskIdx).hide();
       }

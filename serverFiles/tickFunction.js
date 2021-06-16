@@ -20,7 +20,7 @@ module.exports = {
           speed
         );
       });
-      io.to(clientRoomKey).emit("playerMovement", playerPos[clientRoomKey]);
+      io.to(clientRoomKey).emit("playerMovement", JSON.parse(JSON.stringify(playerPos[clientRoomKey])));
       //socket.emit("drawBorders", copy(clientBorders), copy(mergedPos)); //DEBUG
     }
   },
