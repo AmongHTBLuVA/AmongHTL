@@ -198,6 +198,8 @@ function getAngle(cx, cy, ex, ey) {
   let dx = ex - cx;
   let theta = Math.atan2(dy, dx);
   theta *= 180 / Math.PI; 
+  let dist = Math.sqrt(Math.pow(dy, 2) + Math.pow(dx, 2));
+  theta = dist <= 160 ? false : theta;
   return theta;
 }
 
@@ -214,7 +216,12 @@ function updateCompass(playerPos) {
       if (openTasks.includes(taskIdx)) {
           let location = locations[taskIdx + 1];
           let angle = getAngle(location.x, location.y, playerPos.x, playerPos.y);
-          $("#triangleContainer" + taskIdx).css("transform", `rotate(${angle}deg)`);
+          if(angle){
+            $("#triangleContainer" + taskIdx).show();
+            $("#triangleContainer" + taskIdx).css("transform", `rotate(${angle}deg)`);
+          }else{
+            $("#triangleContainer" + taskIdx).hide();
+          }
       } else {
         $("#triangleContainer" + taskIdx).hide();
       }
