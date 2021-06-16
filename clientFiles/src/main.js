@@ -55,6 +55,13 @@ $(document).on("ready", () => {
   canvas.height = height;
 });
 
+$(window).resize(() => {
+  height = window.innerHeight;
+  width = window.innerWidth;
+  canvas.width = width;
+  canvas.height = height;
+})
+
 export {
   background,
   killedOverlay,
