@@ -1,5 +1,3 @@
-import { socket } from "/script/socket.js";
-
 window.addEventListener('load', function () {
     var scContainer = document.getElementById('boardContainer');
     var sc = new ScratchCard('#boardContainer', {
@@ -15,7 +13,7 @@ window.addEventListener('load', function () {
         nPoints: 30,
         pointSize: 4,
         callback: function () {
-            socket.emit("taskFinished", 5);
+            window.parent.endTask(5);
         }
     })
 

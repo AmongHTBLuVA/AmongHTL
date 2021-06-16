@@ -1,4 +1,4 @@
-import { socket, getId, getLocations, getOpenTasks } from "/script/socket.js";
+import { socket, getId, getLocations, getOpenTasks, getRoomKey } from "/script/socket.js";
 import {
   background,
   killedOverlay,

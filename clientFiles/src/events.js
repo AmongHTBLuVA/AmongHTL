@@ -6,8 +6,16 @@ import {
   setLocations,
   getplayerRole,
   setOpenTasks,
+  setRoomKey,
 } from "/script/socket.js";
 import { idToSkin } from "/script/skinManagement.js";
+
+window.endTask = function (taskID) {
+  setTimeout(() => {
+    socket.emit("taskFinished", taskID);
+    $("#taskFrame").hide();
+  }, 500);
+};
 
 socket.on("connect", () => {});
 
@@ -43,11 +51,6 @@ socket.on("checkLogOn", (oldName, absID) => {
 
 socket.on("openTasks", (tasks) => {
   setOpenTasks(tasks);
-});
-
-socket.on("closeTask", () => {
-  console.log("hide");
-  $("#taskFrame").hide();
 });
 
 var cooldownDsp = 0;
@@ -101,8 +104,9 @@ function logOn(userName) {
   $("#userNameLabel").removeClass("hide");
   let path = window.location.pathname;
   let key = path.substr(1, path.length - 1);
+  let parts = key.split("/");
+  setRoomKey(parts[parts.length - 1]);
   setName(userName);
-  console.log(mapName);
   socket.emit("authenticated", userName, key, mapName);
 }
 
@@ -140,52 +144,52 @@ function gameEnd(players, outcome) {
   $(".crwMateText").hide();
   $(".playerDisplay").empty();
   console.log(Object.keys(players).length);
-    Object.keys(players).forEach((playerID) => {
-      console.log(players[playerID]);
-      if (
-        (outcome == "c" && players[playerID].role != "imposter") ||
-        (outcome == "i" && players[playerID].role == "imposter")
-      ) {
-        let iSize = Math.floor(
-          size *
-            (1 -
-              (Math.abs(margin) / marginMax) *
-                (Math.abs(margin) / marginOffset) *
-                sizeOffset)
-        );
-        iSize = iSize == 0 ? 1 : iSize;
-        let posneg = margin < 0 ? -1 : 1;
-        $(".playerDisplay").append(
-          `<img src='${idToSkin[playerID].src}'` +
-            "style='margin-bottom: " +
-            Math.abs(margin) +
-            "px;" +
-            "width:" +
-            iSize +
-            "px;" +
-            "height:" +
-            iSize +
-            "px;" +
-            "position:absolute;" +
-            "left:" +
-            Math.floor(
-              (Math.abs(margin) / marginMax) *
-                (iSize + 260) *
-                (playerCount / 2.6) *
-                posneg
-            ) +
-            "px;" +
-            "z-index:" +
-            (marginMax - Math.abs(margin)) +
-            ";" +
-            "filter: brightness(" +
-            (1 - (Math.abs(margin) / (marginOffset * 10)) * 1.2) +
-            ");'></img>"
-        );
-        margin += marginOffset;
-        i++;
-      }
-    });
+  Object.keys(players).forEach((playerID) => {
+    console.log(players[playerID]);
+    if (
+      (outcome == "c" && players[playerID].role != "imposter") ||
+      (outcome == "i" && players[playerID].role == "imposter")
+    ) {
+      let iSize = Math.floor(
+        size *
+          (1 -
+            (Math.abs(margin) / marginMax) *
+              (Math.abs(margin) / marginOffset) *
+              sizeOffset)
+      );
+      iSize = iSize == 0 ? 1 : iSize;
+      let posneg = margin < 0 ? -1 : 1;
+      $(".playerDisplay").append(
+        `<img src='${idToSkin[playerID].src}'` +
+          "style='margin-bottom: " +
+          Math.abs(margin) +
+          "px;" +
+          "width:" +
+          iSize +
+          "px;" +
+          "height:" +
+          iSize +
+          "px;" +
+          "position:absolute;" +
+          "left:" +
+          Math.floor(
+            (Math.abs(margin) / marginMax) *
+              (iSize + 260) *
+              (playerCount / 2.6) *
+              posneg
+          ) +
+          "px;" +
+          "z-index:" +
+          (marginMax - Math.abs(margin)) +
+          ";" +
+          "filter: brightness(" +
+          (1 - (Math.abs(margin) / (marginOffset * 10)) * 1.2) +
+          ");'></img>"
+      );
+      margin += marginOffset;
+      i++;
+    }
+  });
 }
 
 export { logOn };
