@@ -162,7 +162,7 @@ function setPlayerPositions(playerPos) {
         (id != getId() || deadPlayerPos) &&
         pos &&
         playerPos[id] &&
-        (playerPos[id].x != 0 || playerPos[id].y != 0)
+        (!playerPos[id].dead)
       ) {
         let relativPos = translatePlayerPosistion(playerPos[id], pos);
         ctx.drawImage(idToSkin[id], relativPos.x, relativPos.y, 70, 70);
