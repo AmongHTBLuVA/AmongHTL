@@ -7,12 +7,15 @@ for(let i=0; i<3; i++){
   combination[i] = Math.floor(Math.random() * 100);
 }
 
+var startAngle = 0;
 function getAngle(center, pos) {
   let dy = pos.y - center.y;
   let dx = pos.x - center.x;
   let theta = Math.atan2(dy, dx);
   theta *= 180 / Math.PI;
   theta -= 270;
+  theta -= startAngle;
+  console.log(startAngle);
   if (theta <= 0) {
     theta += 360;
   }
@@ -70,6 +73,7 @@ $(document).ready(function () {
   $(".lockPick").mouseup((event) => {
     event.stopPropagation();
     let num = degToNum(-angle);
+    startAngle = getAngle(center, { x: event.clientX, y: event.clientY });
     if(num -1 <= combination[currComb] && num +1 >= combination[currComb]){
       currComb++;
       $("#innerLock").css("transform", `rotate(0deg)`);
@@ -85,6 +89,7 @@ $(document).ready(function () {
   
   $("#lockdrag").mousedown((e) => {
     e.stopPropagation();
+    startAngle = getAngle(center, { x: e.clientX, y: e.clientY });
     drag = true;
   });
 });
