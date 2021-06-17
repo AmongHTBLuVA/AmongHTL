@@ -15,7 +15,6 @@ function getAngle(center, pos) {
   theta *= 180 / Math.PI;
   theta -= 270;
   theta -= startAngle;
-  console.log(startAngle);
   if (theta <= 0) {
     theta += 360;
   }
