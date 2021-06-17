@@ -1,20 +1,101 @@
+@import url('https://fonts.googleapis.com/css2?family=Shadows+Into+Light&display=swap');
+
 body {
   width: 100%;
   height: 100%;
+  user-select: none;
   overflow: hidden;
-  background-image: url(./images/locker.png);
+  background-image: url(./images/closedLocker.png);
   background-repeat: no-repeat;
   background-position: center center;
   background-size: cover;
   background-attachment: fixed;
 }
 
-img {
+#postIt{
   position: absolute;
-  top: "your percentage";
+  left: 360px;
+  top: 200px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+#postIt img{
+  width: 105px;
+  height: 80px;
+}
+
+#combinationText{
+  font-family: "Shadows Into Light";
+  position: absolute;
+  z-index: 10;
+  font-size: 15pt;
+  font-weight: bold;
+}
+
+#container{
+  position: absolute;
+  z-index: 9;
+  top: 0;
   left: 0;
-  right: 700px;
-  margin: 0 auto;
-  max-width: 400px;
-  height: auto;
+  width: 100%;
+  height: 100%;
+}
+
+#lockdrag{
+  width: 100%;
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.lockPick{
+  z-index: 11;
+  background-color: #1d7138;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);  
+  width: 580px;
+  height: 580px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border: 2px solid black;
+}
+
+.lockPick img{
+  width: 450px;
+  height: 450px;
+  z-index: 15;
+  position: absolute;
+}
+
+
+#zoomLock{
+  background-color: transparent;
+  border: none;
+  width: 70px;
+  height: 70px;
+  z-index: 10;
+  border-radius: 50%;
+  position: absolute;
+  top: 250px;
+  left: 288px;
+  outline: none;
+}
+
+#bread{
+  position: absolute;
+  width: 200px;
+  height: 120px;
+  left: 280px;
+  top: 69px;
+  z-index: 20;
+}
+
+.hide {
+  display: none;
 }
