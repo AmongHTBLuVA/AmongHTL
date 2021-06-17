@@ -12,15 +12,20 @@ module.exports = {
   tick: function tick(clientRoomKey, speed) {
     if (activeGames[clientRoomKey].state == "alive") {
       Object.keys(playerPos[clientRoomKey]).forEach((id) => {
-        movePlayer(
-          deltaPositions[clientRoomKey][id],
-          socketToSessionID[id],
-          id,
-          clientRoomKey,
-          speed
-        );
+        if (!activeGames[clientRoomKey].players[id].using) {
+          movePlayer(
+            deltaPositions[clientRoomKey][id],
+            socketToSessionID[id],
+            id,
+            clientRoomKey,
+            speed
+          );
+        }
       });
-      io.to(clientRoomKey).emit("playerMovement", JSON.parse(JSON.stringify(playerPos[clientRoomKey])));
+      io.to(clientRoomKey).emit(
+        "playerMovement",
+        JSON.parse(JSON.stringify(playerPos[clientRoomKey]))
+      );
       //socket.emit("drawBorders", copy(clientBorders), copy(mergedPos)); //DEBUG
     }
   },

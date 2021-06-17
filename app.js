@@ -230,12 +230,14 @@ io.on("connection", (socket) => {
       ) {
         setMeeting(clientRoomKey, socket.id);
       } else if (interaction == -1) {
+        playerPos[clientRoomKey][socket.id].dead = "none";
         socket.emit(
           "meetingCooldown",
           Math.floor((activeGames[clientRoomKey].meetingCooldown - now.getTime()) / 1000)
         );
       } else if (role == "crewmate") {
         socket.emit("task", interaction);
+        activeGames[clientRoomKey].players[socket.id].using = true;
       }
     }
   });
@@ -251,6 +253,7 @@ io.on("connection", (socket) => {
       }
     })
     io.to(clientRoomKey).emit("openTasks", OpenTasks[clientRoomKey]);
+    activeGames[clientRoomKey].players[socket.id].using = false;
   });
 
   //----------Emergency Meeting Events--------------------------------------

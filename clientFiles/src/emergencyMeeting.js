@@ -41,6 +41,7 @@ socket.on("startEmergencyMeeting", (players) => {
   $("#voteForSkip").empty();
   $("#playersContainer").empty();
   $("#skipButton").prop("disabled", false);
+  $("#taskFrame").hide();
   players.forEach((p) => {
     let playerID = p.id;
     let playerImage = sessionIdToSkin[p.id].src;
