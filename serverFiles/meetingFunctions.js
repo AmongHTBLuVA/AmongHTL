@@ -96,7 +96,7 @@ function eject(roomKey) {
   let ejected = evaluateVote(votes[roomKey]);
   if (ejected != "tie") {
     playerPos[roomKey][connectedUsers[ejected].socketID] = { x: 0, y: 0 };
-    addKilledPlayer(roomKey, connectedUsers[ejected].socketID);
+    addKilledPlayer(roomKey, connectedUsers[ejected].socketID, "none");
     playerPos[roomKey][connectedUsers[ejected].socketID].dead = "none";
     let player = {};
     player.name = connectedUsers[ejected].name;

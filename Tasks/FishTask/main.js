@@ -65,6 +65,7 @@ $("#canvas").mouseup((e) => {
     ctx.drawImage(fish, 200, 420, 150, 50);
   } else {
     ctx.drawImage(fish, 1000, 430, 150, 50);
+    parent.focus();
     window.parent.endTask(3);
   }
 });

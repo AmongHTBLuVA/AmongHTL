@@ -54,24 +54,26 @@ function checkInteraction(pos, roomKey, id) {
 
   if (pos.dead) {
     pos = deadPositions[roomKey][id];
-  }
-  Object.keys(playerPos[roomKey]).forEach((playerID) => {
-    if (playerPos[roomKey][playerID].dead && id != playerID) {
-      let element = playerPos[roomKey][playerID];
-      let right = Math.floor(element.x - (pos.x - hitbox));
-      let left = Math.floor(element.x - hitbox - pos.x);
-      let bottom = Math.floor(element.y + hitbox - pos.y);
-      let top = Math.floor(element.y - (pos.y + hitbox));
-      let inside =
-        ((right >= 0 && right <= hitbox) || (left <= 0 && left >= -hitbox)) &&
-        ((bottom >= 0 && bottom <= hitbox) || (top <= 0 && top >= -hitbox));
-      if (inside) {
-        playerPos[roomKey][playerID] = { x: 0, y: 0 };
-        killedPlayers[roomKey][socketToSessionID[playerID]] = { x: 0, y: 0 };
-        type = -2;
+  } else {
+    Object.keys(playerPos[roomKey]).forEach((playerID) => {
+      if (playerPos[roomKey][playerID].dead && id != playerID) {
+        let element = playerPos[roomKey][playerID];
+        let right = Math.floor(element.x - (pos.x - hitbox));
+        let left = Math.floor(element.x - hitbox - pos.x);
+        let bottom = Math.floor(element.y + hitbox - pos.y);
+        let top = Math.floor(element.y - (pos.y + hitbox));
+        let inside =
+          ((right >= 0 && right <= hitbox) || (left <= 0 && left >= -hitbox)) &&
+          ((bottom >= 0 && bottom <= hitbox) || (top <= 0 && top >= -hitbox));
+        if (inside) {
+          playerPos[roomKey][playerID] = { x: 0, y: 0 };
+          killedPlayers[roomKey][socketToSessionID[playerID]] = { x: 0, y: 0 };
+          type = -2;
+          playerPos[roomKey][playerID].dead = "none";
+        }
       }
-    }
-  });
+    });
+  }
   if (!type) {
     InteractableLocation[roomKey].forEach((element) => {
       if (element.id == -1) {
@@ -221,19 +223,20 @@ io.on("connection", (socket) => {
     );
     let role = connectedUsers[absClientId].role;
     let now = new Date();
-    if (interaction != undefined) {
+    if (interaction || JSON.stringify(interaction) == JSON.stringify(0)) {
       if (
         interaction == -2 ||
         (interaction == -1 &&
           (!activeGames[clientRoomKey].meetingCooldown ||
-            activeGames[clientRoomKey].meetingCooldown - now.getTime()<= 0))
+            activeGames[clientRoomKey].meetingCooldown - now.getTime() <= 0))
       ) {
         setMeeting(clientRoomKey, socket.id);
       } else if (interaction == -1) {
-        playerPos[clientRoomKey][socket.id].dead = "none";
         socket.emit(
           "meetingCooldown",
-          Math.floor((activeGames[clientRoomKey].meetingCooldown - now.getTime()) / 1000)
+          Math.floor(
+            (activeGames[clientRoomKey].meetingCooldown - now.getTime()) / 1000
+          )
         );
       } else if (role == "crewmate") {
         socket.emit("task", interaction);
@@ -243,15 +246,19 @@ io.on("connection", (socket) => {
   });
 
   socket.on("taskFinished", (taskId) => {
-    if(OpenTasks[clientRoomKey].length == 1){
-      io.to(clientRoomKey).emit("gameEnd", "c", activeGames[clientRoomKey].players);
+    if (OpenTasks[clientRoomKey].length == 1) {
+      io.to(clientRoomKey).emit(
+        "gameEnd",
+        "c",
+        activeGames[clientRoomKey].players
+      );
       activeGames[clientRoomKey].state = "over";
     }
     OpenTasks[clientRoomKey].forEach((e, i) => {
-      if(e == taskId){
+      if (e == taskId) {
         OpenTasks[clientRoomKey].splice(i, 1);
       }
-    })
+    });
     io.to(clientRoomKey).emit("openTasks", OpenTasks[clientRoomKey]);
     activeGames[clientRoomKey].players[socket.id].using = false;
   });
@@ -326,7 +333,7 @@ io.on("connection", (socket) => {
             let dist = calcDist(currPos, playerPos);
 
             if (dist <= 100) {
-              addKilledPlayer(clientRoomKey, playerId);
+              addKilledPlayer(clientRoomKey, playerId, true);
               if (!killCooldown) {
                 killCooldown =
                   baseCooldown / activeGames[clientRoomKey].playerCount;

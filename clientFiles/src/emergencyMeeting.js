@@ -94,7 +94,7 @@ socket.on("voteUpdate", (votes) => {
         susPlayer != "initiator"
       ) {
         votes[susPlayer].forEach((votedPlayer) => {
-          ableToVote = !(sessionId == votedPlayer);
+          ableToVote = !(sessionId == votedPlayer) && ableToVote;
           $("#" + votedPlayer)
             .find(".hasVoted")
             .removeClass("hide");
@@ -102,7 +102,7 @@ socket.on("voteUpdate", (votes) => {
       }
     });
     votes.skip.forEach((votedPlayer) => {
-      ableToVote = !(sessionId == votedPlayer);
+      ableToVote = !(sessionId == votedPlayer) && ableToVote;
       $("#" + votedPlayer)
         .find(".hasVoted")
         .removeClass("hide");

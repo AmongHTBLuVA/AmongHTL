@@ -61,6 +61,7 @@ $(".container").mouseup((e) => {
     min >= now.getMinutes() - 1 &&
     min <= now.getMinutes() + 1
   ) {
+    parent.focus();
     window.parent.endTask(0);
   }
 });

@@ -15,6 +15,7 @@ window.addEventListener("load", function () {
     nPoints: 30,
     pointSize: 6,
     callback: function () {
+      parent.focus();
       window.parent.endTask(4);
     },
   });
