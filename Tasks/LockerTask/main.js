@@ -76,6 +76,7 @@ $(document).ready(function () {
     startAngle = getAngle(center, { x: event.clientX, y: event.clientY });
     if(num -1 <= combination[currComb] && num +1 >= combination[currComb]){
       currComb++;
+      startAngle = 0;
       $("#innerLock").css("transform", `rotate(0deg)`);
       if(currComb == 3){
         $(".lockPick").hide();
