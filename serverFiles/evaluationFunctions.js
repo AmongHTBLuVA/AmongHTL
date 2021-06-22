@@ -17,7 +17,7 @@ function copy(o) {
 
 function checkKilledGameEnd(roomKey) {
   let i = true;
-  let c = activeGames[roomKey].playerCount - 1;
+  let c = Object.keys(activeGames[roomKey].players).length - 1;
   Object.keys(playerPos[roomKey]).forEach(playerID => {
     if(playerPos[roomKey][playerID].dead){
       if(activeGames[roomKey].players[playerID].role == "imposter"){
@@ -92,12 +92,12 @@ module.exports = {
     }
     return pos0;
   },
-  addKilledPlayer: function addKilledPlayer(roomId, playerId) {
+  addKilledPlayer: function addKilledPlayer(roomId, playerId, dead) {
     if (killedPlayers[roomId] == undefined) {
       killedPlayers[roomId] = {};
     }
     let absId = socketToSessionID[playerId];
-    playerPos[roomId][playerId].dead = true;
+    playerPos[roomId][playerId].dead = dead;
     killedPlayers[roomId][absId] = playerPos[roomId][playerId];
     let gameEnd = checkKilledGameEnd(roomId);
     if(gameEnd){
